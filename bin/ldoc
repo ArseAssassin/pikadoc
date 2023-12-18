@@ -1,0 +1,4 @@
+#!/usr/bin/env nix-shell
+#! nix-shell -i bash -p bash
+
+nu -e "use $(dirname "$0")/../ldoc.nu; ldoc use "$1

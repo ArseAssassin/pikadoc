@@ -1,0 +1,5 @@
+#!/usr/bin/env nix-shell
+#! nix-shell -i bash -p bash nodejs_20
+
+cd "$(dirname "$0")/.."
+node ldoc-html-to-md.js

@@ -14,6 +14,13 @@
             inherit system;
           };
           nodejs = pkgs.nodejs_20;
+          nu-fns = ./doc.nu;
+          bin = pkgs.writeScript "ldoc" ''
+            #!/usr/bin/env nix-shell
+            #! nix-shell -i bash -p bash
+
+            nu -e "source ${nu-fns}"
+          '';
         in
         rec {
           devShells.default = pkgs.mkShell {
@@ -41,8 +48,7 @@
             src = ./.;
             installPhase = ''
               mkdir -p $out/bin
-              cp $src/ldoc.nu $out
-              cp $src/bin/ldoc $out/bin
+              ln -s ${bin} $out/bin/ldoc
             '';
           };
 

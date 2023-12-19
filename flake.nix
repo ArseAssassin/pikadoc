@@ -14,7 +14,7 @@
             inherit system;
           };
           nodejs = pkgs.nodejs_20;
-          nu-fns = ./doc.nu;
+          nu-fns = ./doc;
 
         in
         rec {
@@ -29,7 +29,7 @@
                 #! nix-shell -i bash -p bash
 
                 PATH=$PATH:${pkgs.pandoc}/bin
-                nu -e "source ${nu-fns}"
+                nu -e "use doc"
               '';
             in pkgs.stdenv.mkDerivation {
               buildInputs = [pkgs.pandoc];
@@ -38,6 +38,7 @@
               src = ./.;
               installPhase = ''
                 mkdir -p $out/bin
+                cp -r $src/doc $out/doc
                 ln -s ${bin} $out/bin/pikadoc
               '';
             };

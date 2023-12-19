@@ -1,0 +1,95 @@
+- name: doc
+  summary: |
+    Returns a list of all available symbols in currently selected docs.
+  type:
+    - nothing
+    - table
+  returns: Summary of all available symbols
+  kind: command
+
+- name: doc <name>
+  summary: |
+    Returns a table of available symbols filtered by <name>
+  type:
+    - string
+    - table
+  returns: Summarized table of symbols filtered by <name>
+  parameters:
+    - name: name
+      summary: |
+        Search term that should be used for filtering. Symbols are filtered by their name, partial matches are included
+  kind: command
+
+- name: doc <name> <index>
+  summary: |
+    Returns symbol selected by <index> from table filtered by <name>
+
+  type:
+    - string
+    - int
+    - record
+
+  parameters:
+    - name: name
+      summary: |
+        Search term that should be used for filtering. Symbols are filtered by their name, partial matches are included
+    - name: index
+      summary: |
+        Index of the symbol to select. Shown on the left side of the table labeled by `#` when filtering symbols
+
+  returns: Record showing all fields belonging to the selected symbol
+
+  kind: command
+
+- name: doc <index>
+  summary: |
+    Returns symbol selected by <index> from all symbols
+  returns: Record showing all fields belonging to the selected symbol
+
+  type:
+    - int
+    - record
+
+  parameters:
+    - name: index
+      summary: |
+        Index of the symbol to select. Shown on the left side of the table labeled by `#` on the symbols table
+
+  kind: command
+
+- name: doc use <file>
+  summary: |
+    Sets currently selected docfile as <file>.
+
+  type:
+    - filepath
+    - nothing
+
+  parameters:
+    - name: file
+      summary: |
+        Path to a valid PikaDoc file
+
+  kind: command
+
+- name: doc get-from-devdocs-io <name> <file>
+  summary: |
+    Downloads, parses and generates a new pkd file based on the devdocs.io database. File is saved into <file>. Remember to call `doc use <file>` to start using the generated docs.
+
+  type:
+    - string
+    - filepath
+    - nothing
+
+  parameters:
+    - name: name
+      summary: |
+        Name of the file to download.
+        Downloaded from: https://downloads.devdocs.io/<name>.tar.gz
+        Check devdocs.io for a full list of available docs
+
+    - name: file
+      summary: Filename to use in your local filesystem
+
+  kind: command
+

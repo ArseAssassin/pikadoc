@@ -1,5 +1,5 @@
 {
-  description = "todo.yaml CLI";
+  description = "pikadoc CLI";
 
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-23.11";
@@ -15,44 +15,34 @@
           };
           nodejs = pkgs.nodejs_20;
           nu-fns = ./doc.nu;
-          bin = pkgs.writeScript "ldoc" ''
-            #!/usr/bin/env nix-shell
-            #! nix-shell -i bash -p bash
 
-            nu -e "source ${nu-fns}"
-          '';
         in
         rec {
           devShells.default = pkgs.mkShell {
-            packages = [pkgs.nushell packages.ldoc-html-to-md];
+            packages = [pkgs.nushell pkgs.pandoc];
           };
 
-          packages.ldoc-html-to-md = pkgs.buildNpmPackage rec {
-            nodejs = pkgs.nodejs_20;
+          packages.pikadoc =
+            let
+              bin = pkgs.writeScript "ldoc" ''
+                #!/usr/bin/env nix-shell
+                #! nix-shell -i bash -p bash
 
-            npmDepsHash = "sha256-ang52ZTO28f37LTlR+GJxKf9CPh4AVaahr34jcvvfQo=";
+                PATH=$PATH:${pkgs.pandoc}/bin
+                nu -e "source ${nu-fns}"
+              '';
+            in pkgs.stdenv.mkDerivation {
+              buildInputs = [pkgs.pandoc];
+              name = "pikadoc";
+              version = "0.1.0";
+              src = ./.;
+              installPhase = ''
+                mkdir -p $out/bin
+                ln -s ${bin} $out/bin/pikadoc
+              '';
+            };
 
-            name = "ldoc-html-to-md";
-            version = "0.1.0";
-            src = ./apps/ldoc-html-to-md;
-
-            installPhase = ''
-              mkdir -p $out/bin
-              mv * $out/lib/node_modules/lightdocs/* $out
-            '';
-          };
-
-          packages.ldoc = pkgs.stdenv.mkDerivation {
-            name = "ldoc";
-            version = "0.1.0";
-            src = ./.;
-            installPhase = ''
-              mkdir -p $out/bin
-              ln -s ${bin} $out/bin/ldoc
-            '';
-          };
-
-          packages.default = packages.ldoc;
+          packages.default = packages.pikadoc;
         }
       );
 }

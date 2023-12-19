@@ -1,45 +1,61 @@
 module doc {
   export def main [name?, index?] {
-    if ($name != null) {
-      let list = $env.LDOC_CURRENT|search $name
+    if (($name|describe) == 'int') {
+      $env.PKD_CURRENT|get $name|present
+    } else if ($name != null) {
+      let list = $env.PKD_CURRENT|search $name
 
       if ($index != null) {
-        $list|get $index
+        $list|get $index|present
       } else {
-        $list|summarize
+        $list|present-list
       }
     } else {
-      $env.LDOC_CURRENT
+      $env.PKD_CURRENT|present-list
+    }
+  }
+
+  def present-list [] {
+    if ($in|length) == 1 {
+      $in|get 0|present
+    } else {
+      $in|summarize-all
     }
   }
 
   export def-env use [docs] {
     let type = $docs|describe
     if ($type == 'string') {
-      $env.LDOC_CURRENT = (open $docs|from yaml)
+      $env.PKD_CURRENT = (open $docs|from yaml)
       $env.PROMPT_COMMAND_RIGHT = { $"using ($docs)" }
     } else {
-      $env.LDOC_CURRENT = $docs
+      $env.PKD_CURRENT = $docs
     }
   }
 
-  export def download-devdocs-io [name] {
+  def download-devdocs-io [name] {
     http get $"https://downloads.devdocs.io/($name).tar.gz"
   }
 
-  export def get-devdocs-io [name] {
+  def get-devdocs-io [name] {
     format-devdocs-io (download-devdocs-io $name)|to yaml
   }
 
-  export def format-devdocs-io [archive] {
+  def format-devdocs-io [archive:binary] {
     let htmldocs = $archive|tar -zx ./db.json -O|complete|get stdout|from json
     let docindex = $htmldocs|(
-      items {|key, doc| {$key: (
-        if ($doc|query web --query '.section' --as-html) != [] {
+      items {|key, doc|
+        let sections = $doc|query web --query '.section' --as-html
+        print $key
+        {$key: (
+        if ($sections != []) {
           $doc|query web --query '.section' --as-html|
-          each {|section| {
-            ($section|query web --query '*[id]' -a id|get 0?|default ''): $section
-          }}|
+          each {|section|
+            let ids = $section|query web --query '*[id]' -a id
+            print $ids
+            {
+              ($ids|get 0?|default ''): ($section)
+            }}|
           reduce --fold {} {|a, b| $a|merge $b}
         } else {
           let ids = $doc|query web --query '*[id]' -a id
@@ -53,13 +69,20 @@ module doc {
           }
 
           $ids|each {|id|
-            let start = find-id-start $id|default 0
+            let start = find-id-start $id
+
+            if ($start == (-1)) {
+              return [$id $doc]
+            }
+
             let endId = $doc|query web --query $"(find-id-query $id) ~ [id]" -a id|get 0?
             let end = if ($endId != null) {
               find-id-start $endId
             } else {
               -1
             }
+
+            print $"id ($id) start ($start) end ($end)"
 
             [$id ($doc|str substring $start..$end)]
           }|
@@ -72,11 +95,23 @@ module doc {
 
     $index.entries|each {|row|
       let uri = $row.path|parse --regex '(?<doc>[^#]+)(?<hash>#.+)?'|get 0
-      let doc = (if ($uri.hash == '' or $uri.hash == null) {
-        $htmldocs|get $uri.doc
+      print $uri
+      let doc = if ($uri.hash == '' or $uri.hash == null or $uri.hash == '#_') {
+        $htmldocs|get $uri.doc|html-to-md
       } else {
-        $docindex|get $uri.doc|get ($uri.hash|str substring 1..)
-      })|ldoc-html-to-md
+        let baseDoc = $docindex|get -i $uri.doc
+        if ($baseDoc == null) {
+          return ''
+        }
+
+        let idDoc = $baseDoc|get -i ($uri.hash|str substring 1..)
+
+        if ($idDoc == null) {
+          $htmldocs|get $uri.doc|html-to-md
+        } else {
+          $idDoc|html-to-md
+        }
+      }
 
       {
         name: $row.name,
@@ -84,6 +119,10 @@ module doc {
         description: $doc
       }
     }
+  }
+
+  export def get-from-devdocs-io [name, file] {
+    get-devdocs-io $name|save -f file
   }
 
   def search [name] {
@@ -94,16 +133,52 @@ module doc {
     less -S --chop-long-lines
   }
 
-  def "from ldoc" [] {
+  def "from pkd" [] {
     from yaml
   }
 
   def summarize [] {
-    select name? summary?
+    select name? summary?|trim-record-whitespace
+  }
+
+  def summarize-all [] {
+    each {|| summarize}
+  }
+
+  def map-record-values [block: closure] {
+    items $block|reduce --fold {} {|a, b| $b|merge $a}
+  }
+
+  def trim-record-whitespace [] {
+    map-record-values {|key, value| {
+      $key: (if (($value|describe) == 'string') {
+        $value|str trim
+      } else {
+        $value
+      })
+    }}
   }
 
   export def from-jsdoc [target] {
-    npx jsdoc -X $target|from json|where undocumented? != true|select longname? description? kind? scope? params? returns? type? comment?|rename name summary type
+    from json|where undocumented? != true|select longname? description? kind? scope? params? returns? type? comment?|rename name summary type
+  }
+
+  def html-to-md [] {
+    pandoc --from=html --to=gfm-raw_html
+  }
+
+  def present [] {
+    trim-record-whitespace
+    |maybe-update type {|| str join ' -> '}
+    |maybe-update parameters {|| each {|| trim-record-whitespace }}
+  }
+
+  def maybe-update [name, value] {
+    if ($in|get -i $name) != null {
+      update $name $value
+    } else {
+      $in
+    }
   }
 }
 

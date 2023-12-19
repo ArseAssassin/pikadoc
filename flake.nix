@@ -24,11 +24,11 @@
 
           packages.pikadoc =
             let
-              bin = pkgs.writeScript "ldoc" ''
+              bin = pkgs.writeScript "pikadoc" ''
                 #!/usr/bin/env nix-shell
-                #! nix-shell -i bash -p bash
+                #! nix-shell -i bash -p bash --pure
 
-                PATH=$PATH:${pkgs.pandoc}/bin
+                PATH=$PATH:${pkgs.pandoc}/bin:${pkgs.nushell}/bin
                 nu -e "use doc"
               '';
             in pkgs.stdenv.mkDerivation {

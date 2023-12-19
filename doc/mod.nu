@@ -66,10 +66,6 @@ def trim-record-whitespace [] {
   }}
 }
 
-export def from-jsdoc [target] {
-  from json|where undocumented? != true|select longname? description? kind? scope? params? returns? type? comment?|rename name summary type
-}
-
 def html-to-md [] {
   pandoc --from=html --to=gfm-raw_html
 }

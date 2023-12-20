@@ -18,7 +18,40 @@
         "type": "github"
       }
     },
+    "naersk": {
+      "inputs": {
+        "nixpkgs": "nixpkgs"
+      },
+      "locked": {
+        "lastModified": 1698420672,
+        "narHash": "sha256-/TdeHMPRjjdJub7p7+w55vyABrsJlt5QkznPYy55vKA=",
+        "owner": "nix-community",
+        "repo": "naersk",
+        "rev": "aeb58d5e8faead8980a807c840232697982d47b9",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "ref": "master",
+        "repo": "naersk",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
+      "locked": {
+        "lastModified": 1703063446,
+        "narHash": "sha256-e59l84kPNX+clUJUvHJ6+0C3Tw+gYeJn/QaH1dr/3kg=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "7c33cd6bf01cf09f77bfdf6741cddfffa2cd5640",
+        "type": "github"
+      },
+      "original": {
+        "id": "nixpkgs",
+        "type": "indirect"
+      }
+    },
+    "nixpkgs_2": {
       "locked": {
         "lastModified": 1702780907,
         "narHash": "sha256-blbrBBXjjZt6OKTcYX1jpe9SRof2P9ZYWPzq22tzXAA=",
@@ -33,10 +66,27 @@
         "type": "indirect"
       }
     },
+    "nushell": {
+      "flake": false,
+      "locked": {
+        "dirtyRev": "109f629cb6f846ee7d7ec9baf75d28d6883e02dc-dirty",
+        "dirtyShortRev": "109f629cb-dirty",
+        "lastModified": 1703103821,
+        "narHash": "sha256-9bKIx3+hQqSGMK/x9PK0NVbzurGoP9lAbRnc18RjRBA=",
+        "type": "git",
+        "url": "file:///home/tuomas/projects/nushell"
+      },
+      "original": {
+        "type": "git",
+        "url": "file:///home/tuomas/projects/nushell"
+      }
+    },
     "root": {
       "inputs": {
         "flake-utils": "flake-utils",
-        "nixpkgs": "nixpkgs"
+        "naersk": "naersk",
+        "nixpkgs": "nixpkgs_2",
+        "nushell": "nushell"
       }
     },
     "systems": {

@@ -4,23 +4,28 @@
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-23.11";
     flake-utils.url = "github:numtide/flake-utils";
+    naersk.url = "github:nix-community/naersk/master";
+    nushell = {
+      url = "git+file:///home/tuomas/projects/nushell";
+      flake = false;
+    };
   };
 
-  outputs = { self, nixpkgs, flake-utils }:
+  outputs = { self, nixpkgs, flake-utils, nushell, naersk }:
     flake-utils.lib.eachDefaultSystem
       (system:
         let
           pkgs = import nixpkgs {
             inherit system;
           };
-          nodejs = pkgs.nodejs_20;
-          nu-fns = ./doc;
-
         in
         rec {
-          devShells.default = pkgs.mkShell {
-            packages = [pkgs.nushell pkgs.pandoc];
-          };
+          packages.nu_plugin_query =
+            let
+              naersk' = pkgs.callPackage naersk {};
+            in naersk'.buildPackage {
+              src = ./.;
+            };
 
           packages.pikadoc =
             let
@@ -29,10 +34,11 @@
                 #! nix-shell -i bash -p bash --pure
 
                 PATH=$PATH:${pkgs.pandoc}/bin:${pkgs.nushell}/bin
-                nu -e "use doc"
+                HOME=$HOME"/.config/pikadoc"
+                nu -e "register ${packages.nu_plugin_query}/bin/nu_plugin_query"
               '';
             in pkgs.stdenv.mkDerivation {
-              buildInputs = [pkgs.pandoc];
+              buildInputs = [];
               name = "pikadoc";
               version = "0.1.0";
               src = ./.;

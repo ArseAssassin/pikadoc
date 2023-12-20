@@ -1,0 +1,11 @@
+[package]
+name = "pikadoc"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+nu-plugin = "0.88.1"
+nu_plugin_query = "0.88.1"
+

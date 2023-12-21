@@ -29,13 +29,14 @@
 
           packages.pikadoc =
             let
+              src = ./.;
               bin = pkgs.writeScript "pikadoc" ''
                 #!/usr/bin/env nix-shell
                 #! nix-shell -i bash -p bash --pure
 
                 PATH=$PATH:${pkgs.pandoc}/bin:${pkgs.nushell}/bin
-                HOME=$HOME"/.config/pikadoc"
-                nu -e "register ${packages.nu_plugin_query}/bin/nu_plugin_query"
+
+                nu -e "register ${packages.nu_plugin_query}/bin/nu_plugin_query; use ${src}/doc" --config $PKD_CONFIG_DIR"/config.nu" --plugin-config $HOME"/.config/pikadoc"
               '';
             in pkgs.stdenv.mkDerivation {
               buildInputs = [];

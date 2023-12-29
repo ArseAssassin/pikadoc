@@ -82,6 +82,12 @@ def format [archive:binary] {
   }
 }
 
+# Downloads and parses documentation from devdocs.io.
+#
+# `name` is the name of the docset in the devdocs.io database
+# `file` is the file to save locally
+#
+# Example: doc src:devdocs save-to-file nushell nushell.pkd
 export def save-to-file [name, file] {
   format (download $name)|save -f file
 }

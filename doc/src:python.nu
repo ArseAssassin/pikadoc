@@ -34,6 +34,13 @@ def get-signature [] {
   |reduce --fold {} {|a, b| $b|merge $a}
 }
 
+# Parses a doctable from a HTML documentation page generated using sphinx.
+#
+# `in` should be a valid sphinx HTML document
+#
+# Example: http get 'https://flask.palletsprojects.com/en/3.0.x/api/'|doc src:python parse-from-sphinx-html
+#
+# NOTE: This command parses only a single HTML page. Sphinx documentation typically consists of multiple documents and a single page might not contain all the references you're looking for. To index all symbols, make sure to parse all relevant pages, or use the `singlehtml` builder in Sphinx to produce a single page documentation.
 export def parse-from-sphinx-html [] {
   let $doc = $in
   let classes = (
@@ -66,6 +73,7 @@ export def parse-from-sphinx-html [] {
       )
     }|flatten
   )
+
   let functions = (
     $doc|query web --query '.py.function' --as-html
     |each {|html|
@@ -80,5 +88,5 @@ export def parse-from-sphinx-html [] {
     }
   )
 
-  [$classes $functions]|flatten
+  $classes|append $functions
 }

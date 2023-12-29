@@ -20,6 +20,19 @@
           };
         in
         rec {
+          devShells.default = pkgs.mkShell {
+            packages = [
+              pkgs.pandoc
+              pkgs.nushell
+              pkgs.mdcat
+            ];
+
+            shellHook = ''
+              export PKD_PATH=`pwd`/doc
+              nu -e "use "$PKD_PATH --plugin-config $HOME"/.config/pikadoc/plugin.nu"
+            '';
+          };
+
           packages.nu_plugin_query =
             let
               naersk' = pkgs.callPackage naersk {};
@@ -32,11 +45,14 @@
               src = ./.;
               bin = pkgs.writeScript "pikadoc" ''
                 #!/usr/bin/env nix-shell
-                #! nix-shell -i bash -p bash --pure
+                #! nix-shell -i bash -p bash
 
-                PATH=$PATH:${pkgs.pandoc}/bin:${pkgs.nushell}/bin
+                PATH=$PATH:${pkgs.pandoc}/bin:${pkgs.nushell}/bin:${pkgs.mdcat}/bin
+                export PKD_PATH="${src}/doc"
+                mkdir -p $HOME"/.config/pikadoc"
 
-                nu -e "register ${packages.nu_plugin_query}/bin/nu_plugin_query; use ${src}/doc" --config $PKD_CONFIG_DIR"/config.nu" --plugin-config $HOME"/.config/pikadoc"
+                touch $HOME"/.config/pikadoc/plugin.nu"
+                nu -e "register ${packages.nu_plugin_query}/bin/nu_plugin_query; use $PKD_PATH" --plugin-config $HOME"/.config/pikadoc/plugin.nu"
               '';
             in pkgs.stdenv.mkDerivation {
               buildInputs = [];

@@ -1,5 +1,5 @@
 def download [name] {
-  http get $"https://downloads.devdocs.io/($name).tar.gz"|to yaml
+  http get $"https://downloads.devdocs.io/($name).tar.gz"
 }
 
 def format [archive:binary] {
@@ -7,13 +7,11 @@ def format [archive:binary] {
   let docindex = $htmldocs|(
     items {|key, doc|
       let sections = $doc|query web --query '.section' --as-html
-      print $key
       {$key: (
       if ($sections != []) {
         $doc|query web --query '.section' --as-html|
         each {|section|
           let ids = $section|query web --query '*[id]' -a id
-          print $ids
           {
             ($ids|get 0?|default ''): ($section)
           }}|
@@ -43,8 +41,6 @@ def format [archive:binary] {
             -1
           }
 
-          print $"id ($id) start ($start) end ($end)"
-
           [$id ($doc|str substring $start..$end)]
         }|
         reduce --fold {} { |row, memo| $memo|merge {($row|get 0): $row.1} }
@@ -52,11 +48,14 @@ def format [archive:binary] {
     )}}
   )|reduce {|a, b| $a|merge $b}
 
-  let index = $archive|tar -zx ./index.json -O|complete|get stdout|from json
-
-  $index.entries|each {|row|
+  $archive
+  |tar -zx ./index.json -O
+  |complete
+  |get stdout
+  |from json
+  |get entries
+  |each {|row|
     let uri = $row.path|parse --regex '(?<doc>[^#]+)(?<hash>#.+)?'|get 0
-    print $uri
     let doc = if ($uri.hash == '' or $uri.hash == null or $uri.hash == '#_') {
       $htmldocs|get $uri.doc|html-to-md
     } else {
@@ -76,18 +75,53 @@ def format [archive:binary] {
 
     {
       name: $row.name,
-      summary: ($doc|lines|skip until {|line| $line =~ "^\\s*$"}|skip 1|get 0?),
+      summary: (
+        $doc
+        |lines
+        |skip until {|line| $line =~ "^[A-z]"}
+        |get 0?
+        |default ''
+        |split column '.'
+        |get column1?.0?
+        |default ''
+        |pandoc -f markdown_strict -t plain --wrap=none),
       description: $doc
     }
   }
 }
 
-# Downloads and parses documentation from devdocs.io.
+def html-to-md [] {
+  pandoc -f html -t markdown_strict --wrap=none
+}
+
+# Retrieves a list of available documentation files from devdocs.io and returns them as a table
+export def index [] {
+  let url = (
+    http get https://devdocs.io
+    |query web --query 'script' -a src
+    |filter {|it| $it|str starts-with '/assets/docs-'}
+    |get 0
+  )
+  http get $"https://devdocs.io/($url)"
+  |str replace 'app.DOCS = [ {' '[{'
+  |str replace '} ];' '}]'
+  |str replace --all '\x' ''
+  |from json
+  |select name slug version? links?.home?
+}
+
+# Downloads and parses documentation from devdocs.io and selects it as the current doctable
 #
-# `name` is the name of the docset in the devdocs.io database
-# `file` is the file to save locally
+# `slug` is the url slug of the documentation file. Use src:devdocs index for a complete list of available files
 #
-# Example: doc src:devdocs save-to-file nushell nushell.pkd
-export def save-to-file [name, file] {
-  format (download $name)|save -f file
+# Example: doc src:devdocs use nushell
+#
+# See also: doc src:devdocs index
+export def-env use [slug] {
+  $env.PKD_CURRENT = (format (download $slug))
+  $env.PKD_ABOUT = {
+    name: $slug
+    text_format: 'markdown'
+    generator: 'src:devdocs'
+  }
 }

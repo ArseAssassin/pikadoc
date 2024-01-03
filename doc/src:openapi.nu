@@ -11,7 +11,7 @@ def normalize-type [doc] {
     |parse "#/definitions/{type}"
     |get 0?
     |if ($in.type? != null) {
-      $in.type
+      $"definitions.($in.type)"
     }
   } else if ($doc.schema? != null) {
     normalize-type $doc.schema
@@ -88,4 +88,13 @@ export def parse-from-swagger [] {
       }
     }
   )
+}
+
+export def-env use [url] {
+  $env.PKD_CURRENT = (http get $url|parse-from-swagger)
+  $env.PKD_ABOUT = {
+    name: $url
+    text_format: 'gfm'
+    generator: 'src:openapi'
+  }
 }

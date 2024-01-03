@@ -19,3 +19,12 @@ export def parse-from-jsdoc [] {
     }
   }
 }
+
+export def-env use [path] {
+  $env.PKD_CURRENT = (jsdoc -X $path|parse-from-jsdoc)
+  $env.PKD_ABOUT = {
+    name: $path
+    text_format: 'plain'
+    generator: 'src:javascript'
+  }
+}

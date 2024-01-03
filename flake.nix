@@ -5,13 +5,10 @@
     nixpkgs.url = "nixpkgs/nixos-23.11";
     flake-utils.url = "github:numtide/flake-utils";
     naersk.url = "github:nix-community/naersk/master";
-    nushell = {
-      url = "git+file:///home/tuomas/projects/nushell";
-      flake = false;
-    };
+    nu-plugin.url = "path:./nu-plugins";
   };
 
-  outputs = { self, nixpkgs, flake-utils, nushell, naersk }:
+  outputs = { self, nixpkgs, flake-utils, naersk, nu-plugin }:
     flake-utils.lib.eachDefaultSystem
       (system:
         let
@@ -20,18 +17,21 @@
           };
         in
         rec {
-          devShells.default = pkgs.mkShell {
-            packages = [
-              pkgs.pandoc
-              pkgs.nushell
-              pkgs.mdcat
-            ];
+          # Devshell not necessary, just do `nix run #pikadoc`
 
-            shellHook = ''
-              export PKD_PATH=`pwd`/doc
-              nu -e "use "$PKD_PATH --plugin-config $HOME"/.config/pikadoc/plugin.nu"
-            '';
-          };
+          # devShells.default = pkgs.mkShell {
+          #   packages = [
+          #     pkgs.pandoc
+          #     pkgs.nushell
+          #     pkgs.mdcat
+          #     pkgs.groff
+          #   ];
+
+          #   shellHook = ''
+          #     export PKD_PATH=`pwd`/doc
+          #     nu -e "use "$PKD_PATH" ; source "$PKD_PATH"/../init.nu" --plugin-config $HOME"/.config/pikadoc/plugin.nu"
+          #   '';
+          # };
 
           packages.nu_plugin_query =
             let
@@ -47,12 +47,12 @@
                 #!/usr/bin/env nix-shell
                 #! nix-shell -i bash -p bash
 
-                PATH=$PATH:${pkgs.pandoc}/bin:${pkgs.nushell}/bin:${pkgs.mdcat}/bin
+                PATH=$PATH:${pkgs.pandoc}/bin:${pkgs.nushell}/bin:${pkgs.mdcat}/bin:${pkgs.groff}/bin
                 export PKD_PATH="${src}/doc"
                 mkdir -p $HOME"/.config/pikadoc"
 
                 touch $HOME"/.config/pikadoc/plugin.nu"
-                nu -e "register ${packages.nu_plugin_query}/bin/nu_plugin_query; use $PKD_PATH" --plugin-config $HOME"/.config/pikadoc/plugin.nu"
+                nu -e "register ${nu-plugin.packages.${system}.nu_plugin_query}/bin/nu_plugin_query; use $PKD_PATH; source $PKD_PATH/../init.nu" --plugin-config $HOME"/.config/pikadoc/plugin.nu"
               '';
             in pkgs.stdenv.mkDerivation {
               buildInputs = [];

@@ -90,3 +90,12 @@ export def parse-from-sphinx-html [] {
 
   $classes|append $functions
 }
+
+export def-env use [url] {
+  $env.PKD_CURRENT = (http get $url|parse-from-sphinx-html)
+  $env.PKD_ABOUT = {
+    name: $url
+    text_format: 'markdown'
+    generator: 'src:python'
+  }
+}

@@ -85,3 +85,12 @@ export def document-module [name, path=[]] {
     |flatten
   )
 }
+
+export def-env use [name] {
+  $env.PKD_CURRENT = (document-module $name)
+  $env.PKD_ABOUT = {
+    name: $name
+    text_format: 'plain'
+    generator: 'src:man'
+  }
+}

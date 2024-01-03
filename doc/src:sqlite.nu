@@ -23,3 +23,12 @@ export def parse-from-db [] {
     kind: (if ($tbl.type == 'index') { 'index' } else { 'table' })
   }}
 }
+
+export def-env use [db] {
+  $env.PKD_CURRENT = (open $db|parse-from-db)
+  $env.PKD_ABOUT = {
+    name: $db
+    text_format: 'text'
+    generator: 'src:sqlite'
+  }
+}

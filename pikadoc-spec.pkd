@@ -1,0 +1,69 @@
+about:
+  name:         PikaDoc file specification
+  version:      0.1.0
+  author:       Tuomas Kanerva
+  generator:    none
+  date:         2023-29-12
+
+pikadoc:
+- name: name
+  namespace: pikadoc
+  summary: Name of the given symbol
+  description: |
+    Name of the symbol. Does not include its namespace. If symbol is a member of a class or some other data structure, name should be prefixed with the parent container's `name`. Module names should not be included here, but in `docs.namespace` instead.
+
+    If symbol is a REST endpoint, the name should be prefixed with its HTTP method.
+  seeAlso:
+    - `docs.namespace`
+  examples:
+    - summary: name of the symbol is `example`
+      example: example
+    - summary: symbol is a member of a class
+      example: ClassName.symbol
+    - summary: symbol is a REST endpoint
+      example: "GET /path/to/endpoint"
+    - summary: symbol is a REST endpoint including parameters
+      example: GET /path/to/endpoint/{parameter_name}
+    - summary: symbol is a database column
+      example: table_name.col_name
+
+  type: string
+  kind: property
+
+- name: summary
+  namespace: pikadoc
+  summary: Summary of the given symbol
+  description: |
+    A brief, human-readable description of this symbol. It should be short enough to fit on one line. Pikadoc CLI will show this alongside the name of the symbol when listing symbols.
+
+    When parsing docs from a body of text, this can be the first sentence, excluding any headers.
+  type: string
+  kind: property
+
+- name: description
+  namespace: pikadoc
+  summary: Long description of the given symbol
+  description: |
+    A free text field containing the full explanation of this symbol. GitHub Flavored Markdown can be used to render rich text elements - `mdcat` is used in the Pikadoc CLI to highlight the text.
+  type: string
+  kind: property
+
+- name: kind
+  namespace: pikadoc
+  type: string
+  summary: Metatype of the symbol
+  examples:
+    - summary: property of a class or data structure
+      description: symbol is a property of a class or data structure, often accessed using `object.name`
+      example: property
+    - summary: method of a class
+      example: method
+    - summary: function belonging to a module
+      example: function
+    - summary: database table
+      example: table
+    - summary: REST endpoint
+      example: rest-endpoint
+
+  type: string
+  kind: property

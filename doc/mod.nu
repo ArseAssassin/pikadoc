@@ -44,7 +44,9 @@ def present-list [] {
 export def-env use [docs] {
   let type = $docs|describe
   if ($type == 'string') {
-    $env.PKD_CURRENT = (open $docs|from yaml)
+    let file = (open $docs|from yaml)
+    $env.PKD_CURRENT = ($file|get doctable)
+    $env.PKD_ABOUT = ($file|get about)
   } else {
     $env.PKD_CURRENT = $docs
   }
@@ -55,8 +57,11 @@ export def-env all [] {
   $env.PKD_CURRENT
 }
 
-def search [name] {
-  find $name -c ["name"]
+# Summarizes current doctable and returns all symbols matching `$query`
+#
+# `$query` is the search term to be matched
+export def search [query] {
+  all|summarize-all|find $query
 }
 
 def show [] {
@@ -87,8 +92,12 @@ alias _save = save
 #
 # `in` is a valid doctable
 # `filepath` is a path to use for saving the file
-export def save [filepath] {
-  to yaml|_save -f $filepath
+export def save [filepath: string, about?: record, doctable?: table] {
+  {
+    about: ($about|default $env.PKD_ABOUT)
+    doctable: ($doctable|default $env.PKD_CURRENT)
+  }
+  |to yaml|_save -f $filepath
 }
 
 def map-record-values [block: closure] {
@@ -111,7 +120,14 @@ def html-to-md [] {
 
 def present [] {
   trim-record-whitespace
-  |maybe-update description {|| mdcat }
+  |maybe-update description {||
+    let $it = $in
+    if ($env.PKD_ABOUT.text_format == 'markdown') {
+       $it|mdcat
+    } else {
+      $it
+    }
+  }
   |maybe-update type {|| str join ' -> '}
   |maybe-update parameters {|| each {|| trim-record-whitespace }}
 }

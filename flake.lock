@@ -139,14 +139,18 @@
         "nixpkgs": "nixpkgs_4"
       },
       "locked": {
-        "lastModified": 1,
-        "narHash": "sha256-B4luT6aN7DPYJznoOVJccjf+bb6RPaJhk25PQaGPLEo=",
-        "path": "nu-plugins",
-        "type": "path"
+        "dir": "nu-plugins",
+        "dirtyRev": "33b8ea80639eabeee39a0cac6b026a4cdcc9f135-dirty",
+        "dirtyShortRev": "33b8ea8-dirty",
+        "lastModified": 1704388627,
+        "narHash": "sha256-r2KcnZ9/vRapJCTU7xvbUIARtO+gVdiQuymi8J2blhw=",
+        "type": "git",
+        "url": "file:.?dir=nu-plugins"
       },
       "original": {
-        "path": "nu-plugins",
-        "type": "path"
+        "dir": "nu-plugins",
+        "type": "git",
+        "url": "file:.?dir=nu-plugins"
       }
     },
     "root": {

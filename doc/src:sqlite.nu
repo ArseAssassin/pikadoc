@@ -24,6 +24,11 @@ export def parse-from-db [] {
   }}
 }
 
+# Queries a sqlite database for its tables and selects the output as the current doctable
+#
+# `db` is a path to your sqlite database
+#
+# Example: doc src:sqlite use ./my-database.db
 export def-env use [db] {
   $env.PKD_CURRENT = (open $db|parse-from-db)
   $env.PKD_ABOUT = {

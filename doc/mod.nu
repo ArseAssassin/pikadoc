@@ -1,6 +1,6 @@
 # Returns a summarized table of all available symbols in the currently selected docfile.
 #
-# If (name) is passed as an argument, results will be filtered by their name. If (index) is passed as an argument, only the selected result will be returned.
+# If `name` is passed as an argument, results will be filtered by their name. If `index` is passed as an argument, only the selected result will be returned.
 #
 # When a single result is found, it'll be presented using `doc present`. If more than one result is found, returned symbols will be summarized using `doc summarize`.
 export def main [name?, index?] {
@@ -119,17 +119,25 @@ def html-to-md [] {
 }
 
 def present [] {
-  trim-record-whitespace
-  |maybe-update description {||
-    let $it = $in
-    if ($env.PKD_ABOUT.text_format == 'markdown') {
-       $it|mdcat
-    } else {
-      $it
+  let output = $in
+    |trim-record-whitespace
+    |maybe-update description {||
+      let $it = $in
+      (if ($env.PKD_ABOUT.text_format == 'markdown') {
+         $it|mdcat
+      } else {
+        $it
+      })
     }
+    |maybe-update type {|| str join ' -> '}
+    |maybe-update parameters {|| each {|| trim-record-whitespace }}
+
+  if (($output.summary?|default ''|str trim) ==
+      ($output.description?|default ''|str trim)) {
+    $output|reject summary
+  } else {
+    $output
   }
-  |maybe-update type {|| str join ' -> '}
-  |maybe-update parameters {|| each {|| trim-record-whitespace }}
 }
 
 def maybe-update [name, value] {

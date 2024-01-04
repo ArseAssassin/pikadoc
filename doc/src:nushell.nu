@@ -42,16 +42,13 @@ def parse-from-help [help: string] {
           |parse --regex "(?<name>[^\\s]+) (?<type>[^:]+):[\\s]*(?<meta>.*)"
           |get 0?
         )
-
-        if ($it == null) {
-          print $line
-        }
+        let meta = $it.meta?|default ''
 
         {
           type: $it.type
           name: $it.name
-          defaultValue: ($it.meta|parse --regex 'default: (?<value>[^)]+)'|get 0?.value?|default null)
-          optional: ('optional,' in $it.meta)
+          defaultValue: ($meta|parse --regex 'default: (?<value>[^)]+)'|get 0?.value?|default null)
+          optional: ('optional' in $meta)
         }
       }
     )
@@ -81,11 +78,16 @@ export def document-module [name, path=[]] {
   })
   | append (
     $submodules
-    |each {|submodule| document-module $submodule.name ($name|append $path) }
+    |each {|submodule| (document-module $submodule.name ($name|append $path)) }
     |flatten
   )
 }
 
+# Generates doctable from nushell module with `name` and selects it as the current doctable
+#
+# `name` is the name of the top level command, e.g. "help"
+#
+# Example: doc src:nushell use "doc"
 export def-env use [name] {
   $env.PKD_CURRENT = (document-module $name)
   $env.PKD_ABOUT = {

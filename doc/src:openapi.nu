@@ -58,7 +58,7 @@ def parse-from-path [method, path, it] {
 
 # Returns documentation for a REST endpoint defined in a .json/.yaml file.
 #
-# `$in` is a record parsed from a valid Swagger .json/.yaml file
+# `in` is a record parsed from a valid Swagger .json/.yaml file
 #
 # Example: http get 'https://petstore.swagger.io/v2/swagger.json'|doc src:openapi parse-from-swagger
 export def parse-from-swagger [] {
@@ -90,6 +90,11 @@ export def parse-from-swagger [] {
   )
 }
 
+# Generates doctable from `url` to a valid Swagger .json/.ymal file and selects it as the current doctable
+#
+# `url` is fetched using a GET request
+#
+# Example: doc src:openapi use "https://petstore.swagger.io/v2/swagger.json"
 export def-env use [url] {
   $env.PKD_CURRENT = (http get $url|parse-from-swagger)
   $env.PKD_ABOUT = {

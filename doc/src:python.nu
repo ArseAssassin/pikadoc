@@ -91,6 +91,13 @@ export def parse-from-sphinx-html [] {
   $classes|append $functions
 }
 
+# Parses a HTML documentation page generated using sphinx and selects it as the current doctable
+#
+# `url` should be a URL to a sphinx-generated HTML page
+#
+# Example: doc src:python use "https://flask.palletsprojects.com/en/3.0.x/api/"
+#
+# NOTE: This parses only a single HTML page. If API documentation is spread over multiple files, see documentation for `parse-from-sphinx-html`
 export def-env use [url] {
   $env.PKD_CURRENT = (http get $url|parse-from-sphinx-html)
   $env.PKD_ABOUT = {

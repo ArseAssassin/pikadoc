@@ -20,10 +20,17 @@ export def parse-from-jsdoc [] {
   }
 }
 
-export def-env use [path] {
-  $env.PKD_CURRENT = (jsdoc -X $path|parse-from-jsdoc)
+# Uses `jsdoc` to generate a doctable from `filepath` and selects is the current doctable
+#
+# Make sure that `jsdoc` is installed in your `PATH` to use this command.
+#
+# `filepath` is a path to the source directory to generate docs from
+#
+# Example: doc src:javascript use "./node_modules/express/lib/"
+export def-env use [filepath] {
+  $env.PKD_CURRENT = (jsdoc -X $filepath|parse-from-jsdoc)
   $env.PKD_ABOUT = {
-    name: $path
+    name: $filepath
     text_format: 'plain'
     generator: 'src:javascript'
   }

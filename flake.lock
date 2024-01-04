@@ -139,18 +139,17 @@
         "nixpkgs": "nixpkgs_4"
       },
       "locked": {
-        "dir": "nu-plugins",
-        "dirtyRev": "91593d8128140a1991e0395c9eb1888c02e20ede-dirty",
-        "dirtyShortRev": "91593d8-dirty",
-        "lastModified": 1704389117,
-        "narHash": "sha256-L2g3nxzsAPz1xiwPmsS01mOZwbkDBNoYWlBnaGcN00Y=",
-        "type": "git",
-        "url": "file:.?dir=nu-plugins"
+        "lastModified": 1704389833,
+        "narHash": "sha256-39LF1qwMUR8Nw+J29KXqbvlKKQC1XetbSw6tQvmc4Sk=",
+        "owner": "ArseAssassin",
+        "repo": "pikadoc-nushell-plugins",
+        "rev": "5403847b405d40cb9ec94017967402d181465293",
+        "type": "github"
       },
       "original": {
-        "dir": "nu-plugins",
-        "type": "git",
-        "url": "file:.?dir=nu-plugins"
+        "owner": "ArseAssassin",
+        "repo": "pikadoc-nushell-plugins",
+        "type": "github"
       }
     },
     "root": {

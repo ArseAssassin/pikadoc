@@ -5,7 +5,7 @@
     nixpkgs.url = "nixpkgs/nixos-23.11";
     flake-utils.url = "github:numtide/flake-utils";
     naersk.url = "github:nix-community/naersk/master";
-    nu-plugin.url = "git+file:.?dir=nu-plugins";
+    nu-plugin.url = "github:ArseAssassin/pikadoc-nushell-plugins";
   };
 
   outputs = { self, nixpkgs, flake-utils, naersk, nu-plugin }:

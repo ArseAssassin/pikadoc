@@ -139,11 +139,11 @@
         "nixpkgs": "nixpkgs_4"
       },
       "locked": {
-        "lastModified": 1704389833,
-        "narHash": "sha256-39LF1qwMUR8Nw+J29KXqbvlKKQC1XetbSw6tQvmc4Sk=",
+        "lastModified": 1704394970,
+        "narHash": "sha256-7pac52ZnVFI8fSWDI/5i/SHlvGPtX3xU1GaLDov+qoo=",
         "owner": "ArseAssassin",
         "repo": "pikadoc-nushell-plugins",
-        "rev": "5403847b405d40cb9ec94017967402d181465293",
+        "rev": "6b48dfa5a9a2558d74343be01832bc41aee22c06",
         "type": "github"
       },
       "original": {

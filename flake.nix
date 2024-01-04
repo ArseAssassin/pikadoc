@@ -5,7 +5,7 @@
     nixpkgs.url = "nixpkgs/nixos-23.11";
     flake-utils.url = "github:numtide/flake-utils";
     naersk.url = "github:nix-community/naersk/master";
-    nu-plugin.url = "path:./nu-plugins";
+    nu-plugin.url = "path:nu-plugins";
   };
 
   outputs = { self, nixpkgs, flake-utils, naersk, nu-plugin }:
@@ -32,13 +32,6 @@
           #     nu -e "use "$PKD_PATH" ; source "$PKD_PATH"/../init.nu" --plugin-config $HOME"/.config/pikadoc/plugin.nu"
           #   '';
           # };
-
-          packages.nu_plugin_query =
-            let
-              naersk' = pkgs.callPackage naersk {};
-            in naersk'.buildPackage {
-              src = ./.;
-            };
 
           packages.pikadoc =
             let

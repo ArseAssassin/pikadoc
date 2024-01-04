@@ -80,7 +80,7 @@ PikaDoc is a CLI for generating human-readable, structured and searchable, plain
 Follow instructions to [install the Nix package manager](https://nixos.org/download) to your system. Then:
 
 ```
-nix --experimental-features 'nix-command flakes' run "github:ArseAssassin/pikadoc"
+nix --experimental-features "nix-command flakes" run "github:ArseAssassin/pikadoc"
 ```
 
 Once pikadoc CLI starts, you can list all available documentation sources:

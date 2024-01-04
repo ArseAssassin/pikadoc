@@ -140,10 +140,10 @@
       },
       "locked": {
         "dir": "nu-plugins",
-        "dirtyRev": "33b8ea80639eabeee39a0cac6b026a4cdcc9f135-dirty",
-        "dirtyShortRev": "33b8ea8-dirty",
-        "lastModified": 1704388627,
-        "narHash": "sha256-r2KcnZ9/vRapJCTU7xvbUIARtO+gVdiQuymi8J2blhw=",
+        "dirtyRev": "91593d8128140a1991e0395c9eb1888c02e20ede-dirty",
+        "dirtyShortRev": "91593d8-dirty",
+        "lastModified": 1704389117,
+        "narHash": "sha256-L2g3nxzsAPz1xiwPmsS01mOZwbkDBNoYWlBnaGcN00Y=",
         "type": "git",
         "url": "file:.?dir=nu-plugins"
       },

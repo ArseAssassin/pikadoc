@@ -45,6 +45,26 @@ PikaDoc is a CLI for generating human-readable, structured and searchable, plain
 │ 20 │ doc src:sqlite use                    │ command │ Queries a sqlite database for its tables and selects the output as │
 │    │                                       │         │  the current doctable                                              │
 ╰────┴───────────────────────────────────────┴─────────┴────────────────────────────────────────────────────────────────────╯
+~/pikadoc: doc 1                                                                                                 pikadoc:doc
+╭─────────────┬─────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ name        │ doc doc                                                                                                     │
+│ summary     │ Returns a summarized table of all available symbols in the currently selected docfile.                      │
+│ description │ Returns a summarized table of all available symbols in the currently selected docfile.                      │
+│             │                                                                                                             │
+│             │ If `name` is passed                                                                                         │
+│             │ as an argument, results will be filtered by their name. If `index` is passed as an argument, only the       │
+│             │ selected result will be returned.                                                                           │
+│             │                                                                                                             │
+│             │ When a single result is found, it'll be presented using `doc present`. If                                   │
+│             │ more than one result is found, returned symbols will be summarized using `doc summarize`.                   │
+│             │ ╭───┬───────┬───────┬──────────────┬──────────╮                                                             │
+│ parameters  │ │ # │ type  │ name  │ defaultValue │ optional │                                                             │
+│             │ ├───┼───────┼───────┼──────────────┼──────────┤                                                             │
+│             │ │ 0 │ <any> │ name  │              │ true     │                                                             │
+│             │ │ 1 │ <any> │ index │              │ true     │                                                             │
+│             │ ╰───┴───────┴───────┴──────────────┴──────────╯                                                             │
+│ kind        │ command                                                                                                     │
+╰─────────────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
 ```
 
 # List of features
@@ -60,7 +80,7 @@ PikaDoc is a CLI for generating human-readable, structured and searchable, plain
 Follow instructions to [install the Nix package manager](https://nixos.org/download) to your system. Then:
 
 ```
-nix run "github:ArseAssassin/pikadoc"
+nix --experimental-features 'nix-command flakes' run "github:ArseAssassin/pikadoc"
 ```
 
 Once pikadoc CLI starts, you can list all available documentation sources:

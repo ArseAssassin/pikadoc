@@ -66,10 +66,13 @@ nix run "github:ArseAssassin/pikadoc"
 Once pikadoc CLI starts, you can list all available documentation sources:
 
 ```nushell
+# Select pikadoc as the current doctable
+doc src:nushell use doc
+
+# List all available doc sources
 doc "src:"
 
 # For more information on a specific command
-
 doc "src:" 0
 ```
 

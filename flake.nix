@@ -19,7 +19,7 @@
           pkgs = import nixpkgs {
             inherit system;
           };
-          version-number = "${builtins.readFile ./VERSION}-${if (self ? rev) then self.rev else "dirty"}";
+          version-number = "0.1.0-${if (self ? rev) then self.rev else "dirty"}";
         in
         rec {
           packages.pikadoc =

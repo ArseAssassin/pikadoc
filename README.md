@@ -66,17 +66,17 @@ When a single result is found, it'll be presented using doc present. If more tha
 be summarized using doc summarize.
 ```
 
-## List of features
+## Features
 
 - rapidly search and filter reference documentation straight from your terminal
 - generate reference documentation directly from your project dependencies
 - language-agnostic and easily extensible via human-readable YAML files
 - docs for 200+ languages and libraries from online sources
-- native support for (jsdoc, python, sqlite, man pages and more from local sources)
+- native support for jsdoc, python, sqlite, man pages and more from local sources
 
 ## Quick start
 
-Follow instructions to [install the Nix package manager](https://nixos.org/download) to your system. Then you can run PikaDoc using:
+Follow instructions to [install the Nix package manager](https://nixos.org/download) to your system. Then you can run pikadoc using:
 
 ```bash
 nix --experimental-features "nix-command flakes" run "github:ArseAssassin/pikadoc"
@@ -187,6 +187,8 @@ The setState function is used to update the state. It accepts a new state value 
 ...
 ```
 
+## FAQ
+
 ### Why use PikaDoc over Zeal/DevDocs/Google etc.?
 
 PikaDoc is not a replacement for existing documentation systems, but a supportive tool - it aims to do two things well: allow you to point at a symbol and answer the question "what is this" as well as provide complete listings of all available symbols in a given language/library/system. It provides a distraction-free, structured view of what you're looking for and allows you to query and filter documentation symbols any way you wish.
@@ -200,3 +202,13 @@ PikaDoc files are human-readable and self-contained, which makes them an easy wa
 Yes, by manually installing its dependencies. At the time of writing this, this consists of `mdcat`, `pandoc`, `nushell` and `groff`, as well as the [nushell query plugin](https://github.com/nushell/nushell/tree/main/crates/nu_plugin_query). You can then clone this repo and call `use ./doc/` to use pikadoc functions.
 
 I fully recommend trying out Nix though, for it is fantastic.
+
+### Why does PikaDoc use nushell for its repl?
+
+To generate docs on the fly, we need to access a wide variety of different data sources, such as local files, web services, databases, etc. As a shell environment, [nushell](https://github.com/nushell/nushell) makes it trivial to get data from sources that are specific to the end user's system. As a structured, functional language it also makes querying, filtering and modifying data easy to the point where it's entirely viable to generate simple doctables straight from the CLI.
+
+If you haven't given nushell a try before, I suggest you do for it is dope.
+
+## License
+
+This project is made available under the MIT license. See the `LICENSE` file for more information.

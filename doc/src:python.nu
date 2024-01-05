@@ -43,11 +43,17 @@ def get-signature [] {
 # NOTE: This command parses only a single HTML page. Sphinx documentation typically consists of multiple documents and a single page might not contain all the references you're looking for. To index all symbols, make sure to parse all relevant pages, or use the `singlehtml` builder in Sphinx to produce a single page documentation.
 export def parse-from-sphinx-html [] {
   let $doc = $in
+  let pyFns = $doc|query web --query '.py.function' --as-html
+  let pyClasses = $doc|query web --query '.py.class' --as-html
+
+  print $"Converting (($pyFns|length) + ($pyClasses|length)) symbols, this could take a while"
+
   let classes = (
-    $doc|query web --query '.py.class' --as-html
+    $pyClasses
     |each {|html|
       let name = ($html|get-name)
       let namespace = ($html|query web --query '.sig-prename'|get 0?)
+      print -n '.'
       [{
         name: $name,
         namespace: ($namespace|str substring ..-1),
@@ -56,27 +62,32 @@ export def parse-from-sphinx-html [] {
         parameters: ($html|query web --query 'dd dl' --as-html|get 0|get-parameters ($html|get-signature))
         kind: 'class'
       }] ++ ($html|query web --query '.py.method' --as-html
-        |each {|methodHtml| {
-          name: $"($name).($methodHtml|get-name)"
-          namespace: ($namespace|str substring ..-1)
-          summary: ($methodHtml|get-summary),
-          description: ($methodHtml|get-description)
-          parameters: ($methodHtml|get-parameters ($methodHtml|get-signature))
-          kind: 'method'
-        }}
+        |each {|methodHtml|
+          print -n '.'
+          {
+            name: $"($name).($methodHtml|get-name)"
+            namespace: ($namespace|str substring ..-1)
+            summary: ($methodHtml|get-summary),
+            description: ($methodHtml|get-description)
+            parameters: ($methodHtml|get-parameters ($methodHtml|get-signature))
+            kind: 'method'
+          }}
       ) ++ ($html|query web --query '.py.attribute' --as-html
-        |each {|attributeHtml| {
-          name: $"($name).($attributeHtml|get-name)"
-          summary: ($attributeHtml|get-summary)
-          kind: 'property'
-        }}
+        |each {|attributeHtml|
+          print -n '.'
+          {
+            name: $"($name).($attributeHtml|get-name)"
+            summary: ($attributeHtml|get-summary)
+            kind: 'property'
+          }}
       )
     }|flatten
   )
 
   let functions = (
-    $doc|query web --query '.py.function' --as-html
+    $pyFns
     |each {|html|
+      print -n '.'
       {
         name: ($html|get-name)
         namespace: ($html|query web --query '.sig-prename'|get 0?|str substring ..-1)
@@ -99,6 +110,7 @@ export def parse-from-sphinx-html [] {
 #
 # NOTE: This parses only a single HTML page. If API documentation is spread over multiple files, see documentation for `parse-from-sphinx-html`
 export def-env use [url] {
+  print $"Downloading ($url)"
   $env.PKD_CURRENT = (http get $url|parse-from-sphinx-html)
   $env.PKD_ABOUT = {
     name: $url

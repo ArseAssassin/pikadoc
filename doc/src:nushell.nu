@@ -63,6 +63,7 @@ def get-help-for-command [cmd: string] {
 # Returns doctable documenting the named module.
 #
 # `name` is the name of the module to document
+#
 # `path` is the path to the submodule. If module is a top-level module, path should be `[]`
 export def document-module [name, path=[]] {
   let modPath = ([$name]|prepend $path)|str join ' '
@@ -92,7 +93,7 @@ export def-env use [name] {
   $env.PKD_CURRENT = (document-module $name)
   $env.PKD_ABOUT = {
     name: $name
-    text_format: 'plain'
+    text_format: 'markdown'
     generator: 'src:man'
   }
 }

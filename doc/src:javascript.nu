@@ -2,7 +2,7 @@
 #
 # `in`: should be a `jsdoc` generated JSON document
 #
-# Example: `jsdoc -X <path to source directory>|doc src:javascript parse-from-jsdoc`
+# Example: `doc use (npx jsdoc -X <path to source directory>|doc src:javascript parse-from-jsdoc)`
 export def parse-from-jsdoc [] {
   from json
   |where undocumented? != true
@@ -28,6 +28,11 @@ export def parse-from-jsdoc [] {
 #
 # Example: doc src:javascript use "./node_modules/express/lib/"
 export def-env use [filepath] {
+  if ((which jsdoc) == []) {
+    print ("`jsdoc` was not found in $PATH - you can install jsdoc by doing `npm install -g jsdoc`. If you'd prefer not to install it globally, see `doc src:javascript parse-from-jsdoc`"|mdcat)
+    return
+  }
+
   $env.PKD_CURRENT = (jsdoc -X $filepath|parse-from-jsdoc)
   $env.PKD_ABOUT = {
     name: $filepath

@@ -11,7 +11,7 @@ export def main [name?, index?] {
   if (($name|describe) == 'int') {
     $env.PKD_CURRENT|get $name|present
   } else if ($name != null) {
-    let list = $env.PKD_CURRENT|search $name
+    let list = $env.PKD_CURRENT|find $name -c ['name']
 
     if ($index != null) {
       $list|get $index|present
@@ -36,11 +36,12 @@ def present-list [] {
 # `docs` is either a file in the local filesystem or a doctable.
 #
 # Examples
+#
 # # Use a docfile from local filesystem
-#   doc use my-doc-file.pkd
+#   ```doc use my-doc-file.pkd```
 #
 # # Download and use pikadoc CLI reference docs
-#   doc use (http get 'https://raw.githubusercontent.com/ArseAssassin/pikadoc/master/reference-docs.pkd'|from yaml)
+#   ```doc use (http get 'https://raw.githubusercontent.com/ArseAssassin/pikadoc/master/reference-docs.pkd'|from yaml)```
 export def-env use [docs] {
   let type = $docs|describe
   if ($type == 'string') {
@@ -90,8 +91,11 @@ alias _save = save
 
 # Saves doctable in the local filesystem.
 #
-# `in` is a valid doctable
 # `filepath` is a path to use for saving the file
+#
+# `about` is a the metadata that should be used for the `about` section. If undefined, `$env.PKD_ABOUT` will be used
+#
+# `doctable` is the doctable that should be used. If undefined, `$env.PKD_CURRENT` will be used
 export def save [filepath: string, about?: record, doctable?: table] {
   {
     about: ($about|default $env.PKD_ABOUT)
@@ -114,30 +118,27 @@ def trim-record-whitespace [] {
   }}
 }
 
-def html-to-md [] {
-  pandoc --from=html --to=gfm-raw_html
-}
-
 def present [] {
   let output = $in
     |trim-record-whitespace
-    |maybe-update description {||
-      let $it = $in
-      (if ($env.PKD_ABOUT.text_format == 'markdown') {
-         $it|mdcat
-      } else {
-        $it
-      })
-    }
     |maybe-update type {|| str join ' -> '}
     |maybe-update parameters {|| each {|| trim-record-whitespace }}
 
-  if (($output.summary?|default ''|str trim) ==
-      ($output.description?|default ''|str trim)) {
-    $output|reject summary
+  let description = if ($env.PKD_ABOUT?.text_format? == 'markdown') {
+    $output.description?|mdcat
   } else {
-    $output
+    $output.description?
   }
+
+  let trimmedOutput = if (($output.summary?|default ''|str trim) ==
+      ($output.description?|default ''|str trim)) {
+    $output|reject summary? description?
+  } else {
+    $output|reject description?
+  }
+
+  print ($trimmedOutput|table --expand)
+  print $description
 }
 
 def maybe-update [name, value] {

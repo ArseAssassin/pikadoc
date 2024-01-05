@@ -1,5 +1,7 @@
 def download [name] {
-  http get $"https://downloads.devdocs.io/($name).tar.gz"
+  let url = $"https://downloads.devdocs.io/($name).tar.gz"
+  print $"Downloading ($url)"
+  http get $url
 }
 
 def format [archive:binary] {
@@ -48,13 +50,20 @@ def format [archive:binary] {
     )}}
   )|reduce {|a, b| $a|merge $b}
 
-  $archive
-  |tar -zx ./index.json -O
-  |complete
-  |get stdout
-  |from json
-  |get entries
+  let entries = (
+    $archive
+    |tar -zx ./index.json -O
+    |complete
+    |get stdout
+    |from json
+    |get entries
+  )
+
+  print $"Converting ($entries|length) HTML pages, this could take a while"
+
+  $entries
   |each {|row|
+    print -n '.'
     let uri = $row.path|parse --regex '(?<doc>[^#]+)(?<hash>#.+)?'|get 0
     let doc = if ($uri.hash == '' or $uri.hash == null or $uri.hash == '#_') {
       $htmldocs|get $uri.doc|html-to-md
@@ -84,14 +93,14 @@ def format [archive:binary] {
         |split column '.'
         |get column1?.0?
         |default ''
-        |pandoc -f markdown_strict -t plain --wrap=none),
+        |pandoc -f gfm -t plain --wrap=none),
       description: $doc
     }
   }
 }
 
 def html-to-md [] {
-  pandoc -f html -t markdown_strict --wrap=none
+  pandoc -f html -t gfm-raw_html --wrap=none
 }
 
 # Retrieves a list of available documentation files from devdocs.io and returns them as a table
@@ -126,4 +135,6 @@ export def-env use [slug] {
     text_format: 'markdown'
     generator: 'src:devdocs'
   }
+  print ''
+  print ("Done! Remember to cache results locally using `doc save`"|mdcat)
 }

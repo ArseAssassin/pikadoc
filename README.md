@@ -2,11 +2,11 @@
 
 PikaDoc is a CLI for generating human-readable, structured and searchable, plaintext reference documentation from your project dependencies. It allows you to search and read documentation from your terminal without touching your browser.
 
-# Demo
+## Demo
 
 ```nushell
-~/pikadoc: doc src:nushell use doc                                                                               pikadoc:doc
-~/pikadoc: doc                                                                                                   pikadoc:doc
+~: doc src:nushell use doc
+~: doc
 ╭────┬───────────────────────────────────────┬─────────┬────────────────────────────────────────────────────────────────────╮
 │  # │                 name                  │  kind   │                              summary                               │
 ├────┼───────────────────────────────────────┼─────────┼────────────────────────────────────────────────────────────────────┤
@@ -45,29 +45,28 @@ PikaDoc is a CLI for generating human-readable, structured and searchable, plain
 │ 20 │ doc src:sqlite use                    │ command │ Queries a sqlite database for its tables and selects the output as │
 │    │                                       │         │  the current doctable                                              │
 ╰────┴───────────────────────────────────────┴─────────┴────────────────────────────────────────────────────────────────────╯
-~/pikadoc: doc 1                                                                                                 pikadoc:doc
-╭─────────────┬─────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
-│ name        │ doc doc                                                                                                     │
-│ summary     │ Returns a summarized table of all available symbols in the currently selected docfile.                      │
-│ description │ Returns a summarized table of all available symbols in the currently selected docfile.                      │
-│             │                                                                                                             │
-│             │ If `name` is passed                                                                                         │
-│             │ as an argument, results will be filtered by their name. If `index` is passed as an argument, only the       │
-│             │ selected result will be returned.                                                                           │
-│             │                                                                                                             │
-│             │ When a single result is found, it'll be presented using `doc present`. If                                   │
-│             │ more than one result is found, returned symbols will be summarized using `doc summarize`.                   │
-│             │ ╭───┬───────┬───────┬──────────────┬──────────╮                                                             │
-│ parameters  │ │ # │ type  │ name  │ defaultValue │ optional │                                                             │
-│             │ ├───┼───────┼───────┼──────────────┼──────────┤                                                             │
-│             │ │ 0 │ <any> │ name  │              │ true     │                                                             │
-│             │ │ 1 │ <any> │ index │              │ true     │                                                             │
-│             │ ╰───┴───────┴───────┴──────────────┴──────────╯                                                             │
-│ kind        │ command                                                                                                     │
-╰─────────────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+~: doc 1
+╭───────────────────────┬───────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ name                  │ doc doc                                                                                           │
+│ summary               │ Returns a summarized table of all available symbols in the currently selected docfile.            │
+│                       │ ╭───┬───────┬───────┬──────────────┬──────────╮                                                   │
+│ parameters            │ │ # │ type  │ name  │ defaultValue │ optional │                                                   │
+│                       │ ├───┼───────┼───────┼──────────────┼──────────┤                                                   │
+│                       │ │ 0 │ <any> │ name  │              │ true     │                                                   │
+│                       │ │ 1 │ <any> │ index │              │ true     │                                                   │
+│                       │ ╰───┴───────┴───────┴──────────────┴──────────╯                                                   │
+│ kind                  │ command                                                                                           │
+╰───────────────────────┴───────────────────────────────────────────────────────────────────────────────────────────────────╯
+Returns a summarized table of all available symbols in the currently selected docfile.
+
+If name is passed as an argument, results will be filtered by their name. If index is passed as an argument, only the
+selected result will be returned.
+
+When a single result is found, it'll be presented using doc present. If more than one result is found, returned symbols will
+be summarized using doc summarize.
 ```
 
-# List of features
+## List of features
 
 - rapidly search and filter reference documentation straight from your terminal
 - generate reference documentation directly from your project dependencies
@@ -75,15 +74,15 @@ PikaDoc is a CLI for generating human-readable, structured and searchable, plain
 - docs for 200+ languages and libraries from online sources
 - native support for (jsdoc, python, sqlite, man pages and more from local sources)
 
-# Quick start
+## Quick start
 
-Follow instructions to [install the Nix package manager](https://nixos.org/download) to your system. Then:
+Follow instructions to [install the Nix package manager](https://nixos.org/download) to your system. Then you can run PikaDoc using:
 
-```
+```bash
 nix --experimental-features "nix-command flakes" run "github:ArseAssassin/pikadoc"
 ```
 
-Once pikadoc CLI starts, you can list all available documentation sources:
+Once the shell starts, you can list all available documentation sources:
 
 ```nushell
 # Select pikadoc as the current doctable
@@ -96,7 +95,14 @@ doc "src:"
 doc "src:" 0
 ```
 
-# More examples
+To (optionally) install PikaDoc on your system:
+
+```bash
+nix --experimental-features "nix-command flakes" profile install "github:ArseAssassin/pikadoc"
+pikadoc
+```
+
+## More examples
 ```nushell
 ~: # Parse man pages for command line options for xargs
 ~: doc src:man use xargs; doc
@@ -181,12 +187,16 @@ The setState function is used to update the state. It accepts a new state value 
 ...
 ```
 
-# FAQ
-
-## Why use PikaDoc over Zeal/DevDocs/Google etc.?
+### Why use PikaDoc over Zeal/DevDocs/Google etc.?
 
 PikaDoc is not a replacement for existing documentation systems, but a supportive tool - it aims to do two things well: allow you to point at a symbol and answer the question "what is this" as well as provide complete listings of all available symbols in a given language/library/system. It provides a distraction-free, structured view of what you're looking for and allows you to query and filter documentation symbols any way you wish.
 
 PikaDoc is not reliant on any single web service, cloud platform, etc. It's designed to be rapidly extensible by running inside a shell environment. You can pipe in data from any source, making it essentially language-agnostic - you can generate PikaDoc definitions using any language you like.
 
 PikaDoc files are human-readable and self-contained, which makes them an easy way to add supportive documentation into your git repository. They're easy to generate and cache locally, making them accessible 24/7 - even when you're on the go.
+
+### Can I use PikaDoc without Nix?
+
+Yes, by manually installing its dependencies. At the time of writing this, this consists of `mdcat`, `pandoc`, `nushell` and `groff`, as well as the [nushell query plugin](https://github.com/nushell/nushell/tree/main/crates/nu_plugin_query). You can then clone this repo and call `use ./doc/` to use pikadoc functions.
+
+I fully recommend trying out Nix though, for it is fantastic.

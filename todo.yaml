@@ -1,6 +1,7 @@
 - task: Remove nushell welcome prompt
   status: done
+- task: Pass command line arguments to pikadoc
 ---
 views:
   default:
-    where: ..|select_task
+    where: ..|select_task|select(.status != "done")

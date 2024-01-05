@@ -1,6 +1,6 @@
 about:
   name: doc
-  text_format: plain
+  text_format: markdown
   generator: src:man
 doctable:
 - name: doc all
@@ -14,26 +14,29 @@ doctable:
   description: |
     Returns a summarized table of all available symbols in the currently selected docfile.
 
-    If (name) is passed as an argument, results will be filtered by their name. If (index) is passed as an argument, only the selected result will be returned.
+    If `name` is passed as an argument, results will be filtered by their name. If `index` is passed as an argument, only the selected result will be returned.
 
     When a single result is found, it'll be presented using `doc present`. If more than one result is found, returned symbols will be summarized using `doc summarize`.
   parameters:
   - type: <any>
     name: name
     defaultValue: null
-    optional: false
+    optional: true
   - type: <any>
     name: index
     defaultValue: null
-    optional: false
+    optional: true
   kind: command
 - name: doc save
   summary: Saves doctable in the local filesystem.
   description: |
     Saves doctable in the local filesystem.
 
-    `in` is a valid doctable
     `filepath` is a path to use for saving the file
+
+    `about` is a the metadata that should be used for the `about` section. If undefined, `$env.PKD_ABOUT` will be used
+
+    `doctable` is the doctable that should be used. If undefined, `$env.PKD_CURRENT` will be used
   parameters:
   - type: <string>
     name: filepath
@@ -42,11 +45,11 @@ doctable:
   - type: <record>
     name: about
     defaultValue: null
-    optional: false
+    optional: true
   - type: <table>
     name: doctable
     defaultValue: null
-    optional: false
+    optional: true
   kind: command
 - name: doc search
   summary: Summarizes current doctable and returns all symbols matching `$query`
@@ -84,16 +87,23 @@ doctable:
     `docs` is either a file in the local filesystem or a doctable.
 
     Examples
+
     # Use a docfile from local filesystem
-      doc use my-doc-file.pkd
+      ```doc use my-doc-file.pkd```
 
     # Download and use pikadoc CLI reference docs
-      doc use (http get 'https://raw.githubusercontent.com/ArseAssassin/pikadoc/master/reference-docs.pkd'|from yaml)
+      ```doc use (http get 'https://raw.githubusercontent.com/ArseAssassin/pikadoc/master/reference-docs.pkd'|from yaml)```
   parameters:
   - type: <any>
     name: docs
     defaultValue: null
     optional: false
+  kind: command
+- name: doc version
+  summary: Returns current pikadoc version
+  description: |
+    Returns current pikadoc version
+  parameters: []
   kind: command
 - name: doc src:devdocs index
   summary: Retrieves a list of available documentation files from devdocs.io and returns them as a table
@@ -111,6 +121,8 @@ doctable:
     Example: doc src:devdocs use nushell
 
     See also: doc src:devdocs index
+
+    NOTE: Since this function downloads and parses a lot of HTML data, it can be quite slow - make sure to use `doc save` to cache frequently used doctables locally.
   parameters:
   - type: <any>
     name: slug
@@ -124,15 +136,22 @@ doctable:
 
     `in`: should be a `jsdoc` generated JSON document
 
-    Example: `jsdoc -X <path to source directory>|doc src:javascript parse-from-jsdoc`
+    Example: `doc use (npx jsdoc -X <path to source directory>|doc src:javascript parse-from-jsdoc)`
   parameters: []
   kind: command
 - name: doc src:javascript use
-  summary: null
-  description: ''
+  summary: Uses `jsdoc` to generate a doctable from `filepath` and selects is the current doctable
+  description: |
+    Uses `jsdoc` to generate a doctable from `filepath` and selects is the current doctable
+
+    Make sure that `jsdoc` is installed in your `PATH` to use this command.
+
+    `filepath` is a path to the source directory to generate docs from
+
+    Example: doc src:javascript use "./node_modules/express/lib/"
   parameters:
   - type: <any>
-    name: path
+    name: filepath
     defaultValue: null
     optional: false
   kind: command
@@ -168,6 +187,7 @@ doctable:
     Returns doctable documenting the named module.
 
     `name` is the name of the module to document
+
     `path` is the path to the submodule. If module is a top-level module, path should be `[]`
   parameters:
   - type: <any>
@@ -180,8 +200,13 @@ doctable:
     optional: true
   kind: command
 - name: doc src:nushell use
-  summary: null
-  description: ''
+  summary: Generates doctable from nushell module with `name` and selects it as the current doctable
+  description: |
+    Generates doctable from nushell module with `name` and selects it as the current doctable
+
+    `name` is the name of the top level command, e.g. "help"
+
+    Example: doc src:nushell use "doc"
   parameters:
   - type: <any>
     name: name
@@ -193,14 +218,19 @@ doctable:
   description: |
     Returns documentation for a REST endpoint defined in a .json/.yaml file.
 
-    `$in` is a record parsed from a valid Swagger .json/.yaml file
+    `in` is a record parsed from a valid Swagger .json/.yaml file
 
     Example: http get 'https://petstore.swagger.io/v2/swagger.json'|doc src:openapi parse-from-swagger
   parameters: []
   kind: command
 - name: doc src:openapi use
-  summary: null
-  description: ''
+  summary: Generates doctable from `url` to a valid Swagger .json/.ymal file and selects it as the current doctable
+  description: |
+    Generates doctable from `url` to a valid Swagger .json/.ymal file and selects it as the current doctable
+
+    `url` is fetched using a GET request
+
+    Example: doc src:openapi use "https://petstore.swagger.io/v2/swagger.json"
   parameters:
   - type: <any>
     name: url
@@ -220,8 +250,15 @@ doctable:
   parameters: []
   kind: command
 - name: doc src:python use
-  summary: null
-  description: ''
+  summary: Parses a HTML documentation page generated using sphinx and selects it as the current doctable
+  description: |
+    Parses a HTML documentation page generated using sphinx and selects it as the current doctable
+
+    `url` should be a URL to a sphinx-generated HTML page
+
+    Example: doc src:python use "https://flask.palletsprojects.com/en/3.0.x/api/"
+
+    NOTE: This parses only a single HTML page. If API documentation is spread over multiple files, see documentation for `parse-from-sphinx-html`
   parameters:
   - type: <any>
     name: url
@@ -239,8 +276,13 @@ doctable:
   parameters: []
   kind: command
 - name: doc src:sqlite use
-  summary: null
-  description: ''
+  summary: Queries a sqlite database for its tables and selects the output as the current doctable
+  description: |
+    Queries a sqlite database for its tables and selects the output as the current doctable
+
+    `db` is a path to your sqlite database
+
+    Example: doc src:sqlite use ./my-database.db
   parameters:
   - type: <any>
     name: db

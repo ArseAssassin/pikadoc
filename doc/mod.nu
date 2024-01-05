@@ -130,7 +130,7 @@ def present [] {
     $output.description?
   }
 
-  let trimmedOutput = if (($output.summary?|default ''|str trim) ==
+  let trimmedOutput = if ($output.summary == '' or ($output.summary?|default ''|str trim) ==
       ($output.description?|default ''|str trim)) {
     $output|reject summary? description?
   } else {
@@ -138,7 +138,7 @@ def present [] {
   }
 
   print ($trimmedOutput|table --expand)
-  print $description
+  $description
 }
 
 def maybe-update [name, value] {

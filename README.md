@@ -96,6 +96,90 @@ doc "src:"
 doc "src:" 0
 ```
 
+# More examples
+```nushell
+~: # Parse man pages for command line options for xargs
+~: doc src:man use xargs; doc
+╭───────┬─────────────────────────────────┬───────────┬─────────────────────────────────────────────────────────────────────╮
+│     # │              name               │   kind    │                               summary                               │
+├───────┼─────────────────────────────────┼───────────┼─────────────────────────────────────────────────────────────────────┤
+│     0 │ -0, --null                      │ option    │ Input  items  are  terminated  by a null character instead of by    │
+│       │                                 │           │ whitespace, and the quotes and backslash are not special  (every    │
+│       │                                 │           │ character is taken literally)                                       │
+│     1 │ -a file, --arg-file=file        │ option    │ Read items from file instead of standard input                      │
+│     2 │ --delimiter=delim, -d delim     │ option    │ Input  items  are  terminated  by  the specified character          │
+╰───────┴─────────────────────────────────┴───────────┴─────────────────────────────────────────────────────────────────────╯
+...
+
+~: # Parse swagger.json for rest endpoints
+~: doc src:openapi use "https://petstore.swagger.io/v2/swagger.json"; doc
+╭───┬───────────────────────────────┬───────────────┬────────────────────────────╮
+│ # │             name              │     kind      │          summary           │
+├───┼───────────────────────────────┼───────────────┼────────────────────────────┤
+│ 0 │ POST /pet/{petId}/uploadImage │ rest-endpoint │ uploads an image           │
+│ 1 │ POST /pet                     │ rest-endpoint │ Add a new pet to the store │
+│ 2 │ GET /pet/findByStatus         │ rest-endpoint │ Finds Pets by status       │
+╰───┴───────────────────────────────┴───────────────┴────────────────────────────╯
+...
+
+~: # Query sqlite database for tables
+~: doc src:sqlite use media-arc.db; doc 1
+╭─────────┬─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╮
+│ name    │ files                                                                                                           │
+│         │ ╭───┬──────────────────┬─────────┬──────────────┬──────────┬───────╮                                            │
+│ columns │ │ # │       name       │  type   │ defaultValue │ nullable │  pk   │                                            │
+│         │ ├───┼──────────────────┼─────────┼──────────────┼──────────┼───────┤                                            │
+│         │ │ 0 │ path             │ TEXT    │              │ false    │ true  │                                            │
+│         │ │ 1 │ data             │ json    │              │ false    │ false │                                            │
+│         │ │ 2 │ mime             │ TEXT    │              │ false    │ false │                                            │
+│         │ │ 3 │ date             │ TEXT    │              │ false    │ false │                                            │
+│         │ │ 4 │ rating           │ INTEGER │ 0            │ false    │ false │                                            │
+│         │ │ 5 │ created_by_index │ TEXT    │              │ false    │ false │                                            │
+│         │ │ 6 │ title            │ TEXT    │              │ true     │ false │                                            │
+│         │ │ 7 │ thumbnail        │ BLOB    │              │ true     │ false │                                            │
+│         │ ╰───┴──────────────────┴─────────┴──────────────┴──────────┴───────╯                                            │
+│ source  │ CREATE TABLE files (path text primary key not null, data json not null, mime text not null, date text not null, │
+│         │  rating integer default 0 not null, created_by_index text not null references file_indexes, title text,         │
+│         │ thumbnail blob)                                                                                                 │
+│ kind    │ table                                                                                                           │
+╰─────────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
+...
+
+# Parse Python documentation
+~: doc src:python use "https://flask.palletsprojects.com/en/3.0.x/api/"; doc
+╭───┬───────────────────────────┬────────┬──────────────────────────────────────────────────────────────────────────────────╮
+│ # │           name            │  kind  │                                     summary                                      │
+├───┼───────────────────────────┼────────┼──────────────────────────────────────────────────────────────────────────────────┤
+│ 0 │ Flask                     │ class  │ The flask object implements a WSGI application and acts as the central object.   │
+│   │                           │        │ It is passed the name of the module or package of the application. Once it is    │
+│   │                           │        │ created it will act as a central registry for the view functions, the URL rules, │
+│   │                           │        │  template configuration and much more.                                           │
+│ 1 │ Flask.add_template_filter │ method │ Register a custom template filter. Works exactly like the template_filter()      │
+│   │                           │        │ decorator.                                                                       │
+│ 2 │ Flask.add_template_global │ method │ Register a custom template global function. Works exactly like the               │
+│   │                           │        │ template_global() decorator.                                                     │
+╰───┴───────────────────────────┴────────┴──────────────────────────────────────────────────────────────────────────────────╯
+...
+
+~: doc src:devdocs use react
+~: doc useState
+╭─────────┬──────────╮
+│ name    │ useState │
+╰─────────┴──────────╯
+┄┄┄useState
+
+────────────────────
+const [state, setState] = useState(initialState);
+────────────────────
+
+Returns a stateful value, and a function to update it.
+
+During the initial render, the returned state (state) is the same as the value passed as the first argument (initialState).
+
+The setState function is used to update the state. It accepts a new state value and enqueues a re-render of the component.
+...
+```
+
 # Why should I use PikaDoc over Zeal/DevDocs/Google etc.?
 
 PikaDoc is not a replacement for existing documentation systems, but a supportive tool - it aims to do two things well: allow you to point at a symbol and answer the question "what is this" as well as provide complete listings of all available symbols in a given language/library/system. It provides a distraction-free, structured view of what you're looking for and allows you to query and filter documentation symbols any way you wish.

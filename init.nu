@@ -6,3 +6,6 @@ $env.PROMPT_COMMAND_RIGHT = {||
     do $PROMPT_COMMAND_RIGHT_OLD
   }
 }
+
+print ($"**Welcome to PikaDoc** - to get started, type:"|mdcat)
+print ("`doc src:nushell use doc; doc`"|mdcat)

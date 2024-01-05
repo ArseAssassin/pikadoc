@@ -1,0 +1,6 @@
+- task: Remove nushell welcome prompt
+  status: done
+---
+views:
+  default:
+    where: ..|select_task

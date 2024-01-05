@@ -137,8 +137,7 @@ def present [] {
     $output|reject description?
   }
 
-  print ($trimmedOutput|table --expand)
-  $description
+  [($trimmedOutput|table --expand) $description]|str join "\n"
 }
 
 def maybe-update [name, value] {

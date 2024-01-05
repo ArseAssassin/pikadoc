@@ -6,9 +6,13 @@
     flake-utils.url = "github:numtide/flake-utils";
     naersk.url = "github:nix-community/naersk/master";
     nu-plugin.url = "github:ArseAssassin/pikadoc-nushell-plugins";
+    nu-source = {
+      url = "github:nushell/nushell";
+      flake = false;
+    };
   };
 
-  outputs = { self, nixpkgs, flake-utils, naersk, nu-plugin }:
+  outputs = { self, nixpkgs, flake-utils, naersk, nu-plugin, nu-source }:
     flake-utils.lib.eachDefaultSystem
       (system:
         let
@@ -31,6 +35,10 @@
                 mkdir -p $HOME"/.config/pikadoc"
 
                 touch $HOME"/.config/pikadoc/plugin.nu"
+                CONFIG=$HOME"/.config/pikadoc/config.nu"
+                if [ ! -f "$CONFIG" ]; then
+                  cat ${nu-source}/crates/nu-utils/src/sample_config/default_config.nu|sed "s/show_banner: true/show_banner: false/g" > $CONFIG
+                fi
                 nu -e "register ${nu-plugin.packages.${system}.nu_plugin_query}/bin/nu_plugin_query; use $PKD_PATH; source $PKD_PATH/../init.nu" --plugin-config $HOME"/.config/pikadoc/plugin.nu"
               '';
             in pkgs.stdenv.mkDerivation {

@@ -152,12 +152,29 @@
         "type": "github"
       }
     },
+    "nu-source": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1704454289,
+        "narHash": "sha256-Fx0j8894b0qG10L5A1BrKiKVLx0CRgc90YEuX3bGs7k=",
+        "owner": "nushell",
+        "repo": "nushell",
+        "rev": "7e26b4fcc2c29041d3115dca8f05fd75fd7878df",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nushell",
+        "repo": "nushell",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "flake-utils": "flake-utils",
         "naersk": "naersk",
         "nixpkgs": "nixpkgs_2",
-        "nu-plugin": "nu-plugin"
+        "nu-plugin": "nu-plugin",
+        "nu-source": "nu-source"
       }
     },
     "systems": {

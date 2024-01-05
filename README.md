@@ -181,7 +181,9 @@ The setState function is used to update the state. It accepts a new state value 
 ...
 ```
 
-# Why should I use PikaDoc over Zeal/DevDocs/Google etc.?
+# FAQ
+
+## Why use PikaDoc over Zeal/DevDocs/Google etc.?
 
 PikaDoc is not a replacement for existing documentation systems, but a supportive tool - it aims to do two things well: allow you to point at a symbol and answer the question "what is this" as well as provide complete listings of all available symbols in a given language/library/system. It provides a distraction-free, structured view of what you're looking for and allows you to query and filter documentation symbols any way you wish.
 

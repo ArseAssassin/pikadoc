@@ -15,24 +15,9 @@
           pkgs = import nixpkgs {
             inherit system;
           };
+          version-number = "${builtins.readFile ./VERSION}-${if (self ? rev) then self.rev else "dirty"}";
         in
         rec {
-          # Devshell not necessary, just do `nix run #pikadoc`
-
-          # devShells.default = pkgs.mkShell {
-          #   packages = [
-          #     pkgs.pandoc
-          #     pkgs.nushell
-          #     pkgs.mdcat
-          #     pkgs.groff
-          #   ];
-
-          #   shellHook = ''
-          #     export PKD_PATH=`pwd`/doc
-          #     nu -e "use "$PKD_PATH" ; source "$PKD_PATH"/../init.nu" --plugin-config $HOME"/.config/pikadoc/plugin.nu"
-          #   '';
-          # };
-
           packages.pikadoc =
             let
               src = ./.;
@@ -42,6 +27,7 @@
 
                 PATH=$PATH:${pkgs.pandoc}/bin:${pkgs.nushell}/bin:${pkgs.mdcat}/bin:${pkgs.groff}/bin
                 export PKD_PATH="${src}/doc"
+                export PKD_VERSION=${version-number}
                 mkdir -p $HOME"/.config/pikadoc"
 
                 touch $HOME"/.config/pikadoc/plugin.nu"
@@ -50,7 +36,7 @@
             in pkgs.stdenv.mkDerivation {
               buildInputs = [];
               name = "pikadoc";
-              version = "0.1.0";
+              version = version-number;
               src = ./.;
               installPhase = ''
                 mkdir -p $out/bin

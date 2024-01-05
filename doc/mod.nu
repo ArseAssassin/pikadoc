@@ -147,3 +147,8 @@ def maybe-update [name, value] {
     $in
   }
 }
+
+# Returns current pikadoc version
+export def version [] {
+  $env.PKD_VERSION
+}

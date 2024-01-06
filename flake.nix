@@ -35,11 +35,13 @@
                 mkdir -p $HOME"/.config/pikadoc"
 
                 touch $HOME"/.config/pikadoc/plugin.nu"
+
                 CONFIG=$HOME"/.config/pikadoc/config.nu"
                 if [ ! -f "$CONFIG" ]; then
                   cat ${nu-source}/crates/nu-utils/src/sample_config/default_config.nu|sed "s/show_banner: true/show_banner: false/g" > $CONFIG
                 fi
-                nu -e "register ${nu-plugin.packages.${system}.nu_plugin_query}/bin/nu_plugin_query; use $PKD_PATH; source $PKD_PATH/../init.nu" --plugin-config $HOME"/.config/pikadoc/plugin.nu"
+
+                nu -e "register ${nu-plugin.packages.${system}.nu_plugin_query}/bin/nu_plugin_query; use $PKD_PATH; source $PKD_PATH/../init.nu; $*" --plugin-config $HOME"/.config/pikadoc/plugin.nu"
               '';
             in pkgs.stdenv.mkDerivation {
               buildInputs = [];

@@ -41,7 +41,15 @@
                   cat ${nu-source}/crates/nu-utils/src/sample_config/default_config.nu|sed "s/show_banner: true/show_banner: false/g" > $CONFIG
                 fi
 
-                nu -e "register ${nu-plugin.packages.${system}.nu_plugin_query}/bin/nu_plugin_query; use $PKD_PATH; source $PKD_PATH/../init.nu; $*" --plugin-config $HOME"/.config/pikadoc/plugin.nu"
+                COMMAND=$*
+                if [ $1 = "-c" ] || [ $1 = "--command"]; then
+                  COMMAND=$2
+                  COMMAND_FLAG="-c"
+                else
+                  COMMAND_FLAG="-e"
+                fi
+
+                nu $COMMAND_FLAG "register ${nu-plugin.packages.${system}.nu_plugin_query}/bin/nu_plugin_query; use $PKD_PATH; source $PKD_PATH/../init.nu; $COMMAND" --plugin-config $HOME"/.config/pikadoc/plugin.nu"
               '';
             in pkgs.stdenv.mkDerivation {
               buildInputs = [];

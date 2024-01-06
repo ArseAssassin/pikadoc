@@ -114,8 +114,8 @@ pikadoc
 │       │                                 │           │ character is taken literally)                                       │
 │     1 │ -a file, --arg-file=file        │ option    │ Read items from file instead of standard input                      │
 │     2 │ --delimiter=delim, -d delim     │ option    │ Input  items  are  terminated  by  the specified character          │
+│       │ ...                             │           │                                                                     │
 ╰───────┴─────────────────────────────────┴───────────┴─────────────────────────────────────────────────────────────────────╯
-...
 
 ~: # Parse swagger.json for rest endpoints
 ~: doc src:openapi use "https://petstore.swagger.io/v2/swagger.json"; doc
@@ -125,8 +125,8 @@ pikadoc
 │ 0 │ POST /pet/{petId}/uploadImage │ rest-endpoint │ uploads an image           │
 │ 1 │ POST /pet                     │ rest-endpoint │ Add a new pet to the store │
 │ 2 │ GET /pet/findByStatus         │ rest-endpoint │ Finds Pets by status       │
+│   │ ...                           │               │                            │
 ╰───┴───────────────────────────────┴───────────────┴────────────────────────────╯
-...
 
 ~: # Query sqlite database for tables
 ~: doc src:sqlite use media-arc.db; doc 1
@@ -149,7 +149,6 @@ pikadoc
 │         │ thumbnail blob)                                                                                                 │
 │ kind    │ table                                                                                                           │
 ╰─────────┴─────────────────────────────────────────────────────────────────────────────────────────────────────────────────╯
-...
 
 # Parse Python documentation
 ~: doc src:python use "https://flask.palletsprojects.com/en/3.0.x/api/"; doc
@@ -164,8 +163,8 @@ pikadoc
 │   │                           │        │ decorator.                                                                       │
 │ 2 │ Flask.add_template_global │ method │ Register a custom template global function. Works exactly like the               │
 │   │                           │        │ template_global() decorator.                                                     │
+│   │ ...                       │        │                                                                                  │
 ╰───┴───────────────────────────┴────────┴──────────────────────────────────────────────────────────────────────────────────╯
-...
 
 # Parse HTML documentation from devdocs.io
 ~: doc src:devdocs use react

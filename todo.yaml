@@ -2,6 +2,11 @@
   status: done
 - task: Pass command line arguments to pikadoc
   status: done
+- task: Add `doc cli` function as the main entry point for pikadoc
+  description: |
+    Command line args passed to pikadoc should be passed to a function called `doc cli` - this way we can leverage nushell for parsing args, outputting proper error messages, documentation, etc.
+
+    This is blocked by nushell throwing an uncatchable parser error on invalid arguments. This makes it impossible to properly exit the CLI when user makes an entirely reasonable mistake such as passing incorrect command line arguments.
 ---
 views:
   default:

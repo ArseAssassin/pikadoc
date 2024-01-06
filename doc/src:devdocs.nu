@@ -128,7 +128,7 @@ export def index [] {
 # See also: doc src:devdocs index
 #
 # NOTE: Since this function downloads and parses a lot of HTML data, it can be quite slow - make sure to use `doc save` to cache frequently used doctables locally.
-export def-env use [slug] {
+export def --env use [slug] {
   $env.PKD_CURRENT = (format (download $slug))
   $env.PKD_ABOUT = {
     name: $slug

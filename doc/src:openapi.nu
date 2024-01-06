@@ -95,7 +95,7 @@ export def parse-from-swagger [] {
 # `url` is fetched using a GET request
 #
 # Example: doc src:openapi use "https://petstore.swagger.io/v2/swagger.json"
-export def-env use [url] {
+export def --env use [url] {
   $env.PKD_CURRENT = (http get $url|parse-from-swagger)
   $env.PKD_ABOUT = {
     name: $url

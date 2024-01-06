@@ -109,7 +109,7 @@ export def parse-from-sphinx-html [] {
 # Example: doc src:python use "https://flask.palletsprojects.com/en/3.0.x/api/"
 #
 # NOTE: This parses only a single HTML page. If API documentation is spread over multiple files, see documentation for `parse-from-sphinx-html`
-export def-env use [url] {
+export def --env use [url] {
   print $"Downloading ($url)"
   $env.PKD_CURRENT = (http get $url|parse-from-sphinx-html)
   $env.PKD_ABOUT = {

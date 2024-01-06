@@ -89,7 +89,7 @@ export def document-module [name, path=[]] {
 # `name` is the name of the top level command, e.g. "help"
 #
 # Example: doc src:nushell use "doc"
-export def-env use [name] {
+export def --env use [name] {
   $env.PKD_CURRENT = (document-module $name)
   $env.PKD_ABOUT = {
     name: $name

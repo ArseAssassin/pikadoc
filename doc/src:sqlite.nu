@@ -29,7 +29,7 @@ export def parse-from-db [] {
 # `db` is a path to your sqlite database
 #
 # Example: doc src:sqlite use ./my-database.db
-export def-env use [db] {
+export def --env use [db] {
   $env.PKD_CURRENT = (open $db|parse-from-db)
   $env.PKD_ABOUT = {
     name: $db

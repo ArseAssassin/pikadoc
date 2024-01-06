@@ -74,7 +74,7 @@ export def parse [] {
 # `$it` is the name of the man page
 #
 # Example: doc src:man use "cat"
-export def-env use [it] {
+export def --env use [it] {
   $env.PKD_CURRENT = (man -Rutf8 $it|do {groff -man -T utf8}|complete|get stdout|parse)
   $env.PKD_ABOUT = {
     name: $it

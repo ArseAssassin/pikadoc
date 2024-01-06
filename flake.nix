@@ -25,6 +25,12 @@
           packages.pikadoc =
             let
               src = ./.;
+              pkd-path = "${src}/doc";
+              bootstrap = pkgs.writeScript "bootstrap.nu" ''
+                register ${nu-plugin.packages.${system}.nu_plugin_query}/bin/nu_plugin_query
+                use ${pkd-path}
+                source ${pkd-path}/../init.nu
+              '';
               bin = pkgs.writeScript "pikadoc" ''
                 #!/usr/bin/env nix-shell
                 #! nix-shell -i bash -p bash
@@ -42,14 +48,14 @@
                 fi
 
                 COMMAND=$*
-                if [ $1 = "-c" ] || [ $1 = "--command"]; then
+                if [ "$1" = "-c" ] || [ "$1" = "--command" ]; then
                   COMMAND=$2
                   COMMAND_FLAG="-c"
                 else
                   COMMAND_FLAG="-e"
                 fi
 
-                nu $COMMAND_FLAG "register ${nu-plugin.packages.${system}.nu_plugin_query}/bin/nu_plugin_query; use $PKD_PATH; source $PKD_PATH/../init.nu; $COMMAND" --plugin-config $HOME"/.config/pikadoc/plugin.nu"
+                nu $COMMAND_FLAG "source ${bootstrap}; $COMMAND" --plugin-config $HOME"/.config/pikadoc/plugin.nu"
               '';
             in pkgs.stdenv.mkDerivation {
               buildInputs = [];

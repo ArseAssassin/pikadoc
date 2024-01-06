@@ -6,7 +6,7 @@
   description: |
     Command line args passed to pikadoc should be passed to a function called `doc cli` - this way we can leverage nushell for parsing args, outputting proper error messages, documentation, etc.
 
-    This is blocked by nushell throwing an uncatchable parser error on invalid arguments. This makes it impossible to properly exit the CLI when user makes an entirely reasonable mistake such as passing incorrect command line arguments.
+    This is blocked by nushell throwing an uncatchable parser error on invalid arguments. This makes it impossible to properly exit the CLI when user makes a mistake such as passing incorrect command line arguments.
 ---
 views:
   default:

@@ -17,6 +17,7 @@ export def main [name?, index?] {
       $list|get $index|present
     } else {
       $list|present-list
+
     }
   } else {
     $env.PKD_CURRENT|present-list
@@ -24,10 +25,18 @@ export def main [name?, index?] {
 }
 
 def present-list [] {
+
   if ($in|length) == 1 {
     $in|get 0|present
   } else {
-    $in|summarize-all
+    let docs = $in
+    let list = $docs|take 20|summarize-all
+    let more = ($docs|length) - 20
+    print ($list|table)
+    if ($more > 0) {
+      print $"Showing 20 symbols out of ($docs|length)"
+    }
+
   }
 }
 
@@ -56,13 +65,6 @@ export def-env use [docs] {
 # Returns the currently selected doctable without applying any formatting.
 export def-env all [] {
   $env.PKD_CURRENT
-}
-
-# Summarizes current doctable and returns all symbols matching `$query`
-#
-# `$query` is the search term to be matched
-export def search [query] {
-  all|summarize-all|find $query
 }
 
 def show [] {
@@ -130,7 +132,7 @@ def present [] {
     $output.description?
   }
 
-  let trimmedOutput = if ($output.summary == '' or ($output.summary?|default ''|str trim) ==
+  let trimmedOutput = if ($output.summary? == '' or ($output.summary?|default ''|str trim) ==
       ($output.description?|default ''|str trim)) {
     $output|reject summary? description?
   } else {

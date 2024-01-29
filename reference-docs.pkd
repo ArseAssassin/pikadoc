@@ -51,18 +51,6 @@ doctable:
     defaultValue: null
     optional: true
   kind: command
-- name: doc search
-  summary: Summarizes current doctable and returns all symbols matching `$query`
-  description: |
-    Summarizes current doctable and returns all symbols matching `$query`
-
-    `$query` is the search term to be matched
-  parameters:
-  - type: <any>
-    name: query
-    defaultValue: null
-    optional: false
-  kind: command
 - name: doc summarize
   summary: Creates a readable summary of a single symbol.
   description: |

@@ -102,6 +102,10 @@ nix --experimental-features "nix-command flakes" profile install "github:ArseAss
 pikadoc
 ```
 
+### Nixless build
+
+If you don't want to install nix, you can follow [nixless install instructions](#user-content-can-i-use-pikadoc-without-nix).
+
 ## More examples
 ```nushell
 ~: # Parse man pages for command line options for xargs

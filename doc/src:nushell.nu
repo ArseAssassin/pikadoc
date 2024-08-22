@@ -56,9 +56,9 @@ def parse-from-help [help: string] {
   }
 }
 
-def get-help-for-command [cmd: string] {
-  nu -c $"use ($env.PKD_PATH); ($cmd) --help|to nuon" --plugin-config ($env.HOME + "/.config/pikadoc/plugin.nu")|from nuon
-}
+# def get-help-for-command [cmd: string] {
+#   nu -c $"use ($env.PKD_PATH); ($cmd) --help|to nuon" --plugin-config ($env.HOME + "/.config/pikadoc/plugin.nu")|from nuon
+# }
 
 # Returns doctable documenting the named module.
 #

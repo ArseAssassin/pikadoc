@@ -27,7 +27,7 @@ export def parse-from-jsdoc [] {
 # `filepath` is a path to the source directory to generate docs from
 #
 # Example: doc src:javascript use "./node_modules/express/lib/"
-export def-env use [filepath] {
+export def --env use [filepath] {
   if ((which jsdoc) == []) {
     print ("`jsdoc` was not found in $PATH - you can install jsdoc by doing `npm install -g jsdoc`. If you'd prefer not to install it globally, see `doc src:javascript parse-from-jsdoc`"|mdcat)
     return

@@ -1,3 +1,5 @@
+export use src:devdocs.nu
+
 # Returns a summarized table of all available symbols in the currently selected docfile.
 #
 # If `name` is passed as an argument, results will be filtered by their name. If `index` is passed as an argument, only the selected result will be returned.
@@ -9,19 +11,22 @@ export def main [name?, index?] {
     return
   }
   if (($name|describe) == 'int') {
-    $env.PKD_CURRENT|get $name|present
+    pkd-doctable|get $name|present
   } else if ($name != null) {
-    let list = $env.PKD_CURRENT|find $name -c ['name']
+    let list = pkd-doctable|find $name -c ['name']
 
     if ($index != null) {
       $list|get $index|present
     } else {
       $list|present-list
-
     }
   } else {
-    $env.PKD_CURRENT|present-list
+    pkd-doctable|present-list
   }
+}
+
+export def * [] {
+  pkd-doctable|get name
 }
 
 def present-list [] {
@@ -51,20 +56,25 @@ def present-list [] {
 #
 # # Download and use pikadoc CLI reference docs
 #   ```doc use (http get 'https://raw.githubusercontent.com/ArseAssassin/pikadoc/master/reference-docs.pkd'|from yaml)```
-export def-env use [docs] {
+export def --env use [docs] {
   let type = $docs|describe
   if ($type == 'string') {
     let file = (open $docs|from yaml)
-    $env.PKD_CURRENT = ($file|get doctable)
-    $env.PKD_ABOUT = ($file|get about)
+    $env.PKD_CURRENT = {
+      about: $file.0
+      doctable: $file.1
+    }
   } else {
     $env.PKD_CURRENT = $docs
   }
 }
 
-# Returns the currently selected doctable without applying any formatting.
-export def-env all [] {
-  $env.PKD_CURRENT
+export def pkd-about [] {
+  $env.PKD_CURRENT|get about
+}
+
+export def pkd-doctable [] {
+  $env.PKD_CURRENT|get doctable
 }
 
 def show [] {
@@ -94,16 +104,8 @@ alias _save = save
 # Saves doctable in the local filesystem.
 #
 # `filepath` is a path to use for saving the file
-#
-# `about` is a the metadata that should be used for the `about` section. If undefined, `$env.PKD_ABOUT` will be used
-#
-# `doctable` is the doctable that should be used. If undefined, `$env.PKD_CURRENT` will be used
-export def save [filepath: string, about?: record, doctable?: table] {
-  {
-    about: ($about|default $env.PKD_ABOUT)
-    doctable: ($doctable|default $env.PKD_CURRENT)
-  }
-  |to yaml|_save -f $filepath
+export def save [filepath: string] {
+  ['---', (pkd-about|to yaml), '---', (pkd-doctable|to yaml)]|str join "\n"|_save -f $filepath
 }
 
 def map-record-values [block: closure] {
@@ -126,12 +128,6 @@ def present [] {
     |maybe-update type {|| str join ' -> '}
     |maybe-update parameters {|| each {|| trim-record-whitespace }}
 
-  let description = if ($env.PKD_ABOUT?.text_format? == 'markdown') {
-    $output.description?|mdcat
-  } else {
-    $output.description?
-  }
-
   let trimmedOutput = if ($output.summary? == '' or ($output.summary?|default ''|str trim) ==
       ($output.description?|default ''|str trim)) {
     $output|reject summary? description?
@@ -139,7 +135,14 @@ def present [] {
     $output|reject description?
   }
 
-  [($trimmedOutput|table --expand) $description]|str join "\n"
+  print ($trimmedOutput|table --expand)
+
+  if ((pkd-about).text_format? == 'markdown') {
+    $output.description?|glow
+  } else {
+    print $output.description?
+  }
+
 }
 
 def maybe-update [name, value] {

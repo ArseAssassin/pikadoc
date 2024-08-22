@@ -2,9 +2,8 @@
   description = "pikadoc CLI";
 
   inputs = {
-    nixpkgs.url = "nixpkgs/nixos-23.11";
+    nixpkgs.url = "nixpkgs/nixos-24.05";
     flake-utils.url = "github:numtide/flake-utils";
-    naersk.url = "github:nix-community/naersk/master";
     nu-plugin.url = "github:ArseAssassin/pikadoc-nushell-plugins";
     nu-source = {
       url = "github:nushell/nushell";
@@ -12,7 +11,7 @@
     };
   };
 
-  outputs = { self, nixpkgs, flake-utils, naersk, nu-plugin, nu-source }:
+  outputs = { self, nixpkgs, flake-utils, nu-plugin, nu-source }:
     flake-utils.lib.eachDefaultSystem
       (system:
         let
@@ -27,22 +26,21 @@
               src = ./.;
               pkd-path = "${src}/doc";
               bootstrap = pkgs.writeScript "bootstrap.nu" ''
-                register ${nu-plugin.packages.${system}.nu_plugin_query}/bin/nu_plugin_query
-                use ${pkd-path}
+                export use ${pkd-path}
                 source ${pkd-path}/../init.nu
               '';
               bin = pkgs.writeScript "pikadoc" ''
                 #!/usr/bin/env nix-shell
                 #! nix-shell -i bash -p bash
 
-                PATH=$PATH:${pkgs.pandoc}/bin:${pkgs.nushell}/bin:${pkgs.mdcat}/bin:${pkgs.groff}/bin
+                PATH=$PATH:${pkgs.pandoc}/bin:${pkgs.nushell}/bin:${pkgs.glow}/bin:${pkgs.groff}/bin:${pkgs.html-xml-utils}/bin
                 export PKD_PATH="${src}/doc"
                 export PKD_VERSION=${version-number}
                 mkdir -p $HOME"/.config/pikadoc"
 
-                touch $HOME"/.config/pikadoc/plugin.nu"
+                touch $HOME"/.config/pikadoc/plugin.msgpackz"
 
-                CONFIG=$HOME"/.config/pikadoc/config.nu"
+                CONFIG=$HOME"/.config/pikadoc/config.msgpackz"
                 if [ ! -f "$CONFIG" ]; then
                   cat ${nu-source}/crates/nu-utils/src/sample_config/default_config.nu|sed "s/show_banner: true/show_banner: false/g" > $CONFIG
                 fi
@@ -55,7 +53,7 @@
                   COMMAND_FLAG="-e"
                 fi
 
-                nu $COMMAND_FLAG "source ${bootstrap}; $COMMAND" --plugin-config $HOME"/.config/pikadoc/plugin.nu"
+                ${pkgs.nushell}/bin/nu $COMMAND_FLAG "source ${bootstrap}; $COMMAND" --plugin-config $HOME"/.config/pikadoc/plugin.msgpackz"
               '';
             in pkgs.stdenv.mkDerivation {
               buildInputs = [];

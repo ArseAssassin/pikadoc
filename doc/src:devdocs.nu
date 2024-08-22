@@ -1,9 +1,21 @@
+def normalize-html [] {
+  hxnormalize -x
+}
+
 def download [name] {
   let url = $"https://downloads.devdocs.io/($name).tar.gz"
   print $"Downloading ($url)"
   let it = http get $url
   print "Download finished"
   $it
+}
+
+def is-inline-section [] {
+  let section = $in
+
+  'h1 h2 h3 h4 h5 h6 br span p'
+  |split words
+  |any {|elem| $section|str starts-with $"<($elem)"}
 }
 
 def format [archive:binary] {
@@ -14,64 +26,36 @@ def format [archive:binary] {
     items {|key, doc|
       { key: $key, doc: $doc }
     }
-    |par-each {|item|
+    |each {|item|
       let key = $item.key
       let doc = $item.doc
       print -n .
-      let sections = $doc|query web --query '.section' --as-html
-      {$key: (
-        if ($sections != []) {
-          $doc|query web --query '.section' --as-html|
-          each {|section|
-            let ids = $section|query web --query '*[id]' -a id
-            {
-              ($ids|get 0?|default ''): ($section)
-            }}|
-          reduce --fold {} {|a, b| $a|merge $b}
-        } else {
-          let ids = $doc|query web --query '*[id]' -a id
+      print $key
 
-          def find-id-query [id] {
-            $'[id="($id)"]'
+      $doc
+      |query web --query '[id]' --as-html
+      |each {|section|
+        let sectionId = $section|normalize-html|query web --query '[id]' -a id|get 0
+        { $"($key)#($sectionId)": (
+          if ($section|is-inline-section) {
+            let subdoc = $doc|str substring ($doc|str index-of $section)..
+
+            $subdoc|str substring ..(
+              $subdoc|str index-of ($subdoc|query web --query $"[id]:not\([id='($sectionId)']\)" --as-html|get 0?|default 'dasofuisdaofuiasodfasodfjcxvkljsdouisaldvjkalieuorals')
+            )
+          } else {
+            $section
           }
-
-          def find-id-start [id] {
-            $doc|str index-of ($doc|query web --query (find-id-query $id) --as-html|get 0?)
-          }
-
-          $ids
-          |zip (($ids|skip 1) ++ null)
-          |reduce --fold {currentDoc: $doc, values: []} {|ids, acc|
-            print -n .
-
-            let id = $ids|get 0
-            let endId = $ids|get 1
-            let doc = $acc.currentDoc
-            let start = find-id-start $id
-
-            if ($start == (-1)) {
-              return { currentDoc: $doc, values: ($acc.values ++ [[$id $doc]]) }
-            }
-
-            let end = if ($endId != null) {
-              find-id-start $endId
-            } else {
-              null
-            }
-
-            let output = $doc|str substring $start..$end
-            { currentDoc: ($doc),
-              values: ($acc.values ++ [[$id $output]]) }
-
-          }
-          |get values
-          |reduce --fold {} { |row, memo| $memo|merge {($row|get 0): $row.1} }
-        }
-      )}
+        ) }
+      }
+      |reduce --fold {$key: $doc} {|section, acc|
+        $acc|merge $section
+      }
     }
   )
   |reduce {|a, b| $a|merge $b}
   print ''
+  print ($docindex|transpose|get column0)
 
   let entries = (
     $archive
@@ -85,49 +69,36 @@ def format [archive:binary] {
   print $"Converting ($entries|length) HTML pages"
 
   $entries
-  |par-each {|row|
+  |each {|row|
     print -n '.'
-    let uri = $row.path|parse --regex '(?<doc>[^#]+)(?<hash>#.+)?'|get 0
-    let doc = if ($uri.hash == '' or $uri.hash == null or $uri.hash == '#_') {
-      $htmldocs|get $uri.doc|html-to-md
-    } else {
-      let baseDoc = $docindex|get -i $uri.doc
-      if ($baseDoc == null) {
-        return ''
-      }
+    print $"($row.path): ($row.name)"
+    let doc = $docindex|get -i ($row.path)
 
-      let idDoc = $baseDoc|get -i ($uri.hash|str substring 1..)
-
-      if ($idDoc == null) {
-        $htmldocs|get $uri.doc|html-to-md
-      } else {
-        $idDoc|html-to-md
-      }
-    }
-
-    if ($doc|str trim|is-empty) {
-      {}
-    } else {
-      {
-        name: $row.name,
+    if ($doc != null) {
+      ({
+        name: $row.name
         summary: (
           $doc
+          |pandoc -f html -t plain --wrap=none
           |lines
-          |skip until {|line| $line =~ "^[A-z]"}
+          |skip until {|line| $line =~ "^[A-Za-z]"}
           |get 0?
           |default ''
           |split column '.'
           |get column1?.0?
           |default ''
-          |pandoc -f gfm -t plain --wrap=none),
-        description: $doc
-      }
+        )
+        description: ($doc|html-to-md)
+      })
+    } else {
+      ({})
     }
   }
+  |where {|| $in.name? != null }
 }
 
 def html-to-md [] {
-  pandoc -f html -t gfm-raw_html --wrap=none
+  pandoc -f html -t gfm --wrap=none --lua-filter $"($env.PKD_PATH)/pandoc-strip-images.lua"
 }
 
 # Retrieves a list of available documentation files from devdocs.io and returns them as a table
@@ -146,12 +117,20 @@ export def index [] {
 #
 # NOTE: Since this function downloads and parses a lot of HTML data, it can be quite slow - make sure to use `doc save` to cache frequently used doctables locally.
 export def --env use [slug] {
-  $env.PKD_CURRENT = (format (download $slug))
-  $env.PKD_ABOUT = {
-    name: $slug
-    text_format: 'markdown'
-    generator: 'src:devdocs'
+  let metadata = index|where {|| $in.slug == $slug}|get 0?
+
+  if ($metadata == null) {
+    print $"Couldn't find devdocs with the slug ($slug)"
+  } else {
+    $env.PKD_CURRENT = {
+      about: {
+        name: $slug
+        text_format: 'markdown'
+        generator: 'src:devdocs'
+        version: $metadata.version
+      },
+      doctable: (format (download $slug))
+    }
   }
-  print ''
-  print ("Done! Remember to cache results locally using `doc save`"|mdcat)
+
 }

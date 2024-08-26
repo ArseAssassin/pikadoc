@@ -1,11 +1,18 @@
+export use s.nu
 export use src:devdocs.nu
+export use src:man.nu
+export use src:sqlite.nu
+export use src:python.nu
+export use src:openapi.nu
+export use src:javascript.nu
+export use src:nushell.nu
 
 # Returns a summarized table of all available symbols in the currently selected docfile.
 #
 # If `name` is passed as an argument, results will be filtered by their name. If `index` is passed as an argument, only the selected result will be returned.
 #
-# When a single result is found, it'll be presented using `doc present`. If more than one result is found, returned symbols will be summarized using `doc summarize`.
-export def main [name?, index?] {
+# When only a single result is found, it'll be presented as whole. If more than one result is found, returned results will be shown in a summarized table.
+export def --env main [name?, index?] {
   if (('PKD_CURRENT' in $env) != true) {
     print "No docfile currently selected. Type `doc use <path>` to select a docfile to use."
     return
@@ -13,7 +20,7 @@ export def main [name?, index?] {
   if (($name|describe) == 'int') {
     pkd-doctable|get $name|present
   } else if ($name != null) {
-    let list = pkd-doctable|find $name -c ['name']
+    let list = pkd-doctable|add-doc-ids|find $name -c ['name']
 
     if ($index != null) {
       $list|get $index|present
@@ -21,40 +28,81 @@ export def main [name?, index?] {
       $list|present-list
     }
   } else {
-    pkd-doctable|present-list
+    pkd-doctable|add-doc-ids|present-list
   }
 }
 
-export def * [] {
-  pkd-doctable|get name
+def add-doc-ids [] {
+  zip 0..|each {|vals| {'#': $vals.1}|merge $vals.0}
 }
 
-def present-list [] {
+export def --env * [] {
+  pkd-doctable|paginate 100000000 true
+}
 
-  if ($in|length) == 1 {
-    $in|get 0|present
+def result-lines [] {
+  20
+}
+
+def --env present-list [] {
+  let docs = $in
+
+
+  if ($docs|length) == 1 {
+    $docs|get 0|present
   } else {
-    let docs = $in
-    let list = $docs|take 20|summarize-all
-    let more = ($docs|length) - 20
-    print ($list|table)
-    if ($more > 0) {
-      print $"Showing 20 symbols out of ($docs|length)"
-    }
+    $docs|paginate (result-lines) true
+  }
+}
 
+def --env paginate [resultLines:int, newResults=false] {
+  let docs = $in
+
+  if ($newResults) {
+    $env.PKD_CURSOR = 0
+    $env.PKD_RESULTS = $docs
+  } else {
+    $env.PKD_CURSOR += $resultLines
+  }
+
+  let list = $docs|skip $env.PKD_CURSOR|take $resultLines
+
+  print ($list|summarize-all|table -i false)
+
+  if (($env.PKD_CURSOR + $resultLines) < ($docs|length)) {
+    print $"Showing ($env.PKD_CURSOR + $resultLines) results out of ($docs|length), type `doc more` for more results"
+  } else {
+    $env.PKD_CURSOR = 0
+  }
+}
+
+# Shows more results from the last search. If `index` is passed as an argument, the given result will be selected from the last result set and presented as a whole.
+#
+# Examples
+#
+# # Show more results from the last search
+#   ```doc more```
+#
+# # Show result number 8
+#   ```doc more 8```
+export def --env more [index?:int] {
+  if ($index != null) {
+    $env.PKD_RESULTS|get ($index)|present
+  } else {
+    $env.PKD_RESULTS|paginate (result-lines)
   }
 }
 
 # Sets the current doctable.
 #
-# `docs` is either a file in the local filesystem or a doctable.
+# `docs` is either a file in the local filesystem or a pikadoc table.
 #
 # Examples
 #
 # # Use a docfile from local filesystem
 #   ```doc use my-doc-file.pkd```
 #
-# # Download and use pikadoc CLI reference docs
+# # Use a docfile downloaded from a server
 #   ```doc use (http get 'https://raw.githubusercontent.com/ArseAssassin/pikadoc/master/reference-docs.pkd'|from yaml)```
 export def --env use [docs] {
   let type = $docs|describe
@@ -65,7 +113,10 @@ export def --env use [docs] {
       doctable: $file.1
     }
   } else {
-    $env.PKD_CURRENT = $docs
+    $env.PKD_CURRENT = {
+      about: ($docs|get 0)
+      doctable: ($docs|get 1)
+    }
   }
 }
 
@@ -89,7 +140,7 @@ def "from pkd" [] {
 #
 # `$in` should be a pikadoc symbol.
 export def summarize [] {
-  select name? kind? summary?|trim-record-whitespace
+  select '#'? name? kind? summary?|trim-record-whitespace
 }
 
 # Creates a readable summary of all symbols.
@@ -101,7 +152,7 @@ export def summarize-all [] {
 
 alias _save = save
 
-# Saves doctable in the local filesystem.
+# Saves doctable in the filesystem.
 #
 # `filepath` is a path to use for saving the file
 export def save [filepath: string] {
@@ -122,7 +173,7 @@ def trim-record-whitespace [] {
   }}
 }
 
-def present [] {
+export def present [] {
   let output = $in
     |trim-record-whitespace
     |maybe-update type {|| str join ' -> '}
@@ -135,12 +186,14 @@ def present [] {
     $output|reject description?
   }
 
-  print ($trimmedOutput|table --expand)
+  let meta = $trimmedOutput|table --expand
 
   if ((pkd-about).text_format? == 'markdown') {
-    $output.description?|glow
+    let body = $output.description?|glow -s auto|complete|get stdout
+
+    $"($meta)\n\n($body)"
   } else {
-    print $output.description?
+    $"($meta)\n\n($output.description?)"
   }
 
 }

@@ -1,5 +1,5 @@
 def normalize-html [] {
-  hxnormalize -x
+  hxnormalize -x|hxunent -b
 }
 
 export def download [name] {
@@ -22,78 +22,58 @@ def merge-all [] {
   }
 }
 
-export def generate-page-index [key, doc, options:record={}] {
-  let preprocessedDoc = if ($options.stripNodes? != null) {
-    $doc
-    |normalize-html
-    |hxremove $options.stripNodes
-  } else {
-    $doc
-  }
-
-  let htmlSections = (
-    $preprocessedDoc
-    |query web --query '.section, dl' --as-html
-    |each {|section|
-      let id = $section|query web --query '[id]' -a id|get 0?
-      if ($id != null) {
-        { $"($key)#($id)": $section }
-      } else {
-        {}
-      }
+export def generate-page-index [docPath:string, doc:string, sections:list, options:record={}] {
+  let sectionedMarkdown = (
+    $sections
+    |reduce --fold ($doc|normalize-html) {|sectionName, xml|
+      print $docPath
+      print $sectionName
+      let localSectionName = $sectionName|parse $"($docPath)#{name}"|get 0.name
+      $xml|xmlstarlet ed -i $"//*[@id='(($localSectionName))']" -t elem -n 'pre' -v $"PIKADOC_PAGE_BREAK ::: `($localSectionName)` :::"
     }
-    |merge-all
+    |pandoc -f html -t gfm-raw_html-tex_math_dollars
   )
 
-  $preprocessedDoc
-  |query web --query '[id]' --as-html
+  $"    PIKADOC_PAGE_BREAK ::: `` :::\n\n($sectionedMarkdown)"
+  |split row '    PIKADOC_PAGE_BREAK ::: '
+  |where {|| $in != ''}
   |each {|section|
-    let sectionId = $section|normalize-html|query web --query '[id]' -a id|get 0
-    { $"($key)#($sectionId)": (
-      if ($section|is-inline-section) {
-        let subdoc = $preprocessedDoc|str substring ($preprocessedDoc|str index-of $section)..
-
-        print $"inline ($sectionId)"
-
-        # try {
-          $subdoc|str substring ..(
-            $subdoc|str index-of ($subdoc|query web --query $"[id]:not\(.method-source-code\)" --as-html|get 0?|default 'dasofuisdaofuiasodfasodfjcxvkljsdouisaldvjkalieuorals')
-          )
-        # } catch {
-        #   print $"Error while processing section id ($sectionId)"
-        #   $subdoc
-        # }
-
-      } else {
-        $section
-      }
-    ) }
+    let sectionParts = $section|parse "`{name}` :::{rest}"
+    { $"($docPath)#($sectionParts.0.name)": $sectionParts.0.rest }
   }
   |merge-all
-  |merge $htmlSections
-  |merge {$key: $preprocessedDoc}
+  |merge { $docPath: ($doc|pandoc -f html -t gfm-raw_html-tex_math_dollars)  }
 }
 
-export def generate-doc-index [options:record] {
-  tar -zx ./db.json -O
-  |complete
-  |get stdout
-  |from json
+export def generate-doc-index [entries:table, options:record] {
+  let db = (
+    tar -zx ./db.json -O
+    |complete
+    |get stdout
+    |from json
+  )
+
+  $db
   |items {|key, doc|
     print -n .
 
-    generate-page-index $key $doc $options
+    generate-page-index $key $doc (
+      $entries
+      |each {|| get path }
+      |where {|| ($in|str starts-with $"($key)#") }
+    ) $options
   }
-  |reduce {|a, b| $a|merge $b}
+  |merge-all
+  |merge { PIKADOC_COPYRIGHT: (
+    $db.index
+    |query web --query '._attribution' --as-html
+    |last
+    |pandoc -f html -t plain
+  ) }
 }
 
 def format [archive:binary, options:record] {
   print "Extracting data"
-  let htmldocs = $archive|tar -zx ./db.json -O|complete|get stdout|from json
-  let docindex = $archive|generate-doc-index $options
-  print ''
-
-  let copyright = $docindex.index|query web --query '._attribution' --as-html|last|pandoc -f html -t plain
 
   let entries = (
     $archive
@@ -103,6 +83,12 @@ def format [archive:binary, options:record] {
     |from json
     |get entries
   )
+  let docindex = $archive|generate-doc-index $entries $options
+  print $entries
+  print ($docindex|columns)
+  print ''
+
+  let copyright = $docindex.PIKADOC_COPYRIGHT
 
   print $"Converting ($entries|length) HTML pages"
 
@@ -122,18 +108,7 @@ def format [archive:binary, options:record] {
       if ($doc != null) {
         ({
           name: $row.name
-          summary: (
-            $doc
-            |query web --query 'p:not([class])'
-            |get 0?
-            |default []
-            |str join ''
-            |split row -r '\.\s'
-            |get 0?
-            |default ''
-            |str trim
-            |str replace -r '\.$' ''
-          )
+          summary: ($doc|str substring ..40)
           belongs_to: (if ($row.path|str contains '#') {
             let parentDoc = (
               $row.path
@@ -145,7 +120,7 @@ def format [archive:binary, options:record] {
             |where {|| $in.path == $parentDoc}
             |get 0?.name?
           })
-          description: ($doc|html-to-md)
+          description: $doc
         })
       } else {
         ({})
@@ -165,7 +140,7 @@ def format [archive:binary, options:record] {
 }
 
 def html-to-md [] {
-  pandoc -f html -t gfm-raw_html --wrap=none --lua-filter $"($env.PKD_PATH)/pandoc-strip-images.lua"
+  pandoc -f html -t gfm-raw_html-tex_math_dollars --wrap=none --lua-filter $"($env.PKD_PATH)/pandoc-strip-images.lua"
 }
 
 # Retrieves a list of available documentation files from devdocs.io and returns them as a table

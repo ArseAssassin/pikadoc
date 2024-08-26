@@ -33,7 +33,7 @@
                 #!/usr/bin/env nix-shell
                 #! nix-shell -i bash -p bash
 
-                PATH=$PATH:${pkgs.pandoc}/bin:${pkgs.nushell}/bin:${pkgs.glow}/bin:${pkgs.groff}/bin:${pkgs.html-xml-utils}/bin
+                PATH=$PATH:${pkgs.pandoc}/bin:${pkgs.nushell}/bin:${pkgs.glow}/bin:${pkgs.groff}/bin:${pkgs.html-xml-utils}/bin:${pkgs.xmlstarlet}/bin
                 export PKD_PATH="${src}/doc"
                 export PKD_VERSION=${version-number}
                 mkdir -p $HOME"/.config/pikadoc"

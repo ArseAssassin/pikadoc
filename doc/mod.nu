@@ -12,7 +12,7 @@ export use src:nushell.nu
 # If `name` is passed as an argument, results will be filtered by their name. If `index` is passed as an argument, only the selected result will be returned.
 #
 # When only a single result is found, it'll be presented as whole. If more than one result is found, returned results will be shown in a summarized table.
-export def --env main [name?, index?] {
+export def --env main [name?] {
   if (('PKD_CURRENT' in $env) != true) {
     print "No docfile currently selected. Type `doc use <path>` to select a docfile to use."
     return
@@ -20,16 +20,59 @@ export def --env main [name?, index?] {
   if (($name|describe) == 'int') {
     pkd-doctable|get $name|present
   } else if ($name != null) {
-    let list = pkd-doctable|add-doc-ids|find $name -c ['name']
+    let query = ($name|str downcase)
+    let search = (
+      pkd-doctable
+      |add-doc-ids
+      |find $name -c ['name', 'summary']
+    )
 
-    if ($index != null) {
-      $list|get $index|present
+    if (($search|length) == 1) {
+      $search|get 0|present
     } else {
-      $list|present-list
+      let list = (
+        $search
+        |insert dist {|row| (
+          (($row.name|ansi strip|str downcase|str index-of $query|if ($in == -1) { 100 } else { $in }) * 100) +
+          (($row.summary|ansi strip|str downcase|find $query|length) * -10) +
+          ($row.description|ansi strip|str downcase|find $query|length) * -1
+        )}
+        |sort-by dist
+        |reject dist
+      )
+
+      $list|summarize-all|present-list
     }
   } else {
-    pkd-doctable|add-doc-ids|present-list
+    pkd-doctable|add-doc-ids|summarize-all|present-list
   }
+}
+
+
+# Searches the descriptions of all symbols in the current doctable. `query` is a regular expression that should be used. System grep is used for matching output.
+export def --env search [query:string] {
+  if (('PKD_CURRENT' in $env) != true) {
+    print "No docfile currently selected. Type `doc use <path>` to select a docfile to use."
+    return
+  }
+
+  pkd-doctable
+  |add-doc-ids
+  |find ($query) -c ['description'] -r
+  |insert ranking {|row| (
+    $row.description
+    |ansi strip
+    |grep -i -o $query
+    |lines
+    |length
+  ) * -1}
+  |sort-by ranking
+  |insert results {|row|
+    $row.description
+    |grep -i $query -A0 -B0 --group-separator='...' -m 5
+  }
+  |select '#' name kind? results
+  |present-list
 }
 
 def add-doc-ids [] {
@@ -45,14 +88,7 @@ def result-lines [] {
 }
 
 def --env present-list [] {
-  let docs = $in
-
-
-  if ($docs|length) == 1 {
-    $docs|get 0|present
-  } else {
-    $docs|paginate (result-lines) true
-  }
+  paginate (result-lines) true
 }
 
 def --env paginate [resultLines:int, newResults=false] {
@@ -67,7 +103,7 @@ def --env paginate [resultLines:int, newResults=false] {
 
   let list = $docs|skip $env.PKD_CURSOR|take $resultLines
 
-  print ($list|summarize-all|table -i false)
+  print ($list|table -i false)
 
   if (($env.PKD_CURSOR + $resultLines) < ($docs|length)) {
     print $"Showing ($env.PKD_CURSOR + $resultLines) results out of ($docs|length), type `doc more` for more results"

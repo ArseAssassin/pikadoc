@@ -23,15 +23,18 @@ def merge-all [] {
 }
 
 export def generate-page-index [docPath:string, doc:string, sections:list, options:record={}] {
+  let preprocessedDoc = (
+    $doc
+    |normalize-html
+    |xmlstarlet ed -d $"//img|//svg|//button|//video|//iframe|//area|//audio|//map|//track|//embed|//object|//picture|//portal|//source|($options.stripElements?|default '*[false()]')"
+  )
   let sectionedMarkdown = (
     $sections
-    |reduce --fold ($doc|normalize-html) {|sectionName, xml|
-      print $docPath
-      print $sectionName
+    |reduce --fold $preprocessedDoc {|sectionName, xml|
       let localSectionName = $sectionName|parse $"($docPath)#{name}"|get 0.name
-      $xml|xmlstarlet ed -i $"//*[@id='(($localSectionName))']" -t elem -n 'pre' -v $"PIKADOC_PAGE_BREAK ::: `($localSectionName)` :::"
+      $xml|xmlstarlet ed -i $"//*[@id=\"(($localSectionName))\"][1]" -t elem -n 'pre' -v $"PIKADOC_PAGE_BREAK ::: `($localSectionName)` :::"
     }
-    |pandoc -f html -t gfm-raw_html-tex_math_dollars
+    |html-to-md
   )
 
   $"    PIKADOC_PAGE_BREAK ::: `` :::\n\n($sectionedMarkdown)"
@@ -42,7 +45,7 @@ export def generate-page-index [docPath:string, doc:string, sections:list, optio
     { $"($docPath)#($sectionParts.0.name)": $sectionParts.0.rest }
   }
   |merge-all
-  |merge { $docPath: ($doc|pandoc -f html -t gfm-raw_html-tex_math_dollars)  }
+  |merge { $docPath: ($preprocessedDoc|html-to-md) }
 }
 
 export def generate-doc-index [entries:table, options:record] {
@@ -84,8 +87,6 @@ def format [archive:binary, options:record] {
     |get entries
   )
   let docindex = $archive|generate-doc-index $entries $options
-  print $entries
-  print ($docindex|columns)
   print ''
 
   let copyright = $docindex.PIKADOC_COPYRIGHT
@@ -108,7 +109,20 @@ def format [archive:binary, options:record] {
       if ($doc != null) {
         ({
           name: $row.name
-          summary: ($doc|str substring ..40)
+          summary: (
+            $doc
+            |pandoc -fgfm -t html-tex_math_dollars --wrap=none
+            |query web --query p
+            |each {||
+              str join ''
+              |str replace -a "\n" ' '
+              |str trim
+              |parse --regex '(.+?[A-Za-z0-9])\.($|\s)'
+            }
+            |flatten
+            |get 0?.capture0?
+            |default null
+          )
           belongs_to: (if ($row.path|str contains '#') {
             let parentDoc = (
               $row.path

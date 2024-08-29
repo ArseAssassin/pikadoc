@@ -26,7 +26,9 @@ export def generate-page-index [docPath:string, doc:string, sections:list, optio
   let preprocessedDoc = (
     $doc
     |normalize-html
-    |xmlstarlet ed -d $"//img|//svg|//button|//video|//iframe|//area|//audio|//map|//track|//embed|//object|//picture|//portal|//source|($options.stripElements?|default '*[false()]')"
+    # Remove multimedia elements as they can't be supported in text output.
+    # Remove linebreaks in tables as they can't be represented in Markdown.
+    |xmlstarlet ed -d $"//img|//svg|//button|//video|//iframe|//area|//audio|//map|//track|//embed|//object|//picture|//portal|//source|//table//br|($options.stripElements?|default '*[false()]')"
   )
   let sectionedMarkdown = (
     $sections
@@ -134,7 +136,7 @@ def format [archive:binary, options:record] {
             |where {|| $in.path == $parentDoc}
             |get 0?.name?
           })
-          description: $doc
+          description: ($doc|str trim)
         })
       } else {
         ({})

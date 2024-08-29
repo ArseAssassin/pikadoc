@@ -111,6 +111,7 @@ def format [archive:binary, options:record] {
       if ($doc != null) {
         ({
           name: $row.name
+          id: $row.path
           summary: (
             $doc
             |pandoc -fgfm -t html-tex_math_dollars --wrap=none

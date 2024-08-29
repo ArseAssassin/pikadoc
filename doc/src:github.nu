@@ -11,9 +11,23 @@ export def --env use [repo:string] {
       |each {|md|
         print -n .
 
+        let doc = http get $"https://raw.githubusercontent.com/($repo)/main/($md.path)"
+
         ({
           name: $md.path
-          description: (http get $"https://raw.githubusercontent.com/($repo)/main/($md.path)")
+          description: $doc
+          summary: (
+            $doc
+            |pandoc -f gfm -t html --wrap=none
+            |hxnormalize -x
+            |hxunent -b
+            |xmlstarlet select -t --value-of '//p[contains(., '.')][1]'
+            |lines
+            |each {|| str trim}
+            |str join ' '
+            |split row '.'
+            |get 0
+            |str trim)
         })}
     )
   } $"src:github use ($repo)"

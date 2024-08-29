@@ -37,11 +37,12 @@
                 export PKD_PATH="${src}/doc"
                 export PKD_VERSION=${version-number}
                 export PKD_HOME=${src}
-                mkdir -p $HOME"/.config/pikadoc"
+                export PKD_CONFIG_HOME=$HOME"/.config/pikadoc"
+                mkdir -p $PKD_CONFIG_HOME
 
-                touch $HOME"/.config/pikadoc/plugin.msgpackz"
+                touch $PKD_CONFIG_HOME"/plugin.msgpackz"
 
-                CONFIG=$HOME"/.config/pikadoc/config.msgpackz"
+                CONFIG=$PKD_CONFIG_HOME"/config.msgpackz"
                 if [ ! -f "$CONFIG" ]; then
                   cat ${nu-source}/crates/nu-utils/src/sample_config/default_config.nu|sed "s/show_banner: true/show_banner: false/g" > $CONFIG
                 fi
@@ -54,7 +55,7 @@
                   COMMAND_FLAG="-e"
                 fi
 
-                ${pkgs.nushell}/bin/nu $COMMAND_FLAG "source ${bootstrap}; $COMMAND" --plugin-config $HOME"/.config/pikadoc/plugin.msgpackz"
+                ${pkgs.nushell}/bin/nu $COMMAND_FLAG "source ${bootstrap}; $COMMAND" --plugin-config $PKD_CONFIG_HOME"/plugin.msgpackz"
               '';
             in pkgs.stdenv.mkDerivation {
               buildInputs = [];

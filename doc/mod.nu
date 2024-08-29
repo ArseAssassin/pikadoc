@@ -6,6 +6,7 @@ export use src:python.nu
 export use src:openapi.nu
 export use src:javascript.nu
 export use src:nushell.nu
+export use src:github.nu
 
 # Returns a summarized table of all available symbols in the currently selected docfile.
 #
@@ -49,7 +50,7 @@ export def --env main [name?] {
 }
 
 
-# Searches the descriptions of all symbols in the current doctable. `query` is a regular expression that should be used. System grep is used for matching output.
+# Searches the descriptions of all symbols in the current doctable for `query`. System grep is used for matching output.
 export def --env search [query:string] {
   if (('PKD_CURRENT' in $env) != true) {
     print "No docfile currently selected. Type `doc use <path>` to select a docfile to use."
@@ -58,18 +59,18 @@ export def --env search [query:string] {
 
   pkd-doctable
   |add-doc-ids
-  |find ($query) -c ['description'] -r
+  |find ($query) -c ['description']
   |insert ranking {|row| (
     $row.description
     |ansi strip
-    |grep -i -o $query
+    |grep -F -i -o $query
     |lines
     |length
   ) * -1}
   |sort-by ranking
   |insert results {|row|
     $row.description
-    |grep -i $query -A0 -B0 --group-separator='...' -m 5
+    |grep -F -i $query -A0 -B0 --group-separator='...' -m 5
   }
   |select '#' name kind? results
   |present-list
@@ -140,7 +141,7 @@ export def --env more [index?:int] {
 #
 # # Use a docfile downloaded from a server
 #   ```doc use (http get 'https://raw.githubusercontent.com/ArseAssassin/pikadoc/master/reference-docs.pkd'|from yaml)```
-export def --env use [docs] {
+export def --env use [docs, command?:string] {
   let type = $docs|describe
   if ($type == 'string') {
     let file = (open $docs|from yaml)
@@ -149,11 +150,15 @@ export def --env use [docs] {
       doctable: $file.1
     }
   } else {
-    $env.PKD_CURRENT = {
-      about: ($docs|get 0)
-      doctable: ($docs|get 1)
-    }
+    $env.PKD_CURRENT = $docs
   }
+
+  if ($command != null) {
+    $command
+  } else {
+    $"use ($docs)"
+  }
+  |add-to-history
 }
 
 export def pkd-about [] {
@@ -245,4 +250,35 @@ def maybe-update [name, value] {
 # Returns current pikadoc version
 export def version [] {
   $env.PKD_VERSION
+}
+
+def history-file [] {
+  $"($env.PKD_CONFIG_HOME)/history.yml"
+}
+
+def _history [] {
+  if (not (history-file|path exists)) {
+    []|to yaml|_save (history-file)
+  }
+
+  open (history-file)
+}
+
+# Returns a list of the last 50 doctables selected with `doc use`
+export def history [] {
+  _history
+  |take 50
+  |each {|| $"doc ($in)"}
+}
+
+def add-to-history [] {
+  let cmd = $in
+  _history
+  |collect { ||
+    prepend $cmd
+    |uniq
+    |to yaml
+    |_save -f (history-file)
+  }
+
 }

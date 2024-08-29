@@ -1,10 +1,10 @@
-let PROMPT_COMMAND_RIGHT_OLD = $env.PROMPT_COMMAND_RIGHT
-$env.PROMPT_COMMAND_RIGHT = {||
-  if ('PKD_ABOUT' in $env) {
-    $"pikadoc:($env.PKD_ABOUT.name)"
-  } else {
-    do $PROMPT_COMMAND_RIGHT_OLD
-  }
+let PROMPT_COMMAND_OLD = $env.PROMPT_COMMAND
+$env.PROMPT_COMMAND = {||
+  $"pikadoc \(($env.PKD_CURRENT?.about.name|default 'none')\) (do $PROMPT_COMMAND_OLD)"
+}
+
+$env.DOC_USE = {|docs, command?:string|
+  doc use $docs $command
 }
 
 print ($"**Welcome to PikaDoc** - to get started, type:"|mdcat)

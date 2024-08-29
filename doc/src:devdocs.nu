@@ -155,6 +155,9 @@ def format [archive:binary, options:record] {
 
 def html-to-md [] {
   pandoc -f html -t gfm-raw_html-tex_math_dollars --wrap=none --lua-filter $"($env.PKD_PATH)/pandoc-strip-images.lua"
+  # pandoc inserts an empty comment between two `dl` elements when rendering
+  # to markdown - as a workaround, replace such paragraphs with two newlines
+  |str replace "\n\n&nbsp;\n\n" "\n\n"
 }
 
 # Retrieves a list of available documentation files from devdocs.io and returns them as a table
@@ -179,7 +182,7 @@ export def --env use [slug, options={}] {
     print $"Couldn't find devdocs with the slug ($slug)"
   } else {
     let docs = (format (download $slug) $options)
-    $env.PKD_CURRENT = {
+    do --env $env.DOC_USE {
       about: {
         name: $metadata.name
         slug: $slug
@@ -190,7 +193,7 @@ export def --env use [slug, options={}] {
         homepage: $metadata.links_home
       },
       doctable: $docs.doctable
-    }
+    } $"src:devdocs use ($slug) (if ($options != {}) { $options } else { null })"
   }
 
 }

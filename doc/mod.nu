@@ -10,12 +10,25 @@ export use src:javascript.nu
 export use src:nushell.nu
 export use src:github.nu
 
-# Returns a summarized table of all available symbols in the currently selected docfile.
+# Returns a summarized table of available symbols in the
+# currently selected doctable.
 #
-# If `name` is passed as an argument, results will be filtered by their name. If `index` is passed as an argument, only the selected result will be returned.
+# If a `string` is passed as an argument, doctable will be
+# filtered by `name` and `summary`. If an `int` is passed
+# as an argument the selected symbol is shown as a whole.
 #
-# When only a single result is found, it'll be presented as whole. If more than one result is found, returned results will be shown in a summarized table.
-export def --env main [name?] {
+# Examples:
+#   Return list of all symbols in current doctable
+#   > doc
+#
+#   Filter symbols by name in current doctable
+#   > doc 'add'
+#
+#   Show symbol at index 3
+#   > doc 3
+export def --env main [
+  name? # Name of the symbol to query
+] {
   if (('PKD_CURRENT' in $env) != true) {
     print "No docfile currently selected. Type `doc use <path>` to select a docfile to use."
     return
@@ -30,24 +43,21 @@ export def --env main [name?] {
       |find $name -c ['name', 'summary']
     )
 
-    if (($search|length) == 1) {
-      $search|get 0|present
-    } else {
-      let list = (
-        $search
-        |insert dist {|row| (
-          (($row.name|ansi strip|str downcase|str index-of $query|if ($in == -1) { 100 } else { $in }) * 100) +
-          (($row.summary|ansi strip|str downcase|find $query|length) * -10) +
-          ($row.description|ansi strip|str downcase|find $query|length) * -1
-        )}
-        |sort-by dist
-        |reject dist
-      )
-
-      $list|summarize-all|present-list
-    }
+    $search
+    |insert dist {|row| (
+      (($row.name|ansi strip|str downcase|str index-of $query|if ($in == -1) { 100 } else { $in }) * 100) +
+      (($row.summary|ansi strip|str downcase|find $query|length) * -10) +
+      ($row.description|ansi strip|str downcase|find $query|length) * -1
+    )}
+    |sort-by dist
+    |reject dist
+    |summarize-all
+    |present-list
   } else {
-    pkd-doctable|add-doc-ids|summarize-all|present-list
+    pkd-doctable
+    |add-doc-ids
+    |summarize-all
+    |present-list
   }
 }
 
@@ -79,10 +89,6 @@ export def --env search [query:string] {
 
 def add-doc-ids [] {
   zip 0..|each {|vals| {'#': $vals.1}|merge $vals.0}
-}
-
-export def --env * [] {
-  pkd-doctable|paginate 100000000 true
 }
 
 def result-lines [] {
@@ -233,11 +239,59 @@ def trim-record-whitespace [] {
   }}
 }
 
+def present-type [] {
+  let type = $in
+  let name = $type|describe
+  if ($name == 'list<list<any>>') {
+    $type
+    |each { present-type }
+    |str join "\n"
+  } else if ($name == 'list<any>') {
+    $type
+    |each { present-type }
+    |str join " -> "
+  } else if ($name|str starts-with 'record') {
+    $"($type.name):($type.type)(if ($type.optional? == true) { '?' })(if ($type.rest? == true) {
+      '...'
+    })(if ($type.default? != null) {
+      '=' + $type.default
+    })"
+  } else {
+    $in
+  }
+}
+
+def present-param [] {
+  $"> `($in|present-type)`\n> ($in.description)"
+}
+
+def present-body [] {
+  let output = $in
+  let params = $output.type?.0?
+    |default []
+    |where {(($in.description|default '') != '')}
+
+  $output.description? + (
+    $output
+    |if (($params|length) > 0) {
+      $"\n\nParams:\n($params|each {
+        present-param
+      }|str join "\n\n")"
+    } else {
+      ''
+    }
+  ) + (
+    |if ($output.examples? != null and $output.examples? != []) {
+      $"\n\nExamples:\n($output.examples|str join "\n\n")"
+    } else {
+      ""
+    }
+  )
+}
+
 export def present [] {
   let output = $in
     |trim-record-whitespace
-    |maybe-update type {|| str join ' -> '}
-    |maybe-update parameters {|| each {|| trim-record-whitespace }}
 
   let trimmedOutput = if ($output.summary? == '' or ($output.summary?|default ''|str trim) ==
       ($output.description?|default ''|str trim)) {
@@ -245,11 +299,18 @@ export def present [] {
   } else {
     $output|reject description?
   }
+  |reject examples?
 
-  let meta = $trimmedOutput|table --expand
+  let meta = $trimmedOutput|maybe-update type {|| present-type }|table --expand
 
   if ((pkd-about).text_format? == 'markdown') {
-    let body = $output.description?|glow -s auto|complete|get stdout
+    let body = (
+      $output
+      |present-body
+      |glow -s auto
+      |complete
+      |get stdout
+    )
 
     $"($meta)\n\n($body)"
   } else {

@@ -15,7 +15,7 @@ export def parse-from-db [] {
         |each {|col| {
           name: $col.name
           type: $col.type
-          defaultValue: $col.dflt_value
+          default: $col.dflt_value
           nullable: ($col.notnull == 0)
           pk: ($col.pk == 1)
         }})

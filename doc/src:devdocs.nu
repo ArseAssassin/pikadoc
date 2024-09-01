@@ -190,18 +190,20 @@ export def --env use [slug, options={}] {
   if ($metadata == null) {
     print $"Couldn't find devdocs with the slug ($slug)"
   } else {
-    let docs = (format (download $slug) $options)
-    do --env $env.DOC_USE {
-      about: {
-        name: $metadata.name
-        slug: $slug
-        text_format: 'markdown'
-        generator: 'src:devdocs'
-        version: $metadata.version
-        copyright: $docs.copyright
-        homepage: $metadata.links_home
-      },
-      doctable: $docs.doctable
+    do --env $env.DOC_USE {||
+      let docs = (format (download $slug) $options)
+      {
+        about: {
+          name: $metadata.name
+          slug: $slug
+          text_format: 'markdown'
+          generator: 'src:devdocs'
+          version: $metadata.version
+          copyright: $docs.copyright
+          homepage: $metadata.links_home
+        },
+        doctable: $docs.doctable
+      }
     } $"src:devdocs use ($slug) (if ($options != {}) { $options } else { null })"
   }
 

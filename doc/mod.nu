@@ -145,6 +145,8 @@ export def --env more [index?:int] {
 #   ```doc use (http get 'https://raw.githubusercontent.com/ArseAssassin/pikadoc/master/reference-docs.pkd'|from yaml)```
 export def --env use [docs, command?:string] {
   let type = $docs|describe
+  let commandId = $command|default ''|cache command-to-id
+
   if ($type == 'string') {
     let file = (open $docs|from yaml)
     $env.PKD_CURRENT = {
@@ -152,17 +154,17 @@ export def --env use [docs, command?:string] {
       doctable: $file.1
     }
   } else if ($type == 'closure') {
-    if ($command in (cache|get name)) {
-      $env.PKD_CURRENT = (open $"(cache repository)/($command)"|from msgpackz)
+    $env.PKD_CURRENT = if ($commandId in (cache|get name)) {
+      open $"(cache repository)/($commandId)"|from msgpackz
     } else {
-      $env.PKD_CURRENT = (do $docs)
+      do $docs
     }
   } else {
     $env.PKD_CURRENT = $docs
   }
 
   if ($command != null) {
-    cache docs $command $env.PKD_CURRENT
+    cache-docs $commandId $env.PKD_CURRENT
   }
 
   if ($command != null) {
@@ -300,14 +302,14 @@ def add-to-history [] {
 
 }
 
-def 'cache docs' [name:string, docs:record] {
-  init
+def cache-docs [name:string, docs:record] {
+  cache init
 
   $docs
   |to msgpackz
-  |_save -f $"(repository)/($name)"
+  |_save -f $"(cache repository)/($name)"
 
-  while (du (repository)|get 0.apparent) > $env.PKD_CONFIG.cacheMaxSize {
+  while (du (cache repository)|get 0.apparent) > $env.PKD_CONFIG.cacheMaxSize {
     rm (mod|sort-by modified|first).name
   }
 }

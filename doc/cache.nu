@@ -7,10 +7,10 @@ export def repository [] {
 # See `doc cache clear` for details on cache management.
 export def main [] {
   init
-  ls (repository)
+  ls -s (repository)
 }
 
-def init [] {
+export def init [] {
   if (not (repository|path exists)) {
     mkdir (repository)
   }
@@ -32,6 +32,9 @@ def init [] {
 export def clear [] {
   init
 
-  rm ((repository) + '/*')
+  rm ((repository) + '/*'|into glob)
 }
 
+export def command-to-id [] string -> string {
+  str replace '/' '__'
+}

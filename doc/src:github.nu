@@ -1,23 +1,68 @@
 export def --env use [repo:string] {
+  let metadata = http get $"https://api.github.com/repos/($repo)"
+  let branch = $metadata.default_branch
+  let docs = (
+    http get $"https://api.github.com/repos/($repo)/git/trees/($branch)?recursive=true"
+    |get tree
+    |where {|| ($in.path|str ends-with -i '.md') and not ($in.path|str starts-with '.github') and ($in.path|find -i -r 'test.*/') == null}
+
+  )
+
+  print $"Downloading ($docs|length) documents"
+
   do --env $env.DOC_USE {
     about: {
       name: $repo
       text_format: 'markdown'
     }
     doctable: (
-      http get $"https://api.github.com/repos/($repo)/git/trees/main?recursive=true"
-      |get tree
-      |where {|| ($in.path|str ends-with '.md') and not ($in.path|str starts-with '.github') and not ($in.path|str starts-with 'test/command/')}
+      $docs
       |each {|md|
         print -n .
 
-        let doc = http get $"https://raw.githubusercontent.com/($repo)/main/($md.path)"
+        $md
+        |merge {
+          doc: (http get $"https://raw.githubusercontent.com/($repo)/($branch)/($md.path)")
+          ns: 'repo'
+          url: $"https://github.com/($repo)/blob/($branch)/($md.path)"
+        }}
+      |if ($metadata.has_wiki) {
+        $in
+        |append (do {
+          let repoPath = "/tmp/" + ($repo|parse '{user}/{name}'|get 0.name) + '.wiki/'
 
+          print ''
+          print $"Repository has wiki enabled, cloning into ($repoPath)"
+
+          git -C /tmp/ clone $"https://github.com/($repo).wiki.git"
+
+          cd $repoPath
+          let wikiPages = (
+            ls **/*.md
+            |each {|| {
+              path: $in.name
+              ns: 'wiki'
+              url: $"https://github.com/($repo)/wiki/($in.name|str substring ..-3)"
+              doc: (open $"($repoPath)($in.name)")
+            }}
+          )
+
+          cd /
+          rm -rf $repoPath
+
+          $wikiPages
+        })
+      } else {
+        $in
+      }
+      |each {|md|
         ({
           name: $md.path
-          description: $doc
+          description: $md.doc
+          ns: $md.ns
+          url: $md.url
           summary: (
-            $doc
+            $md.doc
             |pandoc -f gfm -t html --wrap=none
             |hxnormalize -x
             |hxunent -b

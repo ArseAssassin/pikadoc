@@ -1,3 +1,5 @@
+export use cache.nu
+
 export use s.nu
 export use src:devdocs.nu
 export use src:man.nu
@@ -49,7 +51,6 @@ export def --env main [name?] {
   }
 }
 
-
 # Searches the descriptions of all symbols in the current doctable for `query`. System grep is used for matching output.
 export def --env search [query:string] {
   if (('PKD_CURRENT' in $env) != true) {
@@ -72,7 +73,7 @@ export def --env search [query:string] {
     $row.description
     |grep -F -i $query -A0 -B0 --group-separator='...' -m 5
   }
-  |select '#' name kind? results
+  |select '#' name results
   |present-list
 }
 
@@ -104,12 +105,13 @@ def --env paginate [resultLines:int, newResults=false] {
 
   let list = $docs|skip $env.PKD_CURSOR|take $resultLines
 
-  print ($list|table -i false)
+  let tableOutput = ($list|table -i false)
 
   if (($env.PKD_CURSOR + $resultLines) < ($docs|length)) {
-    print $"Showing ($env.PKD_CURSOR + $resultLines) results out of ($docs|length), type `doc more` for more results"
+    $"($tableOutput)\nShowing ($env.PKD_CURSOR + $resultLines) results out of ($docs|length), type `doc more` for more results"
   } else {
     $env.PKD_CURSOR = 0
+    $tableOutput
   }
 }
 
@@ -149,8 +151,18 @@ export def --env use [docs, command?:string] {
       about: $file.0
       doctable: $file.1
     }
+  } else if ($type == 'closure') {
+    if ($command in (cache|get name)) {
+      $env.PKD_CURRENT = (open $"(cache repository)/($command)"|from msgpackz)
+    } else {
+      $env.PKD_CURRENT = (do $docs)
+    }
   } else {
     $env.PKD_CURRENT = $docs
+  }
+
+  if ($command != null) {
+    cache docs $command $env.PKD_CURRENT
   }
 
   if ($command != null) {
@@ -162,11 +174,11 @@ export def --env use [docs, command?:string] {
 }
 
 export def pkd-about [] {
-  $env.PKD_CURRENT|get about
+  $env.PKD_CURRENT.about
 }
 
 export def pkd-doctable [] {
-  $env.PKD_CURRENT|get doctable
+  $env.PKD_CURRENT.doctable
 }
 
 def show [] {
@@ -177,17 +189,22 @@ def "from pkd" [] {
   from yaml
 }
 
-# Creates a readable summary of a single symbol.
-#
-# `$in` should be a pikadoc symbol.
-export def summarize [] {
-  select '#'? name? kind? summary?|trim-record-whitespace
+def summarize [] {
+  select '#'? ns? name? kind? summary?
+  |if ($in.ns? == null) {
+    reject -i ns
+  } else {
+    $in
+  }
+  |if ($in.kind? == null) {
+    reject -i kind
+  } else {
+    $in
+  }
+  |trim-record-whitespace
 }
 
-# Creates a readable summary of all symbols.
-#
-# `$in` should be a table of pikadoc symbols.
-export def summarize-all [] {
+def summarize-all [] {
   each {|| summarize}
 }
 
@@ -282,3 +299,16 @@ def add-to-history [] {
   }
 
 }
+
+def 'cache docs' [name:string, docs:record] {
+  init
+
+  $docs
+  |to msgpackz
+  |_save -f $"(repository)/($name)"
+
+  while (du (repository)|get 0.apparent) > $env.PKD_CONFIG.cacheMaxSize {
+    rm (mod|sort-by modified|first).name
+  }
+}
+

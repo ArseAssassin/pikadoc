@@ -30,10 +30,12 @@ export def parse-from-db [] {
 #
 # Example: doc src:sqlite use ./my-database.db
 export def --env use [db] {
-  $env.PKD_CURRENT = (open $db|parse-from-db)
-  $env.PKD_ABOUT = {
-    name: $db
-    text_format: 'text'
-    generator: 'src:sqlite'
-  }
+  do --env $env.DOC_USE {
+    about: {
+      name: $db
+      text_format: 'text'
+      generator: 'src:sqlite'
+    }
+    doctable: (open $db|parse-from-db)
+  } $"src:sqlite use ($db)"
 }

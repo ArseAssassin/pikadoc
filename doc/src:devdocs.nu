@@ -28,17 +28,23 @@ export def generate-page-index [docPath:string, doc:string, sections:list, optio
     |normalize-html
     # Remove multimedia elements as they can't be supported in text output.
     # Remove linebreaks in tables as they can't be represented in Markdown.
-    |xmlstarlet ed -d $"//img|//svg|//button|//video|//iframe|//area|//audio|//map|//track|//embed|//object|//picture|//portal|//source|//table//br|($options.stripElements?|default '*[false()]')"
+    |xmlstarlet ed -P -d $"//img|//svg|//button|//video|//iframe|//area|//audio|//map|//track|//embed|//object|//picture|//portal|//source|//table//br|($options.stripElements?|default '*[false()]')"
   )
   let sectionedMarkdown = (
     $sections
     |reduce --fold $preprocessedDoc {|sectionName, xml|
       let localSectionName = $sectionName|parse $"($docPath)#{name}"|get 0.name
+
+      # insert section breaks into xhtml
       $xml|xmlstarlet ed -i $"//*[@id=\"(($localSectionName))\"][1]" -t elem -n 'pre' -v $"PIKADOC_PAGE_BREAK ::: `($localSectionName)` :::"
     }
+    # pandoc handles `dl` elements strangely, inserting unnecessary whitespace
+    # and deleting elements, transform them into divs to work around this
+    |xmlstarlet ed -r '//dl' -v 'div'
     |html-to-md
   )
 
+  # parse xhtml into named sections
   $"    PIKADOC_PAGE_BREAK ::: `` :::\n\n($sectionedMarkdown)"
   |split row '    PIKADOC_PAGE_BREAK ::: '
   |where {|| $in != ''}
@@ -120,7 +126,7 @@ def format [archive:binary, options:record] {
               str join ''
               |str replace -a "\n" ' '
               |str trim
-              |parse --regex '(.+?[A-Za-z0-9])\.($|\s)'
+              |parse --regex '(.+?[A-Za-z0-9\)\]])\.($|\s)'
             }
             |flatten
             |get 0?.capture0?

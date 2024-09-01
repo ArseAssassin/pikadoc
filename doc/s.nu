@@ -1,9 +1,11 @@
 export def --env main [name] {
-  let docs = http get $"https://raw.githubusercontent.com/ArseAssassin/pkdocs/main/docs/($name).pkd"|from yaml
+  do --env $env.DOC_USE {||
+    let docs = http get $"https://raw.githubusercontent.com/ArseAssassin/pkdocs/main/docs/($name).pkd"|from yaml
 
-  do --env $env.DOC_USE {
-    about: ($docs|get 0)
-    doctable: ($docs|get 1)
+    {
+      about: ($docs|get 0)
+      doctable: ($docs|get 1)
+    }
   } $"s ($name)"
 }
 

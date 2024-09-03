@@ -2,7 +2,7 @@ def download-file [repo:string, branch:string, path:string] {
   http get $"https://raw.githubusercontent.com/($repo)/($branch)/($path|url encode)"
 }
 
-export def --env use [repoName:string, branchName:string] {
+export def --env use [repoName:string, branchName?:string] {
   do --env $env.DOC_USE {||
     let repo = if ('/' in $repoName) {
       $repoName

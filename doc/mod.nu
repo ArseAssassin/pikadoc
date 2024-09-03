@@ -7,9 +7,9 @@ export use src:man.nu
 export use src:sqlite.nu
 export use src:python.nu
 export use src:openapi.nu
-export use src:javascript.nu
 export use src:nushell.nu
 export use src:github.nu
+export use src:jsdoc.nu
 
 # Returns a summarized table of available symbols in the
 # currently selected doctable.
@@ -256,16 +256,16 @@ def trim-record-whitespace [] {
 def present-type [] {
   let type = $in
   let name = $type|describe
-  if ($name == 'list<list<any>>') {
+  if ($name == 'list<list<any>>' or ($name|str starts-with 'list<table<')) {
     $type
     |each { present-type }
     |str join "\n"
-  } else if ($name == 'list<any>') {
+  } else if ($name == 'list<any>' or ($name|str starts-with 'table<')) {
     $type
     |each { present-type }
     |str join " -> "
   } else if ($name|str starts-with 'record') {
-    $"($type.name):($type.type)(if ($type.optional? == true) { '?' })(if ($type.rest? == true) {
+    $"($type.name)(if ($type.name != null and $type.type != null) { ':' })($type.type)(if ($type.optional? == true) { '?' })(if ($type.rest? == true) {
       '...'
     })(if ($type.default? != null) {
       '=' + $type.default
@@ -276,21 +276,41 @@ def present-type [] {
 }
 
 def present-param [] {
-  $"> `($in|present-type)`\n> ($in.description)"
+  let param = $in
+  let type = $param|present-type
+
+  (if ($type != '') {
+    $"> `($type)`\n"
+  } else {
+    ''
+  }) + $"> ($param.description)"
 }
 
 def present-body [] {
   let output = $in
-  let params = $output.type?.0?
+  let params = $output.signatures?.0?
     |default []
-    |where {(($in.description|default '') != '')}
+    |do {take ((($in|length) - 1)|if ($in < 0) { 0 } else { $in })}
+    |where {(($in.description|default '') != '' and ($in.name|default '') != '')}
 
-  $output.description? + (
+  ($output.description?|default '') + (
     $output
     |if (($params|length) > 0) {
       $"\n\nParams:\n($params|each {
         present-param
       }|str join "\n\n")"
+    } else {
+      ''
+    }
+  ) + (
+    $output.signatures?.0?
+    |if ($in != null and $in != []) {
+      let returns = (
+        $output.signatures.0
+        |last
+        |present-param
+      )
+      $"\n\nReturns:\n($returns)"
     } else {
       ''
     }
@@ -313,9 +333,9 @@ export def present [] {
   } else {
     $output|reject description?
   }
-  |reject examples?
+  |reject examples? source?
 
-  let meta = $trimmedOutput|maybe-update type {|| present-type }|table --expand
+  let meta = $trimmedOutput|maybe-update signatures {|| present-type }|table --expand
 
   if ((pkd-about).text_format? == 'markdown') {
     let body = (

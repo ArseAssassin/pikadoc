@@ -13,7 +13,7 @@ def document-module [name:string] {
       $in.examples?
       |each { $"```nushell\n# ($in.description)\n($in.example)\n# -> ($in.result|to nuon)\n```" }
     )
-    type: (
+    signatures: (
       $in.signatures
       |items {|output, args|
         $args

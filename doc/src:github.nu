@@ -1,5 +1,5 @@
 def download-file [repo:string, branch:string, path:string] {
-  http get $"https://raw.githubusercontent.com/($repo)/($branch)/($path)"
+  http get $"https://raw.githubusercontent.com/($repo)/($branch)/($path|url encode)"
 }
 
 export def --env use [repoName:string, branchName:string] {
@@ -28,15 +28,15 @@ export def --env use [repoName:string, branchName:string] {
     )
     let pkds = (
       $fileTree
-      |where ($in.path|str ends-with -i '.pkd')
+      |where {($in.path|str ends-with -i '.pkd')}
       |each {|pkd|
         print -n .
 
-        let doc = download-file $repo $branch $pkd.path
+        let doc = download-file $repo $branch $pkd.path|from yaml
 
         $doc.1
         |each {|symbol|
-          $symbol|merge { belongs_to: $pkd.name }
+          $symbol|merge { belongs_to: $doc.0.name }
         }
       }
     )
@@ -49,7 +49,6 @@ export def --env use [repoName:string, branchName:string] {
         $md
         |merge {
           doc: (download-file $repo $branch $md.path)
-          ns: $md.path
           url: $"https://github.com/($repo)/blob/($branch)/($md.path)"
         }}
         # Disabled for now. GitHub incorrectly reports wiki as enabled for many
@@ -87,7 +86,7 @@ export def --env use [repoName:string, branchName:string] {
         |each {|md| ({
           name: $md.path
           description: $md.doc
-          ns: $md.ns
+          ns: $md.ns?
           url: $md.url
           summary: (
             $md.doc

@@ -32,7 +32,7 @@ export def init [] {
 export def clear [] {
   init
 
-  rm ((repository) + '/*'|into glob)
+  rm -f ((repository)|path join *)
 }
 
 export def command-to-id [] string -> string {

@@ -41,7 +41,7 @@ To assist in bringing this about, PikaDoc CLI provides a number of modules out o
 
 #### `doc s`
 
-The pkDocs central repository holds documentation for 200+ technologies that are immediately ready to download for use. See [here](https://github.com/ArseAssassin/pkdocs/tree/main/docs) for a full listing. These are also available using the [web client](https://tuomas.kanerva.info/pkdocs/).
+The pkDocs central repository holds documentation for 150+ technologies that are immediately ready to download for use. See [here](https://github.com/ArseAssassin/pkdocs/tree/main/docs) for a full listing. These are also available using the [web client](https://tuomas.kanerva.info/pkdocs/).
 
 ```nushell
 > doc s javascript

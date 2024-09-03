@@ -7,12 +7,14 @@ homepage: https://github.com/ArseAssassin/pikadoc
 description: User guide for the pikadoc CLI
 ---
 - name: 'Tutorial #1: What is PikaDoc?'
+  kind: 'tutorial'
   description: |
     PikaDoc is a human-readable, structured documentation format. The `pikadoc` CLI is a tool for rapidly generating and reading `pkd` doctables with full text search capabilities.
 
     `pikadoc` runs inside a `nushell` environment giving you powerful capabilities for querying and reading documentation. If you haven't used `nushell` before, you can learn more about it by typing `tutor`. You can then return to this tutorial by typing `doc tutor`.
 
 - name: 'Tutorial #2: Reading pikadocs'
+  kind: 'tutorial'
   description: |
     The simplest possible pikadoc command is `doc`. If you try running it now, you should see a notice telling you that no doctable has been selected for use. To change that, we can run a pikadoc generator to mount one:
 
@@ -29,6 +31,7 @@ description: User guide for the pikadoc CLI
 
 
 - name: 'Tutorial #3: Understanding the summary view'
+  kind: 'tutorial'
   description: |
     When `doc` returns a doctable, instead of showing full documentation it shows you a summarized view of the documentation symbols found. By default, search results are limited to 20 - to show more results you can type in `doc more`.
 
@@ -48,6 +51,7 @@ description: User guide for the pikadoc CLI
     ```
 
 - name: 'Tutorial #4: Finding and generating docs'
+  kind: 'tutorial'
   description: |
     The PikaDoc central repository at the moment holds 150+ ready-made doctables for convenience. To get a list of available docs, you can type:
 
@@ -96,6 +100,7 @@ description: User guide for the pikadoc CLI
 
 
 - name: 'Tutorial #5: Advanced filtering'
+  kind: 'tutorial'
   description: |
     Sometimes we can't find what we need by headlines alone. You can use `doc search` to search through entire symbol definitions:
 
@@ -115,6 +120,7 @@ description: User guide for the pikadoc CLI
     This covers the basics of reading and generating doctables using pikadoc. If you're curious about advanced usage, feel free to keep working through this tutorial.
 
 - name: 'Tutorial appendix #1: Additional commands'
+  kind: 'tutorial'
   description: |
     Here are some additional commands you might find useful:
 

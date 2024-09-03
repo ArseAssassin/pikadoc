@@ -87,6 +87,7 @@ export def --env use [repoName:string, branchName:string] {
           name: $md.path
           description: $md.doc
           ns: $md.ns?
+          kind: 'md doc'
           url: $md.url
           summary: (
             $md.doc
@@ -111,7 +112,7 @@ export def --env use [repoName:string, branchName:string] {
         generator_command: $"src:github ($repoName)"
       }
       doctable: (
-        [$mdDoctable, $pkds]|flatten
+        [$mdDoctable, ($pkds|flatten)]|flatten
       )
     }
   } $"src:github use ($repoName)"

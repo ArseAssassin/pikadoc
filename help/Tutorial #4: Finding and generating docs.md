@@ -1,4 +1,4 @@
-The PikaDoc central repository at the moment holds 200+ ready-made doctables for convenience. To get a list of available docs, you can type:
+The PikaDoc central repository at the moment holds 150+ ready-made doctables for convenience. To get a list of available docs, you can type:
 
 ```nushell
 # Show a list of doctables available in the central repository

@@ -12,3 +12,5 @@ Many generators insert metadata that can be useful for querying. `doc pkd-doctab
 doc src:sqlite use ./path-to.db
 doc pkd-doctable|where {'date' in ($in.columns|get name)}
 ```
+
+This covers the basics of reading and generating doctables using pikadoc. If you're curious about advanced usage, feel free to keep working through this tutorial.

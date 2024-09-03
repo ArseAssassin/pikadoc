@@ -529,6 +529,12 @@ generator: src:nushell
       description: ''
       optional: false
       default: null
+    - name: branchName
+      type: string
+      rest: false
+      description: ''
+      optional: false
+      default: null
     - name: null
       type: any
       rest: false

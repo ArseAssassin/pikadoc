@@ -42,5 +42,3 @@ You can also use the `--help` flag to get help on any generator:
 # Show usage instructions for `doc src:nushell`
 doc src:nushell use --help
 ```
-
-This covers the basics of reading and generating doctables using pikadoc. If you're curious about advanced usage, feel free to keep working through this tutorial.

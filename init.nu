@@ -7,9 +7,12 @@ $env.DOC_USE = {|docs, command?:string|
   doc use $docs $command
 }
 
+$env.DOC = {|query|
+  doc $query
+}
+
 $env.PKD_CONFIG = {
   cacheMaxSize: ('100Mb'|into filesize)
 }
 
-print ($"**Welcome to PikaDoc** - to get started, type:"|mdcat)
-print ("`doc src:nushell use doc; doc`"|mdcat)
+print ($"**Welcome to pikadoc** - to get started, type `doc tutor`"|glow -sauto)

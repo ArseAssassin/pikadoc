@@ -36,5 +36,5 @@ export def clear [] {
 }
 
 export def command-to-id [] string -> string {
-  str replace '/' '__'
+  str replace -a '/' '__'
 }

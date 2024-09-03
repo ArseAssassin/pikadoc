@@ -186,6 +186,7 @@ export def index [] {
 # NOTE: Since this function downloads and parses a lot of HTML data, it can be quite slow - make sure to use `doc save` to cache frequently used doctables locally.
 export def --env use [slug, options={}] {
   let metadata = index|where {|| $in.slug == $slug}|get 0?
+  let generatorCommand = $"src:devdocs use ($slug) (if ($options != {}) { $options } else { null })"
 
   if ($metadata == null) {
     print $"Couldn't find devdocs with the slug ($slug)"
@@ -198,13 +199,14 @@ export def --env use [slug, options={}] {
           slug: $slug
           text_format: 'markdown'
           generator: 'src:devdocs'
+          generator_command: 'src:devdocs'
           version: $metadata.version
           copyright: $docs.copyright
           homepage: $metadata.links_home
         },
         doctable: $docs.doctable
       }
-    } $"src:devdocs use ($slug) (if ($options != {}) { $options } else { null })"
+    }  $generatorCommand
   }
 
 }

@@ -1,6 +1,7 @@
 export use cache.nu
 
 export use s.nu
+export use tutor.nu
 export use src:devdocs.nu
 export use src:man.nu
 export use src:sqlite.nu
@@ -219,10 +220,23 @@ def summarize-all [] {
 alias _save = save
 
 # Saves doctable in the filesystem.
-#
-# `filepath` is a path to use for saving the file
-export def save [filepath: string] {
-  ['---', (pkd-about|to yaml), '---', (pkd-doctable|to yaml)]|str join "\n"|_save -f $filepath
+export def save [
+  filepath: string # path to use for saving the file
+  --format: string='yaml' #
+] {
+  if ($format == 'yaml') {
+    ['---', (pkd-about|to yaml), '---', (pkd-doctable|to yaml)]
+    |str join "\n"
+    |_save -f $filepath
+  } else if ($format == 'md') {
+    pkd-doctable
+    |each {|symbol|
+      let path = $filepath|path join ($symbol.name + '.md')
+      $symbol.description|_save -f $path
+      $path
+    }
+  }
+
 }
 
 def map-record-values [block: closure] {
@@ -371,7 +385,7 @@ def cache-docs [name:string, docs:record] {
   |_save -f $"(cache repository)/($name)"
 
   while (du (cache repository)|get 0.apparent) > $env.PKD_CONFIG.cacheMaxSize {
-    rm (mod|sort-by modified|first).name
+    rm (ls (cache repository)|sort-by modified|first).name
   }
 }
 

@@ -1,9 +1,3 @@
-def peek [] {
-  let it = $in
-  print $it
-  $it
-}
-
 def normalize-type [doc] {
   if ($doc.$ref? != null) {
     $doc.$ref
@@ -95,11 +89,15 @@ export def parse-from-swagger [] {
 # `url` is fetched using a GET request
 #
 # Example: doc src:openapi use "https://petstore.swagger.io/v2/swagger.json"
-export def --env use [url] {
-  $env.PKD_CURRENT = (http get $url|parse-from-swagger)
-  $env.PKD_ABOUT = {
-    name: $url
-    text_format: 'gfm'
-    generator: 'src:openapi'
-  }
+export def --env use [url:string] {
+  let generatorCommand = $"src:openapi use ($url)"
+  do --env $env.DOC_USE {{
+    about: {
+      name: $url
+      text_format: 'gfm'
+      generator: 'src:openapi'
+      generator_command: $generatorCommand
+    },
+    doctable: (http get $url|parse-from-swagger)
+  }} $generatorCommand
 }

@@ -1,0 +1,915 @@
+---
+name: doc
+text_format: markdown
+generator: src:nushell
+
+---
+- name: doc
+  summary: |-
+    Returns a summarized table of available symbols in the
+    currently selected doctable.
+  kind: command
+  description: |-
+    Returns a summarized table of available symbols in the
+    currently selected doctable.
+
+    If a `string` is passed as an argument, doctable will be
+    filtered by `name` and `summary`. If an `int` is passed
+    as an argument the selected symbol is shown as a whole.
+
+    Examples:
+      Return list of all symbols in current doctable
+      > doc
+
+      Filter symbols by name in current doctable
+      > doc 'add'
+
+      Show symbol at index 3
+      > doc 3
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: name
+      type: any
+      rest: false
+      description: Name of the symbol to query
+      optional: true
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc cache
+  summary: |-
+    Returns `ls` of doctables cached in the local filesystem.
+    `cache path` returns the directory used for storing files.
+    See `doc cache clear` for details on cache management.
+  kind: command
+  description: |-
+    Returns `ls` of doctables cached in the local filesystem.
+    `cache path` returns the directory used for storing files.
+    See `doc cache clear` for details on cache management.
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc cache clear
+  summary: |-
+    Clears all locally cached doctables. Useful for updating
+    stale documents.
+  kind: command
+  description: |-
+    Clears all locally cached doctables. Useful for updating
+    stale documents.
+
+    Calling this manually shouldn't be necessary as pikadoc
+    automatically clears old files when cache size surpasses
+    `$env.PKD_CONFIG.cacheMaxSize`.
+
+    The default max cache size is 100Mb.
+
+    Examples
+
+    # adjust max cache size
+    let pkdConfig = $env.PKD_CONFIG|merge { cacheMaxSize: ('200Mb'|into filesize) }; $env.PKD_CONFIG = $pkdConfig
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc cache command-to-id
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc cache init
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc cache repository
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc history
+  summary: Returns a list of the last 50 doctables selected with `doc use`
+  kind: command
+  description: Returns a list of the last 50 doctables selected with `doc use`
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc more
+  summary: Shows more results from the last search. If `index` is passed as an argument, the given result will be selected from the last result set and presented as a whole.
+  kind: command
+  description: |-
+    Shows more results from the last search. If `index` is passed as an argument, the given result will be selected from the last result set and presented as a whole.
+
+    Examples
+
+    # Show more results from the last search
+      ```doc more```
+
+    # Show result number 8
+      ```doc more 8```
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: index
+      type: int
+      rest: false
+      description: ''
+      optional: true
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc pkd-about
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc pkd-doctable
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc present
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc s
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: name
+      type: any
+      rest: false
+      description: ''
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc s index
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc save
+  summary: Saves doctable in the filesystem.
+  kind: command
+  description: Saves doctable in the filesystem.
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: filepath
+      type: string
+      rest: false
+      description: path to use for saving the file
+      optional: false
+      default: null
+    - name: format
+      type: string
+      rest: false
+      description: ''
+      optional: true
+      default: yaml
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc search
+  summary: Searches the descriptions of all symbols in the current doctable for `query`. System grep is used for matching output.
+  kind: command
+  description: Searches the descriptions of all symbols in the current doctable for `query`. System grep is used for matching output.
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: query
+      type: string
+      rest: false
+      description: ''
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc src:devdocs download
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: name
+      type: any
+      rest: false
+      description: ''
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc src:devdocs generate-doc-index
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: entries
+      type: table
+      rest: false
+      description: ''
+      optional: false
+      default: null
+    - name: options
+      type: record
+      rest: false
+      description: ''
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc src:devdocs generate-page-index
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: docPath
+      type: string
+      rest: false
+      description: ''
+      optional: false
+      default: null
+    - name: doc
+      type: string
+      rest: false
+      description: ''
+      optional: false
+      default: null
+    - name: sections
+      type: list<any>
+      rest: false
+      description: ''
+      optional: false
+      default: null
+    - name: options
+      type: record
+      rest: false
+      description: ''
+      optional: true
+      default: {}
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc src:devdocs index
+  summary: Retrieves a list of available documentation files from devdocs.io and returns them as a table
+  kind: command
+  description: Retrieves a list of available documentation files from devdocs.io and returns them as a table
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc src:devdocs use
+  summary: Downloads and parses documentation from devdocs.io and selects it as the current doctable
+  kind: command
+  description: |-
+    Downloads and parses documentation from devdocs.io and selects it as the current doctable
+
+    `slug` is the url slug of the documentation file. Use src:devdocs index for a complete list of available files
+
+    Example: doc src:devdocs use nushell
+
+    See also: doc src:devdocs index
+
+    NOTE: Since this function downloads and parses a lot of HTML data, it can be quite slow - make sure to use `doc save` to cache frequently used doctables locally.
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: slug
+      type: any
+      rest: false
+      description: ''
+      optional: false
+      default: null
+    - name: options
+      type: record
+      rest: false
+      description: ''
+      optional: true
+      default: {}
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc src:github use
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: repoName
+      type: string
+      rest: false
+      description: ''
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc src:javascript parse-from-jsdoc
+  summary: Parses json generated by jsdoc to generate a new doctable.
+  kind: command
+  description: |-
+    Parses json generated by jsdoc to generate a new doctable.
+
+    `in`: should be a `jsdoc` generated JSON document
+
+    Example: `doc use (npx jsdoc -X <path to source directory>|doc src:javascript parse-from-jsdoc)`
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc src:javascript use
+  summary: Uses `jsdoc` to generate a doctable from `filepath` and selects is the current doctable
+  kind: command
+  description: |-
+    Uses `jsdoc` to generate a doctable from `filepath` and selects is the current doctable
+
+    Make sure that `jsdoc` is installed in your `PATH` to use this command.
+
+    `filepath` is a path to the source directory to generate docs from
+
+    Example: doc src:javascript use "./node_modules/express/lib/"
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: filepath
+      type: any
+      rest: false
+      description: ''
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc src:man parse
+  summary: Parses a roff input into a doctable
+  kind: command
+  description: |-
+    Parses a roff input into a doctable
+
+    `$in` is a valid string in roff format
+
+    Example: man -Rutf8 man|doc src:man parse
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc src:man use
+  summary: Parses a man page and selects it as the current doctable
+  kind: command
+  description: |-
+    Parses a man page and selects it as the current doctable
+
+    Takes the name of the manual entry as an argument and parses the command line options for that entry. The generated doctable is selected as the current doctable.
+
+    `$it` is the name of the man page
+
+    Example: doc src:man use "cat"
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: it
+      type: string
+      rest: false
+      description: ''
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc src:nushell use
+  summary: Generates doctable from nushell module with `name` and selects it as the current doctable
+  kind: command
+  description: |-
+    Generates doctable from nushell module with `name` and selects it as the current doctable
+
+    Example: doc src:nushell use "doc"
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: name
+      type: string
+      rest: false
+      description: the name of the module to document
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc src:openapi parse-from-swagger
+  summary: Returns documentation for a REST endpoint defined in a .json/.yaml file.
+  kind: command
+  description: |-
+    Returns documentation for a REST endpoint defined in a .json/.yaml file.
+
+    `in` is a record parsed from a valid Swagger .json/.yaml file
+
+    Example: http get 'https://petstore.swagger.io/v2/swagger.json'|doc src:openapi parse-from-swagger
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc src:openapi use
+  summary: Generates doctable from `url` to a valid Swagger .json/.ymal file and selects it as the current doctable
+  kind: command
+  description: |-
+    Generates doctable from `url` to a valid Swagger .json/.ymal file and selects it as the current doctable
+
+    `url` is fetched using a GET request
+
+    Example: doc src:openapi use "https://petstore.swagger.io/v2/swagger.json"
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: url
+      type: string
+      rest: false
+      description: ''
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc src:python parse-from-sphinx-html
+  summary: Parses a doctable from a HTML documentation page generated using sphinx.
+  kind: command
+  description: |-
+    Parses a doctable from a HTML documentation page generated using sphinx.
+
+    `in` should be a valid sphinx HTML document
+
+    Example: http get 'https://flask.palletsprojects.com/en/3.0.x/api/'|doc src:python parse-from-sphinx-html
+
+    NOTE: This command parses only a single HTML page. Sphinx documentation typically consists of multiple documents and a single page might not contain all the references you're looking for. To index all symbols, make sure to parse all relevant pages, or use the `singlehtml` builder in Sphinx to produce a single page documentation.
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc src:python use
+  summary: Parses a HTML documentation page generated using sphinx and selects it as the current doctable
+  kind: command
+  description: |-
+    Parses a HTML documentation page generated using sphinx and selects it as the current doctable
+
+    `url` should be a URL to a sphinx-generated HTML page
+
+    Example: doc src:python use "https://flask.palletsprojects.com/en/3.0.x/api/"
+
+    NOTE: This parses only a single HTML page. If API documentation is spread over multiple files, see documentation for `parse-from-sphinx-html`
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: url
+      type: any
+      rest: false
+      description: ''
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc src:sqlite parse-from-db
+  summary: Returns documentation for all tables, columns and indexes in a sqlite database.
+  kind: command
+  description: |-
+    Returns documentation for all tables, columns and indexes in a sqlite database.
+
+    `in` is a valid sqlite database.
+
+    Example: open my-database.db|doc src:sqlite parse-from-db
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc src:sqlite use
+  summary: Queries a sqlite database for its tables and selects the output as the current doctable
+  kind: command
+  description: |-
+    Queries a sqlite database for its tables and selects the output as the current doctable
+
+    `db` is a path to your sqlite database
+
+    Example: doc src:sqlite use ./my-database.db
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: db
+      type: any
+      rest: false
+      description: ''
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc tutor
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: page
+      type: int
+      rest: false
+      description: ''
+      optional: true
+      default: 1
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc use
+  summary: Sets the current doctable.
+  kind: command
+  description: |-
+    Sets the current doctable.
+
+    `docs` is either a file in the local filesystem or a pikadoc table.
+
+    Examples
+
+    # Use a docfile from local filesystem
+      ```doc use my-doc-file.pkd```
+
+    # Use a docfile downloaded from a server
+      ```doc use (http get 'https://raw.githubusercontent.com/ArseAssassin/pikadoc/master/reference-docs.pkd'|from yaml)```
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: docs
+      type: any
+      rest: false
+      description: ''
+      optional: false
+      default: null
+    - name: command
+      type: string
+      rest: false
+      description: ''
+      optional: true
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc version
+  summary: Returns current pikadoc version
+  kind: command
+  description: Returns current pikadoc version
+  examples: []
+  type:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null

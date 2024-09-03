@@ -74,11 +74,15 @@ export def parse [] {
 # `$it` is the name of the man page
 #
 # Example: doc src:man use "cat"
-export def --env use [it] {
-  $env.PKD_CURRENT = (man -Rutf8 $it|do {groff -man -T utf8}|complete|get stdout|parse)
-  $env.PKD_ABOUT = {
-    name: $it
-    text_format: 'plain'
-    generator: 'src:man'
-  }
+export def --env use [it:string] {
+  let generatorCommand = $"src:man use ($it)"
+  do --env $env.DOC_USE {{
+    about: {
+      name: $it
+      text_format: 'plain'
+      generator: 'src:man'
+      generator_command: $generatorCommand
+    }
+    doctable: (man -Rutf8 $it|do {groff -man -T utf8}|complete|get stdout|parse)
+  }} $generatorCommand
 }

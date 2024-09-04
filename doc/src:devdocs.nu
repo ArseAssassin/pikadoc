@@ -2,7 +2,7 @@ def normalize-html [] {
   hxnormalize -x|hxunent -b
 }
 
-export def download [name] {
+def download [name] {
   let url = $"https://downloads.devdocs.io/($name).tar.gz"
   print $"Downloading ($url)"
   let it = http get $url
@@ -22,7 +22,7 @@ def merge-all [] {
   }
 }
 
-export def generate-page-index [docPath:string, doc:string, sections:list, options:record={}] {
+def generate-page-index [docPath:string, doc:string, sections:list, options:record={}] {
   let preprocessedDoc = (
     $doc
     |normalize-html
@@ -56,7 +56,7 @@ export def generate-page-index [docPath:string, doc:string, sections:list, optio
   |merge { $docPath: ($preprocessedDoc|html-to-md) }
 }
 
-export def generate-doc-index [entries:table, options:record] {
+def generate-doc-index [entries:table, options:record] {
   let db = (
     tar -zx ./db.json -O
     |complete
@@ -169,22 +169,22 @@ def html-to-md [] {
   |str replace "\n\n&nbsp;\n\n" "\n\n"
 }
 
-# Retrieves a list of available documentation files from devdocs.io and returns them as a table
+# Retrieves a list of available documentation files from devdocs.io
+# and returns them as a table
 export def index [] {
   http get https://devdocs.io/docs.json
   |select name slug version? links?.home?
 }
 
-# Downloads and parses documentation from devdocs.io and selects it as the current doctable
-#
-# `slug` is the url slug of the documentation file. Use src:devdocs index for a complete list of available files
-#
-# Example: doc src:devdocs use nushell
-#
-# See also: doc src:devdocs index
-#
-# NOTE: Since this function downloads and parses a lot of HTML data, it can be quite slow - make sure to use `doc save` to cache frequently used doctables locally.
-export def --env use [slug, options={}] {
+# Downloads and attempts to parse a file downloaded from devdocs.io
+# into a doctable. This can be a slow process, so it's best to
+# use `doc s` over this when possible. If `options` is passed,
+# `$options.stripElements` should be an XPath selector that's used
+# to strip unnecessary elements from the HTML input.
+export def --env use [
+  slug:string, # url slug of the documentation to use
+  options={}   # options for parsing
+] {
   let metadata = index|where {|| $in.slug == $slug}|get 0?
   let generatorCommand = $"src:devdocs use ($slug) (if ($options != {}) { $options } else { null })"
 

@@ -62,19 +62,22 @@ def trim-whitespace [] {
 # `$in` is a valid string in roff format
 #
 # Example: man -Rutf8 man|doc src:man parse
-export def parse [] {
+def parse [] {
   let doc = $in
   ($doc|parse-section OPTIONS) ++ ($doc|parse-section DESCRIPTION)
 }
 
-# Parses a man page and selects it as the current doctable
+# Parses a man page and selects it as the current doctable.
 #
 # Takes the name of the manual entry as an argument and parses the command line options for that entry. The generated doctable is selected as the current doctable.
 #
-# `$it` is the name of the man page
-#
-# Example: doc src:man use "cat"
-export def --env use [it:string] {
+# ### Examples:
+# ```nushell
+# > doc src:man use "cat"
+# ```
+export def --env use [
+  it:string # name of the man page
+] {
   let generatorCommand = $"src:man use ($it)"
   do --env $env.DOC_USE {{
     about: {

@@ -1,4 +1,7 @@
-export def main [page:int=1] {
+# Shows the pikadoc tutorial.
+export def main [
+  page:int=1 # page to show
+] {
   do --env $env.DOC_USE $"($env.PKD_HOME)/user_guide.pkd"
 
   let tutorials = $env.PKD_CURRENT.doctable|where {$in.name|str starts-with 'Tutorial'}

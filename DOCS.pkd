@@ -15,17 +15,19 @@ generator: src:nushell
 
     If a `string` is passed as an argument, doctable will be
     filtered by `name` and `summary`. If an `int` is passed
-    as an argument the selected symbol is shown as a whole.
+    as an argument, only the selected symbol is presented.
 
     Examples:
-      Return list of all symbols in current doctable
-      > doc
+    ```nushell
+    # Return list of all symbols in current doctable
+    > doc
 
-      Filter symbols by name in current doctable
-      > doc 'add'
+    # Filter symbols by name in current doctable
+    > doc 'add'
 
-      Show symbol at index 3
-      > doc 3
+    # Show symbol at index 3
+    > doc 3
+    ```
   examples: []
   signatures:
   - - name: null
@@ -48,12 +50,12 @@ generator: src:nushell
       default: null
 - name: doc cache
   summary: |-
-    Returns `ls` of doctables cached in the local filesystem.
+    Returns a list of doctables cached in the local filesystem.
     `cache path` returns the directory used for storing files.
     See `doc cache clear` for details on cache management.
   kind: command
   description: |-
-    Returns `ls` of doctables cached in the local filesystem.
+    Returns a list of doctables cached in the local filesystem.
     `cache path` returns the directory used for storing files.
     See `doc cache clear` for details on cache management.
   examples: []
@@ -104,9 +106,9 @@ generator: src:nushell
       optional: false
       default: null
 - name: doc cache command-to-id
-  summary: ''
+  summary: Escapes special characters in input command to use it as a valid Unix path
   kind: command
-  description: ''
+  description: Escapes special characters in input command to use it as a valid Unix path
   examples: []
   signatures:
   - - name: null
@@ -122,9 +124,9 @@ generator: src:nushell
       optional: false
       default: null
 - name: doc cache init
-  summary: ''
+  summary: Initializes cache
   kind: command
-  description: ''
+  description: Initializes cache
   examples: []
   signatures:
   - - name: null
@@ -140,9 +142,13 @@ generator: src:nushell
       optional: false
       default: null
 - name: doc cache repository
-  summary: ''
+  summary: |-
+    Returns the path to the cache directory that's currently
+    being used.
   kind: command
-  description: ''
+  description: |-
+    Returns the path to the cache directory that's currently
+    being used.
   examples: []
   signatures:
   - - name: null
@@ -176,9 +182,27 @@ generator: src:nushell
       optional: false
       default: null
 - name: doc history clear
-  summary: ''
+  summary: Deletes the history file
   kind: command
-  description: ''
+  description: Deletes the history file
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc history-file
+  summary: Returns path to the history file that's currently in use
+  kind: command
+  description: Returns path to the history file that's currently in use
   examples: []
   signatures:
   - - name: null
@@ -227,9 +251,9 @@ generator: src:nushell
       optional: false
       default: null
 - name: doc pkd-about
-  summary: ''
+  summary: Returns the header section for the currently mounted doctable
   kind: command
-  description: ''
+  description: Returns the header section for the currently mounted doctable
   examples: []
   signatures:
   - - name: null
@@ -245,9 +269,9 @@ generator: src:nushell
       optional: false
       default: null
 - name: doc pkd-doctable
-  summary: ''
+  summary: Returns the body section for the currently mounted doctable
   kind: command
-  description: ''
+  description: Returns the body section for the currently mounted doctable
   examples: []
   signatures:
   - - name: null
@@ -263,9 +287,16 @@ generator: src:nushell
       optional: false
       default: null
 - name: doc present
-  summary: ''
+  summary: |-
+    Presents the symbol passed in as input as tidily formatted output.
+    Useful for showing the results of custom queries.
   kind: command
-  description: ''
+  description: |-
+    Presents the symbol passed in as input as tidily formatted output.
+    Useful for showing the results of custom queries.
+
+    ### Example:
+        ```> doc pkd-doctable|get 0|doc present```
   examples: []
   signatures:
   - - name: null
@@ -281,9 +312,16 @@ generator: src:nushell
       optional: false
       default: null
 - name: doc s
-  summary: ''
+  summary: |-
+    Mounts doctable with `name` for use from the pikadoc central repository.
+    To get a list of available doctables, see `doc s index`.
   kind: command
-  description: ''
+  description: |-
+    Mounts doctable with `name` for use from the pikadoc central repository.
+    To get a list of available doctables, see `doc s index`.
+
+    ### Example:
+        ```> doc s use python~3.13```
   examples: []
   signatures:
   - - name: null
@@ -292,10 +330,10 @@ generator: src:nushell
       description: null
       optional: false
       default: null
-    - name: name
-      type: any
+    - name: slug
+      type: string
       rest: false
-      description: ''
+      description: url slug of the file to use, including the version number
       optional: false
       default: null
     - name: null
@@ -305,9 +343,13 @@ generator: src:nushell
       optional: false
       default: null
 - name: doc s index
-  summary: ''
+  summary: |-
+    Returns a list of doctables available in the pikadoc central repository.
+    See `doc s` for more information.
   kind: command
-  description: ''
+  description: |-
+    Returns a list of doctables available in the pikadoc central repository.
+    See `doc s` for more information.
   examples: []
   signatures:
   - - name: null
@@ -376,106 +418,14 @@ generator: src:nushell
       description: null
       optional: false
       default: null
-- name: doc src:devdocs download
-  summary: ''
-  kind: command
-  description: ''
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      rest: false
-      description: null
-      optional: false
-      default: null
-    - name: name
-      type: any
-      rest: false
-      description: ''
-      optional: false
-      default: null
-    - name: null
-      type: any
-      rest: false
-      description: null
-      optional: false
-      default: null
-- name: doc src:devdocs generate-doc-index
-  summary: ''
-  kind: command
-  description: ''
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      rest: false
-      description: null
-      optional: false
-      default: null
-    - name: entries
-      type: table
-      rest: false
-      description: ''
-      optional: false
-      default: null
-    - name: options
-      type: record
-      rest: false
-      description: ''
-      optional: false
-      default: null
-    - name: null
-      type: any
-      rest: false
-      description: null
-      optional: false
-      default: null
-- name: doc src:devdocs generate-page-index
-  summary: ''
-  kind: command
-  description: ''
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      rest: false
-      description: null
-      optional: false
-      default: null
-    - name: docPath
-      type: string
-      rest: false
-      description: ''
-      optional: false
-      default: null
-    - name: doc
-      type: string
-      rest: false
-      description: ''
-      optional: false
-      default: null
-    - name: sections
-      type: list<any>
-      rest: false
-      description: ''
-      optional: false
-      default: null
-    - name: options
-      type: record
-      rest: false
-      description: ''
-      optional: true
-      default: {}
-    - name: null
-      type: any
-      rest: false
-      description: null
-      optional: false
-      default: null
 - name: doc src:devdocs index
-  summary: Retrieves a list of available documentation files from devdocs.io and returns them as a table
+  summary: |-
+    Retrieves a list of available documentation files from devdocs.io
+    and returns them as a table
   kind: command
-  description: Retrieves a list of available documentation files from devdocs.io and returns them as a table
+  description: |-
+    Retrieves a list of available documentation files from devdocs.io
+    and returns them as a table
   examples: []
   signatures:
   - - name: null
@@ -491,18 +441,19 @@ generator: src:nushell
       optional: false
       default: null
 - name: doc src:devdocs use
-  summary: Downloads and parses documentation from devdocs.io and selects it as the current doctable
+  summary: |-
+    Downloads and attempts to parse a file downloaded from devdocs.io
+    into a doctable. This can be a slow process, so it's best to
+    use `doc s` over this when possible. If `options` is passed,
+    `$options.stripElements` should be an XPath selector that's used
+    to strip unnecessary elements from the HTML input.
   kind: command
   description: |-
-    Downloads and parses documentation from devdocs.io and selects it as the current doctable
-
-    `slug` is the url slug of the documentation file. Use src:devdocs index for a complete list of available files
-
-    Example: doc src:devdocs use nushell
-
-    See also: doc src:devdocs index
-
-    NOTE: Since this function downloads and parses a lot of HTML data, it can be quite slow - make sure to use `doc save` to cache frequently used doctables locally.
+    Downloads and attempts to parse a file downloaded from devdocs.io
+    into a doctable. This can be a slow process, so it's best to
+    use `doc s` over this when possible. If `options` is passed,
+    `$options.stripElements` should be an XPath selector that's used
+    to strip unnecessary elements from the HTML input.
   examples: []
   signatures:
   - - name: null
@@ -512,15 +463,15 @@ generator: src:nushell
       optional: false
       default: null
     - name: slug
-      type: any
+      type: string
       rest: false
-      description: ''
+      description: url slug of the documentation to use
       optional: false
       default: null
     - name: options
       type: record
       rest: false
-      description: ''
+      description: options for parsing
       optional: true
       default: {}
     - name: null
@@ -530,9 +481,30 @@ generator: src:nushell
       optional: false
       default: null
 - name: doc src:github use
-  summary: ''
+  summary: |-
+    Attempts to download and use all available documentation from
+    the given GitHub repo using the public API. `repoName` should be
+    the name of the repository, including the name of the owner.  If it
+    doesn't include the name of the owner, GitHub search API is used to
+    select the most popular repo with the given name. If `branchName` is
+    not passed an argument, default branch of the project is chosen.
   kind: command
-  description: ''
+  description: |-
+    Attempts to download and use all available documentation from
+    the given GitHub repo using the public API. `repoName` should be
+    the name of the repository, including the name of the owner.  If it
+    doesn't include the name of the owner, GitHub search API is used to
+    select the most popular repo with the given name. If `branchName` is
+    not passed an argument, default branch of the project is chosen.
+
+    ### Examples:
+    ```nushell
+    # Use the docs available in the pikadoc GitHub repository
+    > doc src:github use ArseAssassin/pikadoc
+
+    # Use the docs available in the nushell GitHub repository
+    > doc src:github use nushell
+    ```
   examples: []
   signatures:
   - - name: null
@@ -544,13 +516,13 @@ generator: src:nushell
     - name: repoName
       type: string
       rest: false
-      description: ''
+      description: name of the repo, including the owner
       optional: false
       default: null
     - name: branchName
       type: string
       rest: false
-      description: ''
+      description: name of the branch
       optional: true
       default: null
     - name: null
@@ -590,40 +562,18 @@ generator: src:nushell
       description: null
       optional: false
       default: null
-- name: doc src:man parse
-  summary: Parses a roff input into a doctable
-  kind: command
-  description: |-
-    Parses a roff input into a doctable
-
-    `$in` is a valid string in roff format
-
-    Example: man -Rutf8 man|doc src:man parse
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      rest: false
-      description: null
-      optional: false
-      default: null
-    - name: null
-      type: any
-      rest: false
-      description: null
-      optional: false
-      default: null
 - name: doc src:man use
-  summary: Parses a man page and selects it as the current doctable
+  summary: Parses a man page and selects it as the current doctable.
   kind: command
   description: |-
-    Parses a man page and selects it as the current doctable
+    Parses a man page and selects it as the current doctable.
 
     Takes the name of the manual entry as an argument and parses the command line options for that entry. The generated doctable is selected as the current doctable.
 
-    `$it` is the name of the man page
-
-    Example: doc src:man use "cat"
+    ### Examples:
+    ```nushell
+    > doc src:man use "cat"
+    ```
   examples: []
   signatures:
   - - name: null
@@ -635,7 +585,7 @@ generator: src:nushell
     - name: it
       type: string
       rest: false
-      description: ''
+      description: name of the man page
       optional: false
       default: null
     - name: null
@@ -832,9 +782,9 @@ generator: src:nushell
       optional: false
       default: null
 - name: doc tutor
-  summary: ''
+  summary: Shows the pikadoc tutorial.
   kind: command
-  description: ''
+  description: Shows the pikadoc tutorial.
   examples: []
   signatures:
   - - name: null
@@ -846,7 +796,7 @@ generator: src:nushell
     - name: page
       type: int
       rest: false
-      description: ''
+      description: page to show
       optional: true
       default: 1
     - name: null

@@ -55,6 +55,14 @@ Downloads all `md` files from a GitHub repository and indexes them by filename.
 > doc src:github use ArseAssassin/pikadoc
 ```
 
+#### `doc src:jsdoc`
+
+Parses jsdocs from a path.
+
+```nushell
+> doc src:jsdoc use ./node_modules/ramda/src/
+```
+
 #### `doc src:man`
 
 Parses available command line flags from manpages installed locally.

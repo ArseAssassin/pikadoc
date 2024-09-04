@@ -16,17 +16,19 @@ export use src:jsdoc.nu
 #
 # If a `string` is passed as an argument, doctable will be
 # filtered by `name` and `summary`. If an `int` is passed
-# as an argument the selected symbol is shown as a whole.
+# as an argument, only the selected symbol is presented.
 #
 # Examples:
-#   Return list of all symbols in current doctable
-#   > doc
+# ```nushell
+# # Return list of all symbols in current doctable
+# > doc
 #
-#   Filter symbols by name in current doctable
-#   > doc 'add'
+# # Filter symbols by name in current doctable
+# > doc 'add'
 #
-#   Show symbol at index 3
-#   > doc 3
+# # Show symbol at index 3
+# > doc 3
+# ```
 export def --env main [
   name? # Name of the symbol to query
 ] {
@@ -182,10 +184,12 @@ export def --env use [docs, command?:string] {
   |add-to-history
 }
 
+# Returns the header section for the currently mounted doctable
 export def pkd-about [] {
   $env.PKD_CURRENT.about
 }
 
+# Returns the body section for the currently mounted doctable
 export def pkd-doctable [] {
   $env.PKD_CURRENT.doctable
 }
@@ -323,6 +327,11 @@ def present-body [] {
   )
 }
 
+# Presents the symbol passed in as input as tidily formatted output.
+# Useful for showing the results of custom queries.
+#
+# ### Example:
+#     ```> doc pkd-doctable|get 0|doc present```
 export def present [] {
   let output = $in
     |trim-record-whitespace
@@ -370,7 +379,8 @@ export def version [] {
   $env.PKD_VERSION
 }
 
-def history-file [] {
+# Returns path to the history file that's currently in use
+export def history-file [] {
   $"($env.PKD_CONFIG_HOME)/history.yml"
 }
 
@@ -390,6 +400,7 @@ export def history [] {
   |reverse
 }
 
+# Deletes the history file
 export def 'history clear' [] {
   rm (history-file)
 }

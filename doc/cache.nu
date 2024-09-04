@@ -1,8 +1,10 @@
+# Returns the path to the cache directory that's currently
+# being used.
 export def repository [] {
   $"($env.PKD_CONFIG_HOME)/doc-cache"
 }
 
-# Returns `ls` of doctables cached in the local filesystem.
+# Returns a list of doctables cached in the local filesystem.
 # `cache path` returns the directory used for storing files.
 # See `doc cache clear` for details on cache management.
 export def main [] {
@@ -10,6 +12,7 @@ export def main [] {
   ls -s (repository)
 }
 
+# Initializes cache
 export def init [] {
   if (not (repository|path exists)) {
     mkdir (repository)
@@ -35,6 +38,7 @@ export def clear [] {
   rm -f ((repository) + '/*'|into glob)
 }
 
+# Escapes special characters in input command to use it as a valid Unix path
 export def command-to-id [] string -> string {
   str replace -a '/' '__'
 }

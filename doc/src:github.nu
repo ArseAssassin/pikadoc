@@ -2,7 +2,25 @@ def download-file [repo:string, branch:string, path:string] {
   http get $"https://raw.githubusercontent.com/($repo)/($branch)/($path|url encode)"
 }
 
-export def --env use [repoName:string, branchName?:string] {
+# Attempts to download and use all available documentation from
+# the given GitHub repo using the public API. `repoName` should be
+# the name of the repository, including the name of the owner.  If it
+# doesn't include the name of the owner, GitHub search API is used to
+# select the most popular repo with the given name. If `branchName` is
+# not passed an argument, default branch of the project is chosen.
+#
+# ### Examples:
+# ```nushell
+# # Use the docs available in the pikadoc GitHub repository
+# > doc src:github use ArseAssassin/pikadoc
+#
+# # Use the docs available in the nushell GitHub repository
+# > doc src:github use nushell
+# ```
+export def --env use [
+  repoName:string,    # name of the repo, including the owner
+  branchName?:string  # name of the branch
+] {
   do --env $env.DOC_USE {||
     let repo = if ('/' in $repoName) {
       $repoName

@@ -53,14 +53,19 @@ def parse-from-jsdoc [] {
   }
 }
 
-# Uses `jsdoc` to generate a doctable from `filepath` and selects is the current doctable
+# Parses doctable using `jsdoc -X`. Output can be unpredictable
+# for projects not using jsdoc syntax. You can run
+# `less $"($env.PKD_HOME)/doc/jsdoc-run"`
+# for more details on how jsdoc is invoked.
 #
-# Make sure that `jsdoc` is installed in your `PATH` to use this command.
-#
-# `filepath` is a path to the source directory to generate docs from
-#
-# Example: doc src:javascript use "./node_modules/express/lib/"
-export def --env use [filepath:string] {
+# ### Examples:
+# ```nushell
+# # Mount jsdocs for ramda.js
+# > doc src:jsdoc use node_modules/ramda/src/
+# ```
+export def --env use [
+  filepath:string # path to the directory jsdoc should be run against
+] {
   let absolutePath = $filepath|path expand
   let generatorCommand = $"src:jsdoc use ($absolutePath|to nuon)"
   do --env $env.DOC_USE {{

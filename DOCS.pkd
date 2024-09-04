@@ -175,6 +175,24 @@ generator: src:nushell
       description: null
       optional: false
       default: null
+- name: doc history clear
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
 - name: doc more
   summary: Shows more results from the last search. If `index` is passed as an argument, the given result will be selected from the last result set and presented as a whole.
   kind: command

@@ -1,9 +1,10 @@
 def parse-type [] {
   let value = $in
   {
-    name: $value.name?
-    type: $value.type?.names?.0?
-    description: $value.description?
+    name:         $value.name?
+    type:         $value.type?.names?.0?
+    description:  $value.description?
+    optional:     $value.optional?
   }
 }
 
@@ -15,9 +16,10 @@ def parse-type [] {
 def parse-from-jsdoc [] {
   from json
   |where undocumented? != true and kind? != 'package'
-  |each {
-    |row| {
-      name: ($row.longname?),
+  |each {|row|
+    let isConstructor = $row.kind? == 'class' and $row.params? != null
+    {
+      name: (if ($isConstructor) { $"new ($row.longname?)" } else { $row.longname? }),
       summary: ($row.description?|default ""|split row "."|get 0?),
       signatures: (if ($row.params? != null) {
         [(
@@ -25,13 +27,21 @@ def parse-from-jsdoc [] {
           |each { parse-type }
           |append (if ($row.returns?.0? != null) {
             $row.returns.0|parse-type
+          } else if ($isConstructor) {
+            [{ name: null, type: $row.name?, description: null }]
           } else {
             []
           })
         )]
       })
       description: $row.description?
-      kind: $row.kind?
+      kind: (
+        if ($isConstructor) {
+          'constructor'
+        } else {
+          $row.kind?
+        }
+      )
       source: $row.comment?
       examples: (
         $row.examples?
@@ -51,13 +61,15 @@ def parse-from-jsdoc [] {
 #
 # Example: doc src:javascript use "./node_modules/express/lib/"
 export def --env use [filepath:string] {
+  let absolutePath = $filepath|path expand
+  let generatorCommand = $"src:jsdoc use ($absolutePath|to nuon)"
   do --env $env.DOC_USE {{
     about: {
       name: $filepath
       text_format: 'markdown'
       generator: 'src:jsdoc'
-      generator_command: $"doc src:jsdoc use ($filepath|to nuon)"
+      generator_command: $generatorCommand
     }
-    doctable: (run-external $"($env.PKD_HOME)/doc/jsdoc-run" $filepath|parse-from-jsdoc)
-  }}
+    doctable: (run-external $"($env.PKD_HOME)/doc/jsdoc-run" $absolutePath|parse-from-jsdoc)
+  }} $generatorCommand
 }

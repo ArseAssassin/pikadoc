@@ -201,12 +201,12 @@ def "from pkd" [] {
 def summarize [] {
   select '#'? ns? name? kind? summary?
   |if ($in.ns? == null) {
-    reject -i ns
+    update ns ''
   } else {
     $in
   }
   |if ($in.kind? == null) {
-    reject -i kind
+    update kind ''
   } else {
     $in
   }
@@ -335,7 +335,11 @@ export def present [] {
   }
   |reject examples? source?
 
-  let meta = $trimmedOutput|maybe-update signatures {|| present-type }|table --expand
+  let meta = (
+    $trimmedOutput
+    |maybe-update signatures {|| present-type }
+    |table --expand
+  )
 
   if ((pkd-about).text_format? == 'markdown') {
     let body = (
@@ -380,9 +384,14 @@ def _history [] {
 
 # Returns a list of the last 50 doctables selected with `doc use`
 export def history [] {
-  _history
-  |take 50
+  let history = _history
+  $history
   |each {|| $"doc ($in)"}
+  |reverse
+}
+
+export def 'history clear' [] {
+  rm (history-file)
 }
 
 def add-to-history [] {
@@ -394,7 +403,6 @@ def add-to-history [] {
     |to yaml
     |_save -f (history-file)
   }
-
 }
 
 def cache-docs [name:string, docs:record] {

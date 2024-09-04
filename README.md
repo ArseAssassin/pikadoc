@@ -55,12 +55,12 @@ Downloads all `md` files from a GitHub repository and indexes them by filename.
 > doc src:github use ArseAssassin/pikadoc
 ```
 
-#### `doc src:jsdoc`
+#### `doc src:npm`
 
-Parses jsdocs from a path.
+Parses documentation from an npm package.
 
 ```nushell
-> doc src:jsdoc use ./node_modules/ramda/src/
+> doc src:npm use ramda@0.30.1
 ```
 
 #### `doc src:man`

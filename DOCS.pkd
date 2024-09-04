@@ -531,18 +531,66 @@ generator: src:nushell
       description: null
       optional: false
       default: null
-- name: doc src:jsdoc use
+- name: doc src:jsdoc index
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: path
+      type: string
+      rest: false
+      description: ''
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc src:jsdoc is-jsdoc-module
   summary: |-
-    Parses doctable using `jsdoc -X`. Output can be unpredictable
-    for projects not using jsdoc syntax. You can run
-    `less $"($env.PKD_HOME)/doc/jsdoc-run"`
-    for more details on how jsdoc is invoked.
+    Attempts to detect whether given path contains any jsdoc annotations
+    in .js files.
   kind: command
   description: |-
-    Parses doctable using `jsdoc -X`. Output can be unpredictable
-    for projects not using jsdoc syntax. You can run
+    Attempts to detect whether given path contains any jsdoc annotations
+    in .js files.
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: path
+      type: string
+      rest: false
+      description: ''
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc src:jsdoc use
+  summary: |-
+    Parses doctable using `jsdoc -X`. For more details on how jsdoc is invoked, you can run:
     `less $"($env.PKD_HOME)/doc/jsdoc-run"`
-    for more details on how jsdoc is invoked.
+  kind: command
+  description: |-
+    Parses doctable using `jsdoc -X`. For more details on how jsdoc is invoked, you can run:
+    `less $"($env.PKD_HOME)/doc/jsdoc-run"`
 
     ### Examples:
     ```nushell
@@ -593,6 +641,45 @@ generator: src:nushell
       type: string
       rest: false
       description: name of the man page
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc src:npm use
+  summary: |-
+    Generates doctable for npm package `package`. Parses .md files
+    found in the package repository and attempts to parse jsdocs
+    if available.
+  kind: command
+  description: |-
+    Generates doctable for npm package `package`. Parses .md files
+    found in the package repository and attempts to parse jsdocs
+    if available.
+
+    ### Examples:
+    ```nushell
+    # Generate docs for ramda.js npm package
+    > doc src:npm use ramda
+
+    # Generate docs for an old version
+    > doc src:npm use ramda@0.29.1
+    ```
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: package
+      type: string
+      rest: false
+      description: package name, including version
       optional: false
       default: null
     - name: null
@@ -863,6 +950,42 @@ generator: src:nushell
       type: any
       rest: false
       description: null
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc view-source
+  summary: |-
+    If symbol selected with `index` has sources available
+    (`$symbol.defined_in.file` can be found in the filesystem), opens it
+    for reading using `$env.PKD_CONFIG.pagerCommand`.
+  kind: command
+  description: |-
+    If symbol selected with `index` has sources available
+    (`$symbol.defined_in.file` can be found in the filesystem), opens it
+    for reading using `$env.PKD_CONFIG.pagerCommand`.
+
+    ### Examples:
+    ```nushell
+    # Show sources for symbol 0 using `less`
+    doc view-source 0
+    ```
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: index
+      type: int
+      rest: false
+      description: index of the symbol
       optional: false
       default: null
     - name: null

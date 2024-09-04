@@ -105,7 +105,7 @@ export def --env use [
           name: $md.path
           description: $md.doc
           ns: $md.ns?
-          kind: 'md doc'
+          kind: 'user guide'
           url: $md.url
           summary: (
             $md.doc
@@ -118,7 +118,8 @@ export def --env use [
             |str join ' '
             |split row '.'
             |get 0
-            |str trim)
+            |str trim
+          )
         })}
     )
 

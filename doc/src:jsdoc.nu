@@ -15,12 +15,16 @@ def parse-type [] {
 # Example: `doc use (npx jsdoc -X <path to source directory>|doc src:javascript parse-from-jsdoc)`
 def parse-from-jsdoc [] {
   from json
-  |where undocumented? != true and kind? != 'package'
+  |where undocumented? != true and kind? != 'package' and kind? != 'member'
   |each {|row|
     let isConstructor = $row.kind? == 'class' and $row.params? != null
     {
       name: (if ($isConstructor) { $"new ($row.longname?)" } else { $row.longname? }),
       summary: ($row.description?|default ""|split row "."|get 0?),
+      defined_in: {
+        file: ($"($row.meta?.path?)/($row.meta?.filename?)")
+        line: $row.meta?.lineno?
+      }
       signatures: (if ($row.params? != null) {
         [(
           $row.params
@@ -51,12 +55,26 @@ def parse-from-jsdoc [] {
       ns: $row.memberof?
     }
   }
+  |where {|row| ($"($row.summary?)($row.description?)"|str trim) != '' and not ($row.ns?|default ''|str starts-with '<anonymous>')}
 }
 
-# Parses doctable using `jsdoc -X`. Output can be unpredictable
-# for projects not using jsdoc syntax. You can run
+# Attempts to detect whether given path contains any jsdoc annotations
+# in .js files.
+export def is-jsdoc-module [path:string] {
+  cd $path
+  (grep -qs '\\* @' **/*.js -m1 --exclude-dir=*.js|complete|get exit_code) == 0
+}
+
+export def index [path:string] {
+  cd $path
+  grep '\\* @' **/*.js -l
+  |lines
+  |each { split row '/'|get 0 }
+  |uniq
+}
+
+# Parses doctable using `jsdoc -X`. For more details on how jsdoc is invoked, you can run:
 # `less $"($env.PKD_HOME)/doc/jsdoc-run"`
-# for more details on how jsdoc is invoked.
 #
 # ### Examples:
 # ```nushell
@@ -66,6 +84,10 @@ def parse-from-jsdoc [] {
 export def --env use [
   filepath:string # path to the directory jsdoc should be run against
 ] {
+  if (not (is-jsdoc-module $filepath)) {
+    return $"($filepath) doesn't seem to be a jsdoc module. See `doc src:jsdoc is-jsdoc-module` for details"
+  }
+
   let absolutePath = $filepath|path expand
   let generatorCommand = $"src:jsdoc use ($absolutePath|to nuon)"
   do --env $env.DOC_USE {{

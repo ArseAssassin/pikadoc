@@ -13,6 +13,13 @@ $env.DOC = {|query|
 
 $env.PKD_CONFIG = {
   cacheMaxSize: ('100Mb'|into filesize)
+  pagerCommand: {|file, line?|
+    if ($line == null) {
+      less $file
+    } else {
+      less $"+($line)" -N $"($file)"
+    }
+  }
 }
 
 print ($"**Welcome to pikadoc** - to get started, type `doc tutor`"|glow -sauto)

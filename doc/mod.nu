@@ -10,6 +10,7 @@ export use src:openapi.nu
 export use src:nushell.nu
 export use src:github.nu
 export use src:jsdoc.nu
+export use src:npm.nu
 
 # Returns a summarized table of available symbols in the
 # currently selected doctable.
@@ -166,8 +167,15 @@ export def --env use [docs, command?:string] {
     $env.PKD_CURRENT = if ($commandId in (cache|get name)) {
       open $"(cache repository)/($commandId)"|from msgpackz
     } else {
-      do $docs
+      let result = do $docs
+      if ($result == null) {
+        return
+      } else {
+        $result
+      }
     }
+  } else if ($type == 'nothing') {
+    return
   } else {
     $env.PKD_CURRENT = $docs
   }
@@ -428,3 +436,26 @@ def cache-docs [name:string, docs:record] {
   }
 }
 
+# If symbol selected with `index` has sources available
+# (`$symbol.defined_in.file` can be found in the filesystem), opens it
+# for reading using `$env.PKD_CONFIG.pagerCommand`.
+#
+# ### Examples:
+# ```nushell
+# # Show sources for symbol 0 using `less`
+# doc view-source 0
+# ```
+export def view-source [
+  index:int # index of the symbol
+] {
+  let symbol = pkd-doctable|get -i $index|get defined_in?
+  if ($symbol.file? != null and ($symbol.file?|path exists)) {
+    do (get-config pagerCommand) $symbol.file ($symbol.line?|default 0)
+  } else {
+    print "Couldn't open sources for reading"
+  }
+}
+
+def get-config [configName:string] {
+  $env.PKD_CONFIG|get $configName
+}

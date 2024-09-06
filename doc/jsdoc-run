@@ -1,4 +1,0 @@
-#! /usr/bin/env nix-shell
-#! nix-shell -i bash -p nodejs_20 bash
-
-npx --yes jsdoc@4.0.3 -X -r $@

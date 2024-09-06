@@ -109,12 +109,19 @@ description: User guide for the pikadoc CLI
     doc search 'zip'
     ```
 
-    Many generators insert metadata that can be useful for querying. `doc pkd-doctable` can be used to create custom filters:
+    Sometimes it's useful to filter symbols by their header metadata. A closure can be passed to `doc` query any field in the full doctable.
 
     ```nushell
     # Show all tables with a column named `date`
     doc src:sqlite use ./path-to.db
-    doc pkd-doctable|where {'date' in ($in.columns|get name)}
+    doc {|| where {'date' in ($in.columns|get name)}}
+    ```
+
+    When you query symbols with `doc`, the results are transformed to make them easier to read. `doc pkd-doctable` can be used to access raw symbols for planning queries for advanced filters:
+
+    ```nushell
+    # Get raw data for symbol 0 in current doctable
+    doc pkd-doctable|get 0
     ```
 
     This covers the basics of reading and generating doctables using pikadoc. If you're curious about advanced usage, feel free to keep working through this tutorial.

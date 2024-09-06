@@ -13,8 +13,19 @@ $env.DOC = {|query|
 
 $env.PKD_CONFIG = {
   cacheMaxSize: ('100Mb'|into filesize)
-  pagerCommand: {|file, line?|
-    if ($line == null) {
+  pythonCommand: {|...args:string|
+    run-external 'python3' ...$args
+  }
+  npmCommand: {|...args:string|
+    run-external 'npm' ...$args
+  }
+  npxCommand: {|...args:string|
+    run-external 'npx' ...$args
+  }
+  pagerCommand: {|file?:string, line?:int|
+    if ($file == null) {
+      less
+    } else if ($line == null) {
       less $file
     } else {
       less $"+($line)" -N $"($file)"

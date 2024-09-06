@@ -14,8 +14,18 @@ use src:jsdoc.nu
 # > doc src:npm use ramda@0.29.1
 # ```
 export def --env use [
-  package:string # package name, including version
+  packageName:string # package name, including version
 ] {
+  let package = if (not ('@' in $packageName) and ('package.json'|path exists)) {
+    let packageJson = open 'package.json'
+    let dependencies = $packageJson.devDependencies|merge $packageJson.dependencies
+
+    if ($packageName in $dependencies) {
+      $"($packageName)@($dependencies|get $packageName)"
+    }
+  } else {
+    $packageName
+  }
   let generatorCommand = $"src:npm use ($package|to nuon)"
   do --env $env.DOC_USE {
     let tempProject = '/tmp/pikadoc-npm'
@@ -25,7 +35,7 @@ export def --env use [
     cd $tempProject
 
     let install = (
-      run-external $"($env.PKD_HOME)/doc/npm-install" "--no-save" $package
+      do $env.PKD_CONFIG.npmCommand "install" "--no-save" $package
       |complete
     )
 
@@ -46,6 +56,13 @@ export def --env use [
         version: $packageMeta.version
         text_format: 'markdown'
         generator_command: $generatorCommand
+        license: (
+          open (
+            ['LICENSE', 'LICENSE.md', 'LICENSE.txt']
+            |where {path exists}
+            |first
+          )
+        )
       }
       doctable: ((
         ls **/*.md
@@ -57,7 +74,7 @@ export def --env use [
             name: $file
             kind: 'user guide'
             defined_in: {
-              file: $file
+              file: ($file|path expand)
             }
             description: $md
             summary: ($md|helpers markdown-to-summary)

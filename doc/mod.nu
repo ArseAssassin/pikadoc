@@ -18,8 +18,10 @@ export use src:npm.nu
 # If a `string` is passed as an argument, doctable will be
 # filtered by `name` and `summary`. If an `int` is passed
 # as an argument, only the selected symbol is presented.
+# If a closure is passed as an argument, it'll be used to
+# filter the full doctable before being summarized and paged.
 #
-# Examples:
+# ### Examples:
 # ```nushell
 # # Return list of all symbols in current doctable
 # > doc
@@ -29,22 +31,37 @@ export use src:npm.nu
 #
 # # Show symbol at index 3
 # > doc 3
+#
+# # Filter symbols by namespace
+# > doc {|| where ns == 'inspect'}
+#
+# # Show symbols that are either functions or classes
+# > doc {|| where kind in ['function', 'class']}
+#
+# # Show symbols that have a summary
+# > doc {|| where summary != ''}
 # ```
 export def --env main [
-  name? # Name of the symbol to query
+  query? # name/index/closure to query for
 ] {
   if (('PKD_CURRENT' in $env) != true) {
     print "No docfile currently selected. Type `doc use <path>` to select a docfile to use."
     return
   }
-  if (($name|describe) == 'int') {
-    pkd-doctable|get $name|present
-  } else if ($name != null) {
-    let query = ($name|str downcase)
+  if (($query|describe) == 'int') {
+    pkd-doctable|get $query|present
+  } else if (($query|describe) == 'closure') {
+    pkd-doctable
+    |add-doc-ids
+    |do $query
+    |summarize-all
+    |present-list
+  } else if ($query != null) {
+    let query = ($query|str downcase)
     let search = (
       pkd-doctable
       |add-doc-ids
-      |find $name -c ['name', 'summary']
+      |find $query -c ['name', 'summary']
     )
 
     $search
@@ -186,8 +203,8 @@ export def --env use [docs, command?:string] {
 
   if ($command != null) {
     $command
-  } else {
-    $"use ($docs)"
+  } else if ($type == 'string') {
+    $docs|path expand|to nuon
   }
   |add-to-history
 }
@@ -237,7 +254,7 @@ export def save [
   --format: string='yaml' #
 ] {
   if ($format == 'yaml') {
-    ['---', (pkd-about|to yaml), '---', (pkd-doctable|to yaml)]
+    ['---', (pkd-about|to yaml), '---', (pkd-doctable|reject defined_in|to yaml)]
     |str join "\n"
     |_save -f $filepath
   } else if ($format == 'md') {
@@ -277,7 +294,7 @@ def present-type [] {
     |each { present-type }
     |str join " -> "
   } else if ($name|str starts-with 'record') {
-    $"($type.name)(if ($type.name != null and $type.type != null) { ':' })($type.type)(if ($type.optional? == true) { '?' })(if ($type.rest? == true) {
+    $"($type.name?)(if ($type.name? != null and $type.type? != null) { ':' })($type.type?)(if ($type.optional? == true) { '?' })(if ($type.rest? == true) {
       '...'
     })(if ($type.default? != null) {
       '=' + $type.default
@@ -335,6 +352,15 @@ def present-body [] {
   )
 }
 
+def pager [] {
+  let s = $in
+  if (($s|lines|length) > (term size).rows) {
+    $s|do (pkd-config pagerCommand)
+  } else {
+    $s
+  }
+}
+
 # Presents the symbol passed in as input as tidily formatted output.
 # Useful for showing the results of custom queries.
 #
@@ -371,7 +397,7 @@ export def present [] {
   } else {
     $"($meta)\n\n($output.description?)"
   }
-
+  |pager
 }
 
 def maybe-update [name, value] {
@@ -450,12 +476,12 @@ export def view-source [
 ] {
   let symbol = pkd-doctable|get -i $index|get defined_in?
   if ($symbol.file? != null and ($symbol.file?|path exists)) {
-    do (get-config pagerCommand) $symbol.file ($symbol.line?|default 0)
+    do (pkd-config pagerCommand) $symbol.file ($symbol.line?|default 0)
   } else {
     print "Couldn't open sources for reading"
   }
 }
 
-def get-config [configName:string] {
-  $env.PKD_CONFIG|get $configName
+export def pkd-config [name:string] {
+  $env.PKD_CONFIG|get $name
 }

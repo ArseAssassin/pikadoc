@@ -97,6 +97,6 @@ export def --env use [
       generator: 'src:jsdoc'
       generator_command: $generatorCommand
     }
-    doctable: (run-external $"($env.PKD_HOME)/doc/jsdoc-run" $absolutePath|parse-from-jsdoc)
+    doctable: (do $env.PKD_CONFIG.npxCommand 'jsdoc' '-X' '-r' $absolutePath|parse-from-jsdoc)
   }} $generatorCommand
 }

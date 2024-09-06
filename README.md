@@ -55,6 +55,14 @@ Downloads all `md` files from a GitHub repository and indexes them by filename.
 > doc src:github use ArseAssassin/pikadoc
 ```
 
+#### `doc src:python`
+
+Parses documentation from a Python package.
+
+```nushell
+> doc src:python use flask
+```
+
 #### `doc src:npm`
 
 Parses documentation from an npm package.

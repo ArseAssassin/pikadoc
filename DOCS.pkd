@@ -16,8 +16,10 @@ generator: src:nushell
     If a `string` is passed as an argument, doctable will be
     filtered by `name` and `summary`. If an `int` is passed
     as an argument, only the selected symbol is presented.
+    If a closure is passed as an argument, it'll be used to
+    filter the full doctable before being summarized and paged.
 
-    Examples:
+    ### Examples:
     ```nushell
     # Return list of all symbols in current doctable
     > doc
@@ -27,6 +29,15 @@ generator: src:nushell
 
     # Show symbol at index 3
     > doc 3
+
+    # Filter symbols by namespace
+    > doc {|| where ns == 'inspect'}
+
+    # Show symbols that are either functions or classes
+    > doc {|| where kind in ['function', 'class']}
+
+    # Show symbols that have a summary
+    > doc {|| where summary != ''}
     ```
   examples: []
   signatures:
@@ -36,10 +47,10 @@ generator: src:nushell
       description: null
       optional: false
       default: null
-    - name: name
+    - name: query
       type: any
       rest: false
-      description: Name of the symbol to query
+      description: name/index/closure to query for
       optional: true
       default: null
     - name: null
@@ -260,6 +271,30 @@ generator: src:nushell
       type: any
       rest: false
       description: null
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc pkd-config
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: name
+      type: string
+      rest: false
+      description: ''
       optional: false
       default: null
     - name: null
@@ -676,7 +711,7 @@ generator: src:nushell
       description: null
       optional: false
       default: null
-    - name: package
+    - name: packageName
       type: string
       rest: false
       description: package name, including version
@@ -767,42 +802,20 @@ generator: src:nushell
       description: null
       optional: false
       default: null
-- name: doc src:python parse-from-sphinx-html
-  summary: Parses a doctable from a HTML documentation page generated using sphinx.
-  kind: command
-  description: |-
-    Parses a doctable from a HTML documentation page generated using sphinx.
-
-    `in` should be a valid sphinx HTML document
-
-    Example: http get 'https://flask.palletsprojects.com/en/3.0.x/api/'|doc src:python parse-from-sphinx-html
-
-    NOTE: This command parses only a single HTML page. Sphinx documentation typically consists of multiple documents and a single page might not contain all the references you're looking for. To index all symbols, make sure to parse all relevant pages, or use the `singlehtml` builder in Sphinx to produce a single page documentation.
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      rest: false
-      description: null
-      optional: false
-      default: null
-    - name: null
-      type: any
-      rest: false
-      description: null
-      optional: false
-      default: null
 - name: doc src:python use
-  summary: Parses a HTML documentation page generated using sphinx and selects it as the current doctable
+  summary: Generates a doctable from Python `$module`. Invokes `$env.PKD_CONFIG.pythonCommand` to run a script using `python3` found using PATH. Doesn't install packages.
   kind: command
   description: |-
-    Parses a HTML documentation page generated using sphinx and selects it as the current doctable
+    Generates a doctable from Python `$module`. Invokes `$env.PKD_CONFIG.pythonCommand` to run a script using `python3` found using PATH. Doesn't install packages.
 
-    `url` should be a URL to a sphinx-generated HTML page
+    ### Examples:
+    ```nushell
+    # Generates a doctable from a locally installed package
+    > doc src:python use flask
 
-    Example: doc src:python use "https://flask.palletsprojects.com/en/3.0.x/api/"
-
-    NOTE: This parses only a single HTML page. If API documentation is spread over multiple files, see documentation for `parse-from-sphinx-html`
+    # Generates a doctable from a locally installed package
+    > doc src:python use flask
+    ```
   examples: []
   signatures:
   - - name: null
@@ -811,8 +824,8 @@ generator: src:nushell
       description: null
       optional: false
       default: null
-    - name: url
-      type: any
+    - name: module
+      type: string
       rest: false
       description: ''
       optional: false

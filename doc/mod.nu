@@ -254,7 +254,7 @@ export def save [
   --format: string='yaml' #
 ] {
   if ($format == 'yaml') {
-    ['---', (pkd-about|to yaml), '---', (pkd-doctable|reject defined_in|to yaml)]
+    ['---', (pkd-about|to yaml), '---', (pkd-doctable|reject -i defined_in|to yaml)]
     |str join "\n"
     |_save -f $filepath
   } else if ($format == 'md') {

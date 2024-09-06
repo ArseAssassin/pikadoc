@@ -23,7 +23,7 @@ nix --experimental-features "nix-command flakes" profile install "github:ArseAss
 The best way to learn `pikadoc` is by going through the interactive tutorial:
 
 ```nushell
-# Guides you through the pikadoc tutorial while inside the `pikadoc` shell
+# Inside the `pikadoc` shell
 doc tutor
 ```
 
@@ -41,7 +41,7 @@ To assist in bringing this about, PikaDoc CLI provides a number of modules out o
 
 #### `doc s`
 
-The pkDocs central repository holds documentation for 150+ technologies that are immediately ready to download for use. See [here](https://github.com/ArseAssassin/pkdocs/tree/main/docs) for a full listing. These are also available using the [web client](https://tuomas.kanerva.info/pkdocs/).
+The pkDocs central repository holds documentation for 150+ technologies that are immediately ready to download for use. See [here](https://github.com/ArseAssassin/pkdocs/tree/main/docs/index.yml) for a full listing. These are also available using the [web client](https://tuomas.kanerva.info/pkdocs/).
 
 ```nushell
 > doc s javascript

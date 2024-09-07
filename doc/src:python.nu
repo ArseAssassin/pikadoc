@@ -19,6 +19,8 @@ export def --env use [module:string] {
       |from json
     )
 
+    let description = $parsed.about?.description?|default ''
+
     {
       about: ({
         name: $module
@@ -30,9 +32,9 @@ export def --env use [module:string] {
       |merge {
         description: (
           match ($parsed.packageMetadata?.descriptionContentType) {
-            'text/x-rst' => { $parsed.about.description|pandoc -f rst -tplain }
-            'text/markdown' => { $parsed.about.description|pandoc -f gfm -tplain }
-            _ => { $parsed.about.description }
+            'text/x-rst' => { $description|pandoc -f rst -tplain }
+            'text/markdown' => { $description|pandoc -f gfm -tplain }
+            _ => { $description }
           }
         )
       }

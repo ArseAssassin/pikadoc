@@ -136,6 +136,7 @@ try:
   about = {
     "name": meta['Name'],
     "version": meta['version'],
+    "summary": meta['Summary'],
     "description": meta['Description'],
     "homepage": meta['Home-page'],
     "license": meta['License'],
@@ -144,7 +145,11 @@ except PackageNotFoundError:
   pass
 # print(l)
 print(json.dumps({
-  "packageMetadata": meta,
+  "packageMetadata": {
+    "descriptionContentType":
+      "Description-Content-Type" in meta and meta["Description-Content-Type"] or
+      "text/plain"
+  },
   "about": about,
   "doctable": l
 }))

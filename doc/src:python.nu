@@ -25,7 +25,18 @@ export def --env use [module:string] {
         text_format: 'rst'
         generator: 'src:python'
         generator_command: $generatorCommand
-      }|merge $parsed.about)
+      }
+      |merge $parsed.about
+      |merge {
+        description: (
+          match ($parsed.packageMetadata?.descriptionContentType) {
+            'text/x-rst' => { $parsed.about.description|pandoc -f rst -tplain }
+            'text/markdown' => { $parsed.about.description|pandoc -f gfm -tplain }
+            _ => { $parsed.about.description }
+          }
+        )
+      }
+      )
       doctable: (
         $parsed.doctable
       )

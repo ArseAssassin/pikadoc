@@ -32,8 +32,8 @@ export def --env use [module:string] {
       |merge {
         description: (
           match ($parsed.packageMetadata?.descriptionContentType) {
-            'text/x-rst' => { $description|pandoc -f rst -tplain }
-            'text/markdown' => { $description|pandoc -f gfm -tplain }
+            'text/x-rst' => { $description|pandoc -f rst -tgfm-raw_html }
+            'text/markdown' => { $description|pandoc -f gfm -tgfm-raw_html }
             _ => { $description }
           }
         )

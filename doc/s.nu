@@ -2,23 +2,53 @@
 # To get a list of available doctables, see `doc s index`.
 #
 # ### Example:
-#     ```> doc s use python~3.13```
+#     ```> doc s python~3.13```
 #
 export def --env main [
-  slug:string # url slug of the file to use, including the version number
+  path:string # path to the file to use, including the version number
   ] {
   do --env $env.DOC_USE {||
-    let docs = http get $"https://raw.githubusercontent.com/ArseAssassin/pkdocs/main/docs/($slug|str downcase).pkd"|from yaml
+    let matches = find-doc $path
+    if (($matches|length) != 1) {
+      print (
+        $matches
+        |select name path version? generator
+      )
+      print $"Found ($matches|length) results when searching for `($path)`"
+      print $"Type `doc s $path` to specify results"
+      return
+    } else {
+      let docs = http get ($matches.0.repoUrl)|from yaml
 
-    {
-      about: ($docs|get 0)
-      doctable: ($docs|get 1)
+      {
+        about: ($docs|get 0)
+        doctable: ($docs|get 1)
+      }
     }
-  } $"s ($slug|str downcase)"
+
+  } $"s ($path|str downcase)"
 }
 
 # Returns a list of doctables available in the pikadoc central repository.
 # See `doc s` for more information.
-export def index [] {
-  http get "https://raw.githubusercontent.com/ArseAssassin/pkdocs/main/docs/index.yml"|select name slug? version?
+export def --env index [] {
+  index full
+  |insert id {|row| $row.path|path basename|str substring ..-4}
+  |select name id version? generator
+}
+
+export def --env 'index full' [] {
+  if ($env.PKD_REPO_INDEX? == null) {
+    $env.PKD_REPO_INDEX = (http get "https://raw.githubusercontent.com/ArseAssassin/pkdocs/main/docs/index.yml")
+  }
+
+  $env.PKD_REPO_INDEX
+}
+
+def find-doc [path:string] {
+  index full
+  |find -c ['path'] $path
+  |each {
+    insert repoUrl {|| $"https://raw.githubusercontent.com/ArseAssassin/pkdocs/main/docs/($in.path|ansi strip)"}
+  }
 }

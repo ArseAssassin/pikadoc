@@ -207,6 +207,8 @@ export def --env use [docs, command?:string] {
     $docs|path expand|to nuon
   }
   |add-to-history
+
+  $"(pkd-doctable|length) symbols found\nUsing doctable ((pkd-about).name)~((pkd-about).version?)"
 }
 
 # Returns the header section for the currently mounted doctable

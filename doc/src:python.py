@@ -130,6 +130,7 @@ if hasattr(module, '__path__'):
 
 about = {}
 
+meta = {}
 try:
   meta = metadata(module_name)
   about = {
@@ -143,6 +144,7 @@ except PackageNotFoundError:
   pass
 # print(l)
 print(json.dumps({
+  "packageMetadata": meta,
   "about": about,
   "doctable": l
 }))

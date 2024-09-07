@@ -356,7 +356,7 @@ generator: src:nushell
     To get a list of available doctables, see `doc s index`.
 
     ### Example:
-        ```> doc s use python~3.13```
+        ```> doc s python~3.13```
   examples: []
   signatures:
   - - name: null
@@ -365,10 +365,10 @@ generator: src:nushell
       description: null
       optional: false
       default: null
-    - name: slug
+    - name: path
       type: string
       rest: false
-      description: url slug of the file to use, including the version number
+      description: path to the file to use, including the version number
       optional: false
       default: null
     - name: null
@@ -385,6 +385,24 @@ generator: src:nushell
   description: |-
     Returns a list of doctables available in the pikadoc central repository.
     See `doc s` for more information.
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc s index full
+  summary: ''
+  kind: command
+  description: ''
   examples: []
   signatures:
   - - name: null

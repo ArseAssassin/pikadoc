@@ -1,3 +1,5 @@
+*It's like man pages, but for reference docs*
+
 # PikaDoc
 
 PikaDoc is a human-readable, structured documentation format. `pkd`-files don't ship as HTML files, but as already indexed data tables, ready to be explored on the command line or your browser.
@@ -18,6 +20,15 @@ You can (optionally) add `pikadoc` to your path by doing:
 
 ```bash
 nix --experimental-features "nix-command flakes" profile install "github:ArseAssassin/pikadoc"
+```
+
+If you prefer, you can try `pikadoc` with Docker without installing Nix:
+
+```bash
+docker run -ti ghcr.io/nixos/nix
+
+# Inside docker shell
+nix --experimental-features "nix-command flakes" run "github:ArseAssassin/pikadoc"
 ```
 
 The best way to learn `pikadoc` is by going through the interactive tutorial:

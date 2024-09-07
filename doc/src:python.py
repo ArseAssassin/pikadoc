@@ -44,7 +44,7 @@ def gen_module(module_name):
     l.append({
       "name": name,
       "kind": kind,
-      "ns": item != module and module_name or None,
+      "ns": (item is not module and module_name) or None,
       "description": kind != 'const' and getdoc(item) or None,
       "summary": (kind != 'const' and getdoc(item) or '').split('\n')[0].split('.')[0].replace("\n", ' ').replace('  ', ' '),
       "signatures": gen_signature(item),
@@ -59,7 +59,11 @@ def gen_module(module_name):
 
       members = []
       if hasattr(item, '__all__'):
-        members = [(x, getattr(item, x)) for x in item.__all__]
+        for memberName in item.__all__:
+          try:
+            members.append((memberName, getattr(item, memberName)))
+          except:
+            pass
       else:
         members = inspect.getmembers(item)
 

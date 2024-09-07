@@ -26,6 +26,7 @@ def gen_module(module_name):
       isclass(item) and 'class' or
       ismethod(item) and (not isclass(parent) and 'method' or 'function') or
       isfunction(item) and (not isclass(parent) and 'function' or 'method') or
+      callable(item) and 'callable' or
       isclass(parent) and 'property' or
       'const'
     )
@@ -61,12 +62,9 @@ def gen_module(module_name):
         members = inspect.getmembers(item)
 
       for (memberName, memberItem) in members:
-        mod = inspect.getmodule(memberItem)
-
         if (not inspect.isbuiltin(memberItem) and
           (not ismodule(memberItem) or memberItem.__name__.startswith(module_name)) and
-          (not (isclass(memberItem) or ismodule(memberItem)) or memberItem not in parsed_items) and
-          # (mod == module or mod == None) and
+          (not (isclass(memberItem) and ismodule(memberItem)) or memberItem not in parsed_items) and
           not memberName.startswith('_')):
 
           if inspect.isclass(item):
@@ -129,6 +127,7 @@ about = {}
 try:
   meta = metadata(module_name)
   about = {
+    "name": meta['Name'],
     "version": meta['version'],
     "description": meta['Description'],
     "homepage": meta['Home-page'],

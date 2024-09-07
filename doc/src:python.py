@@ -4,6 +4,8 @@ from importlib.metadata import metadata, PackageNotFoundError
 from pkgutil import iter_modules
 from inspect import ismodule, isclass, ismethod, isfunction, isbuiltin
 
+parsed_items = []
+
 def gen_module(module_name):
   module = importlib.import_module(module_name)
 
@@ -15,6 +17,8 @@ def gen_module(module_name):
       return doc
 
   def gen_symbol(name, item, parent=None):
+    parsed_items.append(item)
+
     l = []
     defined_in = None
     kind = (
@@ -41,7 +45,7 @@ def gen_module(module_name):
       "kind": kind,
       "ns": item != module and module_name or None,
       "description": kind != 'const' and getdoc(item) or None,
-      "summary": (kind != 'const' and getdoc(item) or '').split('.')[0].replace("\n", ' ').replace('  ', ' '),
+      "summary": (kind != 'const' and getdoc(item) or '').split('\n')[0].split('.')[0].replace("\n", ' ').replace('  ', ' '),
       "signatures": gen_signature(item),
       "defined_in": defined_in,
       "inherits_from":
@@ -50,11 +54,19 @@ def gen_module(module_name):
     })
 
     if inspect.ismodule(item) or inspect.isclass(item):
-      for (memberName, memberItem) in inspect.getmembers(item):
+      members = []
+      if hasattr(item, '__all__'):
+        members = [(x, getattr(item, x)) for x in item.__all__]
+      else:
+        members = inspect.getmembers(item)
+
+      for (memberName, memberItem) in members:
         mod = inspect.getmodule(memberItem)
 
         if (not inspect.isbuiltin(memberItem) and
-          (mod == module or mod == None) and
+          (not ismodule(memberItem) or memberItem.__name__.startswith(module_name)) and
+          (not (isclass(memberItem) or ismodule(memberItem)) or memberItem not in parsed_items) and
+          # (mod == module or mod == None) and
           not memberName.startswith('_')):
 
           if inspect.isclass(item):

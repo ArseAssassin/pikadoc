@@ -14,6 +14,8 @@ export def --env use [module:string] {
   do --env $env.DOC_USE {||
     let parsed = (
       do $env.PKD_CONFIG.pythonCommand $"($env.PKD_HOME)/doc/src:python.py" $module
+      |lines
+      |last
       |from json
     )
 

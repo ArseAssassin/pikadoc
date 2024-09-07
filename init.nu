@@ -23,8 +23,13 @@ $env.PKD_CONFIG = {
     run-external 'npx' ...$args
   }
   pagerCommand: {|file?:string, line?:int|
-    if ($file == null) {
-      less
+    let s = $in
+    if ($file == null and $s != null) {
+      if (($s|lines|length) >= (term size).rows) {
+        $s|less
+      } else {
+        $s
+      }
     } else if ($line == null) {
       less $file
     } else {

@@ -353,12 +353,7 @@ def present-body [] {
 }
 
 def pager [] {
-  let s = $in
-  if (($s|lines|length) > (term size).rows) {
-    $s|do (pkd-config pagerCommand)
-  } else {
-    $s
-  }
+  $in|do (pkd-config pagerCommand)
 }
 
 # Presents the symbol passed in as input as tidily formatted output.

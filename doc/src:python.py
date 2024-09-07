@@ -17,10 +17,7 @@ def gen_module(module_name):
       return doc
 
   def gen_symbol(name, item, parent=None):
-    parsed_items.append(item)
-
     l = []
-    defined_in = None
     kind = (
       ismodule(item) and 'module' or
       isclass(item) and 'class' or
@@ -30,6 +27,9 @@ def gen_module(module_name):
       isclass(parent) and 'property' or
       'const'
     )
+
+    defined_in = None
+
     if (ismodule(item) or isclass(item) or ismethod(item) or isfunction(item)) and not isbuiltin(item):
       try:
         defined_in = {
@@ -55,6 +55,8 @@ def gen_module(module_name):
     })
 
     if inspect.ismodule(item) or inspect.isclass(item):
+      parsed_items.append(item)
+
       members = []
       if hasattr(item, '__all__'):
         members = [(x, getattr(item, x)) for x in item.__all__]
@@ -64,7 +66,7 @@ def gen_module(module_name):
       for (memberName, memberItem) in members:
         if (not inspect.isbuiltin(memberItem) and
           (not ismodule(memberItem) or memberItem.__name__.startswith(module_name)) and
-          (not (isclass(memberItem) and ismodule(memberItem)) or memberItem not in parsed_items) and
+          (not (isclass(memberItem) or ismodule(memberItem)) or memberItem not in parsed_items) and
           not memberName.startswith('_')):
 
           if inspect.isclass(item):

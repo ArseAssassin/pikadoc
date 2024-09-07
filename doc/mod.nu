@@ -250,11 +250,18 @@ alias _save = save
 
 # Saves doctable in the filesystem.
 export def save [
-  filepath: string # path to use for saving the file
-  --format: string='yaml' #
+  filepath: string        # path to use for saving the file
+  --format: string='yaml' # format of the output - supports `yaml` and `md`
+  --keepFiles             # keep references to local files
 ] {
   if ($format == 'yaml') {
-    ['---', (pkd-about|to yaml), '---', (pkd-doctable|reject -i defined_in|to yaml)]
+    ['---', (pkd-about|to yaml), '---', (
+      pkd-doctable|if ($keepFiles) {
+        $in
+      } else {
+        reject -i defined_in
+      }
+      |to yaml)]
     |str join "\n"
     |_save -f $filepath
   } else if ($format == 'md') {

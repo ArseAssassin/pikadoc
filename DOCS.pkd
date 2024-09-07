@@ -420,9 +420,15 @@ generator: src:nushell
     - name: format
       type: string
       rest: false
-      description: ''
+      description: format of the output - supports `yaml` and `md`
       optional: true
       default: yaml
+    - name: keepFiles
+      type: bool
+      rest: false
+      description: keep references to local files
+      optional: true
+      default: null
     - name: null
       type: any
       rest: false

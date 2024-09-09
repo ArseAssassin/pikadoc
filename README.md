@@ -42,7 +42,7 @@ The tutorial can also be viewed under the [`help/` directory](help/).
 
 ### PikaDoc web
 
-`pkd`s available in the PikaDoc central repository can also be viewed using the [web client](https://tuomas.kanerva.info/pkdocs/).
+pkd files available in the PikaDoc central repository can also be viewed using the [web client](https://tuomas.kanerva.info/pkdocs/).
 
 ## Why PikaDoc?
 
@@ -116,13 +116,15 @@ Generates documentation from commands available in the current nushell session.
 
 ## Documentation
 
-The best way to find usage information for the PikaDoc CLI is exploring the official documentation through `pikadoc' itsef. You can type `doc tutor` to run through the tutorial, or type `doc src:nushell use doc` to find documentation on all available commands. The user guide is also available via the web client.
+The best way to find usage information for the PikaDoc CLI is exploring the official documentation through pikadoc itsef. You can type `doc tutor` to run through the tutorial, or type `doc src:nushell use doc` to find documentation on all available commands. The user guide is also available via the web client.
 
 ### Is this a replacement for README files?
 
 Absolutely not! README files are great - when they're well written and maintained, they can act as fantastic guides explaining how to use the repo. They come with a sizable downside though: maintaining reference documentation can be an unwieldy task. Largely because of this, many projects end up creating their own online documentation portals, or worse, leave large parts of the codebase undocumented to the public. This is where PikaDoc comes in.
 
 With the `pkd` file format, project maintainers can generate accurate and up-to-date reference documentation straight from the sources. The files are already indexed and searchable, making all parts of the codebase instantly discoverable to the end user.
+
+For more information on the file format and our motivation, [see here](<help/What is the DOCS.pkd file?.md>)
 
 ## License
 

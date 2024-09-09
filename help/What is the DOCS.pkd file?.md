@@ -18,7 +18,7 @@ While packaging documentation with software is hardly a new idea, what's novel a
 - list all classes with a property called "name"
 - list all functions that return an instance of the class "Foo"
 
-Despite these advanced features, pkd doctables are formatted in simple, human-readable YAML. For small projects, this file is uncomplicated enough to write by hand, yet it easily scales up to thousands, even tens of thousands of symbols. [Click here](The .pkd file format.md) for more information on the file format.
+Despite these advanced features, pkd doctables are formatted in simple, human-readable YAML. For small projects, this file is uncomplicated enough to write by hand, yet it easily scales up to thousands, even tens of thousands of symbols. [Click here](<help/The .pkd file format.md>) for more information on the file format.
 
 Much like the README-file explains how to use a software distribution, the DOCS.pkd explains what it contains. It lists every public-facing function, class, method and what-have-you, explaining briefly or in-detail what it's all about. Ideally it's generated directly from the project sources using a documentation generator, making sure it stays up to date at all times. Essentially, the pkd file acts as a portable reference guide, making that type of documentation accessible even for small-scale projects that have no resources for maintaining their own documentation portal. As such, the point is not to stretch the already meager project resources even thinner with a new format, but simply to make the already existing documentation more available to end users.
 

@@ -3,9 +3,224 @@ name: pikadoc user guide
 version: 0.1.0
 slug: pikadoc_user_guide~0.1.0
 text_format: markdown
+generator: manual
 homepage: https://github.com/ArseAssassin/pikadoc
 description: User guide for the pikadoc CLI
+license: MIT
 ---
+- name: 'README'
+  id: 'README.md'
+  kind: 'user guide'
+  description: |
+    *It's like man pages, but for reference docs*
+
+    # PikaDoc
+
+    PikaDoc is a human-readable, structured documentation format. `pkd`-files don't ship as HTML files, but as already indexed data tables, ready to be explored on the command line or your browser.
+
+    Currently there are two PikaDoc clients: the `pikadoc` CLI maintained in this repository and the [web interface](https://tuomas.kanerva.info/pkdocs/) for reading docs stored in the [pkDocs central repository](https://github.com/ArseAssassin/pkdocs/tree/main/docs).
+
+    ## Quick start
+
+    ### PikaDoc CLI
+
+    `pikadoc` uses Nix for packaging. To run the CLI, first [install Nix](https://nixos.org/download/#download-nix) using your preferred method, then run:
+
+    ```bash
+    nix --experimental-features "nix-command flakes" run "github:ArseAssassin/pikadoc"
+    ```
+
+    You can (optionally) add `pikadoc` to your path by doing:
+
+    ```bash
+    nix --experimental-features "nix-command flakes" profile install "github:ArseAssassin/pikadoc"
+    ```
+
+    If you prefer, you can try `pikadoc` with Docker without installing Nix:
+
+    ```bash
+    docker run -ti ghcr.io/nixos/nix
+
+    # Inside docker shell
+    nix --experimental-features "nix-command flakes" run "github:ArseAssassin/pikadoc"
+    ```
+
+    The best way to learn `pikadoc` is by going through the interactive tutorial:
+
+    ```nushell
+    # Inside the `pikadoc` shell
+    doc tutor
+    ```
+
+    The tutorial can also be viewed under the [`help/` directory](help/).
+
+    ### PikaDoc web
+
+    `pkd`s available in the PikaDoc central repository can also be viewed using the [web client](https://tuomas.kanerva.info/pkdocs/).
+
+    ## Why PikaDoc?
+
+    Development of PikaDoc is motivated by one belief: all code that runs on your computer should have version-specific offline documentation available. To bring about this vision, we encourage developers to add a `DOCS.pkd` to the root of their repo. [Here's an example](DOCS.pkd) of what it looks like. `pkd` is a simple, YAML-based file format that remains human-readable without any special reader software: accessing it is as simple as doing `less repo/DOCS.pkd`.
+
+    To assist in bringing this about, PikaDoc CLI provides a number of modules out of the box for generating documentation from offline as well as online sources:
+
+    #### `doc s`
+
+    The pkDocs central repository holds documentation for 150+ technologies that are immediately ready to download for use. See [here](https://github.com/ArseAssassin/pkdocs/tree/main/docs/index.yml) for a full listing. These are also available using the [web client](https://tuomas.kanerva.info/pkdocs/).
+
+    ```nushell
+    > doc s javascript
+    ```
+
+    #### `doc src:github`
+
+    Downloads all `md` files from a GitHub repository and indexes them by filename.
+
+    ```nushell
+    > doc src:github use ArseAssassin/pikadoc
+    ```
+
+    #### `doc src:python`
+
+    Parses documentation from a Python package.
+
+    ```nushell
+    > doc src:python use flask
+    ```
+
+    #### `doc src:npm`
+
+    Parses documentation from an npm package.
+
+    ```nushell
+    > doc src:npm use ramda@0.30.1
+    ```
+
+    #### `doc src:man`
+
+    Parses available command line flags from manpages installed locally.
+
+    ```nushell
+    > doc src:man use curl
+    ```
+
+    #### `doc src:sqlite`
+
+    Given an sqlite file, generates doctable from all tables and columns.
+
+    ```nushell
+    > doc src:sqlite use ./path-to.db
+    ```
+
+    #### `doc src:openapi`
+
+    Generates documentation from a Swagger API definition file.
+
+    ```nushell
+    > doc src:openapi use "https://petstore.swagger.io/v2/swagger.json"
+    ```
+
+    #### `doc src:nushell`
+
+    Generates documentation from commands available in the current nushell session.
+
+    ```nushell
+    > doc src:nushell use "doc"
+    ```
+
+    ## Documentation
+
+    The best way to find usage information for the PikaDoc CLI is exploring the official documentation through `pikadoc' itsef. You can type `doc tutor` to run through the tutorial, or type `doc src:nushell use doc` to find documentation on all available commands. The user guide is also available via the web client.
+
+    ### Is this a replacement for README files?
+
+    Absolutely not! README files are great - when they're well written and maintained, they can act as fantastic guides explaining how to use the repo. They come with a sizable downside though: maintaining reference documentation can be an unwieldy task. Largely because of this, many projects end up creating their own online documentation portals, or worse, leave large parts of the codebase undocumented to the public. This is where PikaDoc comes in.
+
+    With the `pkd` file format, project maintainers can generate accurate and up-to-date reference documentation straight from the sources. The files are already indexed and searchable, making all parts of the codebase instantly discoverable to the end user.
+
+    ## License
+
+    This project is made available under the MIT license. See the `LICENSE` file for more information.
+- name: 'What is the DOCS.pkd file?'
+  id: 'What is the DOCS.pkd file?.md'
+  kind: 'user guide'
+  description: |
+    # What is the DOCS.pkd file?
+
+    The PikaDoc project proposes adding a file called `DOCS.pkd` to the root of your repositories to make your reference documentation more discoverable. This is a simple, auto-generated text file that can be read without specialized reader software. It offers relevant information for all functions, modules, etc. in your project. To find out more about our reasoning, keep reading.
+
+    ## Why we need offline documentation
+
+    As long as open source software has been distributed, we've had the wonderful convention of including a README file explaining the contents of a distribution. While these days those files are more fully-featured, including dynamic elements such as images and other rich media, one thing hasn't changed: the role of the README-file as the first source of information when encountering new software.
+
+    README files (and other text files) can be an incredibly useful form of documentation when well-written and maintained. Indeed, many open source projects could benefit from relying more on this type of documentation. What we tend to get instead is a variety of documentation portals coming in different shapes and sizes. This is a reasonable solution. Even a medium-size open source project can have hundreds to thousands of symbols that need to be systematically documented, hardly a job that can be done by hand. Documentation also needs to be discoverable by search engines as this is what we've grown accustomed to answer our technical questions.
+
+    Still, in the recent years many developers are finding that search engines are doing an increasingly poor job in returning relevant results to their questions. Finding official documentation can be a pain, especially when your project depends on an outdated package. Ideally we'd like to package our software with a file that is capable of providing answers even when the project homepage is unavailable. This is where "DOCS.pkd" comes in.
+
+    `pkd` is a structured documentation format that exists primarily to answer one question: *what is this?* When you see an unfamiliar function, class or some other reference, answering this question should be near instant - it should not require minutes of navigating through search engines and documentation portals. While you're doing this, you shouldn't be exposed to ads, sidenotes and other forms of digital noise breaking your flow. You should only see the answer you're looking for.
+
+    While packaging documentation with software is hardly a new idea, what's novel about pkd is that it is a structured data format. Reading a pkd-file is as simple as typing `less DOCS.pkd`, yet it can be used to answer advanced queries that are beyond the capabilities of most documentation portals. For example:
+
+    - list all modules with "parse" in their name
+    - list all classes with a property called "name"
+    - list all functions that return an instance of the class "Foo"
+
+    Despite these advanced features, pkd doctables are formatted in simple, human-readable YAML. For small projects, this file is uncomplicated enough to write by hand, yet it easily scales up to thousands, even tens of thousands of symbols. [Click here](The .pkd file format.md) for more information on the file format.
+
+    Much like the README-file explains how to use a software distribution, the DOCS.pkd explains what it contains. It lists every public-facing function, class, method and what-have-you, explaining briefly or in-detail what it's all about. Ideally it's generated directly from the project sources using a documentation generator, making sure it stays up to date at all times. Essentially, the pkd file acts as a portable reference guide, making that type of documentation accessible even for small-scale projects that have no resources for maintaining their own documentation portal. As such, the point is not to stretch the already meager project resources even thinner with a new format, but simply to make the already existing documentation more available to end users.
+
+    ## How do I generate a pkd-file?
+
+    Install the [PikaDoc CLI](README.md) to find out more about our currently available documentation sources. If your tech stack isn't supported yet, writing a pkd-generator can be quite convenient, if your documentation format supports structured output. For a simple example, you can take a look at our `src:nushell` generator.
+
+- name: 'The .pkd file format'
+  id: 'The .pkd file format.md'
+  kind: 'user guide'
+  description: |
+    `pkd` is a simple YAML-based file format consisting of two sections: header and the body. The two sections are separated by the YAML `---` document marker. While the format doesn't limit what kind of metadata can be stored, there are certain conventions to be followed to get good results from pkd-readers.
+
+    Note that pikadoc is still a work-in-progress, and these specifications are likely to change and become more detailed in the future.
+
+    ## The header section
+
+    The header section consists of the following fields:
+
+    - `name` - name of the documentation target. This should be recognizable as the name of the library/framework/language you're documenting. PikaDoc users should be able to use this to pick your doctable from a list, as if picking a book from a bookshelf
+    - `version` - version number of your documentation target. Users can use this to recognize whether their documentation is up to date
+    - `text_format (markdown/rst/text)` - format of the symbol descriptions. Helps pkd-readers figure out how to format the text body. Markdown is used commonly, some readers may also support ReStructuredText. If reader doesn't support the given format, it'll fall back on plain text
+    - `homepage` - homepage of your documentation target. Often this will be a URL to the GitHub repo
+    - `generator` - name of the generator used to create this file. If file was created manually, use `manual`
+    - `license` - license notice for this documentation. Should match the license of your repository. Can be the same as the contents of your `LICENSE.txt`, or shorthand for the license like `MIT`
+
+    Some **optional header fields** are useful for updating and archiving pkd files:
+
+    - `description` - long text description of your documentation target. Can be the same as the contents of your `README.md`
+    - `summary` - one line explanation of your documentation target
+    - `generator_command` - command used to generate this documentation. Users can refer to this to generate up to date documentation against your repo
+    - `generator_homepage` - homepage of the generator. Users can use this download latest version for generating up to date documentation
+
+    ## The body section
+
+    The body of a pkd-file consists of a list of documentation symbols with the following required fields:
+
+    - `name` - name of the documented symbol. For things like class methods, class name should be included. Should be unique in its namespace
+    - `ns` - namespace of the documented symbol. This should include things like package/module/file name, informing users how to import the symbol for use
+    - `kind` - a string value of what of symbol this is. Some valid values include: `function`, `class`, `method`, `property`, `module`, `table`, `const`. Note that this is *not the type of the symbol*: if you have a constant with the type string, this value should be `const`, not `string`
+
+    These fields are technically optional (pkd readers should consider them valid symbols), but are strongly encouraged to be included:
+
+    - `description` - free text description of what this symbol is. Can use the markup format defined in the header field `text_format` for rich text formatting
+    - `summary` - a single line plain text description of what this symbol is. Shown next to the name when searching through the doctable
+
+    These fields are optional, but extremely helpful for end users:
+
+    - `signatures` - list of type signatures if your symbol is a `function`, `method`, `command` or other type of callable. To support language features such as method overloading, this value is a list of lists consisting of parameters, ending with a return value. That is to say, each type signature is a list of objects with the following optional fields:
+      - `name` - name of the parameter
+      - `description` - description of what the parameter is
+      - `type` - type of the parameter, following your language's type system
+      - `kind` - kind of the parameter. Some valid values include: `positional`, `return`, `rest`, `flag`, etc. Should follow your language's conventions
+      - `default` - string representation of the default value for this parameter. `null` if it doesn't have one
+    - `inherits_from` - if this symbol is a class, list of classes this symbol inherits from.
 - name: 'Tutorial #1: What is PikaDoc?'
   kind: 'tutorial'
   description: |

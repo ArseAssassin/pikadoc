@@ -114,6 +114,10 @@ Generates documentation from commands available in the current nushell session.
 > doc src:nushell use "doc"
 ```
 
+## Documentation
+
+The best way to find usage information for the PikaDoc CLI is exploring the official documentation through `pikadoc' itsef. You can type `doc tutor` to run through the tutorial, or type `doc src:nushell use doc` to find documentation on all available commands. The user guide is also available via the web client.
+
 ### Is this a replacement for README files?
 
 Absolutely not! README files are great - when they're well written and maintained, they can act as fantastic guides explaining how to use the repo. They come with a sizable downside though: maintaining reference documentation can be an unwieldy task. Largely because of this, many projects end up creating their own online documentation portals, or worse, leave large parts of the codebase undocumented to the public. This is where PikaDoc comes in.

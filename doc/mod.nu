@@ -67,6 +67,7 @@ export def --env main [
     $search
     |insert dist {|row| (
       (($row.name|ansi strip|str downcase|str index-of $query|if ($in == -1) { 100 } else { $in }) * 100) +
+      (($row.name|ansi strip|str distance $query)) * 100 +
       (($row.summary|ansi strip|str downcase|find $query|length) * -10) +
       ($row.description|ansi strip|str downcase|find $query|length) * -1
     )}
@@ -299,9 +300,9 @@ def present-type [] {
     |each { present-type }
     |str join "\n"
   } else if ($name == 'list<any>' or ($name|str starts-with 'table<')) {
-    $type
-    |each { present-type }
-    |str join " -> "
+    let types = $type|each { present-type }
+
+    $"($types|take (($types|length) - 1)|str join ', ') -> ($types|last)"
   } else if ($name|str starts-with 'record') {
     $"($type.name?)(if ($type.name? != null and $type.type? != null) { ':' })($type.type?)(if ($type.optional? == true) { '?' })(if ($type.rest? == true) {
       '...'

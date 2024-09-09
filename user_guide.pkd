@@ -7,8 +7,8 @@ homepage: https://github.com/ArseAssassin/pikadoc
 description: |
   This user guide contains basic information on how to use PikaDoc, pkd-files, `DOCS.pkd` and the PikaDoc CLI. While the best way to learn how to use PikaDoc is to run through the official tutorial using the CLI, this user guide includes some additional information on the file format and its conventions.
 
-  - [What is the DOCS.pkd file?](<help/What is the DOCS.pkd file?.md>)
-  - [The pkd file format](<help/The .pkd file format.md>)
+  - [What is the DOCS.pkd file?](</help/What is the DOCS.pkd file?.md>)
+  - [The pkd file format](</help/The .pkd file format.md>)
 license: MIT
 ---
 - name: 'README'
@@ -147,7 +147,7 @@ license: MIT
 
     This project is made available under the MIT license. See the `LICENSE` file for more information.
 - name: 'What is the DOCS.pkd file?'
-  id: 'help/What is the DOCS.pkd file?.md'
+  id: '/help/What is the DOCS.pkd file?.md'
   kind: 'user guide'
   description: |
     # What is the DOCS.pkd file?
@@ -170,7 +170,7 @@ license: MIT
     - list all classes with a property called "name"
     - list all functions that return an instance of the class "Foo"
 
-    Despite these advanced features, pkd doctables are formatted in simple, human-readable YAML. For small projects, this file is uncomplicated enough to write by hand, yet it easily scales up to thousands, even tens of thousands of symbols. [Click here](<help/The .pkd file format.md>) for more information on the file format.
+    Despite these advanced features, pkd doctables are formatted in simple, human-readable YAML. For small projects, this file is uncomplicated enough to write by hand, yet it easily scales up to thousands, even tens of thousands of symbols. [Click here](</help/The .pkd file format.md>) for more information on the file format.
 
     Much like the README-file explains how to use a software distribution, the DOCS.pkd explains what it contains. It lists every public-facing function, class, method and what-have-you, explaining briefly or in-detail what it's all about. Ideally it's generated directly from the project sources using a documentation generator, making sure it stays up to date at all times. Essentially, the pkd file acts as a portable reference guide, making that type of documentation accessible even for small-scale projects that have no resources for maintaining their own documentation portal. As such, the point is not to stretch the already meager project resources even thinner with a new format, but simply to make the already existing documentation more available to end users.
 
@@ -179,7 +179,7 @@ license: MIT
     Install the [PikaDoc CLI](README.md) to find out more about our currently available documentation sources. If your tech stack isn't supported yet, writing a pkd-generator can be quite convenient, if your documentation format supports structured output. For a simple example, you can take a look at our `src:nushell` generator.
 
 - name: 'The .pkd file format'
-  id: 'help/The .pkd file format.md'
+  id: '/help/The .pkd file format.md'
   kind: 'user guide'
   description: |
     `pkd` is a simple YAML-based file format consisting of two sections: header and the body. The two sections are separated by the YAML `---` document marker. While the format doesn't limit what kind of metadata can be stored, there are certain conventions to be followed to get good results from pkd-readers.

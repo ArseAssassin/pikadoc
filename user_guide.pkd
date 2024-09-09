@@ -141,12 +141,12 @@ license: MIT
 
     With the `pkd` file format, project maintainers can generate accurate and up-to-date reference documentation straight from the sources. The files are already indexed and searchable, making all parts of the codebase instantly discoverable to the end user.
 
-    For more information on the file format and our motivation, [see here](<help/What is the DOCS.pkd file?.md>)
+    For more information on the file format and our motivation, [see here](</help/What is the DOCS.pkd file.md>)
 
     ## License
 
     This project is made available under the MIT license. See the `LICENSE` file for more information.
-- name: 'What is the DOCS.pkd file?'
+- name: 'What is the DOCS.pkd file'
   id: '/help/What is the DOCS.pkd file?.md'
   kind: 'user guide'
   description: |

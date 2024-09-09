@@ -124,7 +124,7 @@ Absolutely not! README files are great - when they're well written and maintaine
 
 With the `pkd` file format, project maintainers can generate accurate and up-to-date reference documentation straight from the sources. The files are already indexed and searchable, making all parts of the codebase instantly discoverable to the end user.
 
-For more information on the file format and our motivation, [see here](<help/What is the DOCS.pkd file?.md>)
+For more information on the file format and our motivation, [see here](</help/What is the DOCS.pkd file.md>)
 
 ## License
 

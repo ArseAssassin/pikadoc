@@ -1,11 +1,15 @@
 ---
-name: pikadoc user guide
-version: 0.1.0
+name: PikaDoc user guide
+version: 1.0.0
 slug: pikadoc_user_guide~0.1.0
 text_format: markdown
 generator: manual
 homepage: https://github.com/ArseAssassin/pikadoc
-description: User guide for the pikadoc CLI
+description: |
+  This user guide contains basic information on how to use PikaDoc, pkd-files, `DOCS.pkd` and the PikaDoc CLI. While the best way to learn how to use PikaDoc is to run through the official tutorial using the CLI, this user guide includes some additional information on the file format and its conventions.
+
+  - [What is the DOCS.pkd file?](What is the DOCS.pkd file?.md)
+  - [The .pkd file format](The .pkd file format.md)
 license: MIT
 ---
 - name: 'README'

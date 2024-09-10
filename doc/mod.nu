@@ -355,7 +355,11 @@ def present-body [] {
     }
   ) + (
     |if ($output.examples? != null and $output.examples? != []) {
-      $"\n\nExamples:\n($output.examples|str join "\n\n")"
+      let language = (pkd-about).language?|default ''
+      $"\n\nExamples:\n```($language)\n" + (
+        $output.examples
+        |str join "\n\n"
+      ) + "\n```"
     } else {
       ""
     }

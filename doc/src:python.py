@@ -88,7 +88,7 @@ def gen_module(module_name):
         spec = inspect.getfullargspec(item)
         kwonlydefaults = spec.kwonlydefaults or {}
         defaults = spec.defaults or []
-        return [{
+        return [[{
           "kind":
             x == spec.varargs and 'rest' or
             x == spec.varkw and 'rest-kw' or
@@ -107,8 +107,8 @@ def gen_module(module_name):
             "kind": "kw-only"
           } for x in spec.kwonlyargs]
         ) + (
-          [{ 'type': inspect.isclass(item) and item.__name__ or '?' }]
-        )
+          [{ 'type': inspect.isclass(item) and item.__name__ or '?', 'kind': 'return' }]
+        )]
     except TypeError:
       pass
 

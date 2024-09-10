@@ -26,10 +26,16 @@ def document-module [name:string] {
             } else {
               $arg.syntax_shape
             })
-            rest: ($arg.parameter_type == 'rest')
             description: $arg.description
             optional: $arg.is_optional
             default: $arg.parameter_default
+            kind: (match $arg.parameter_type {
+              'input' => 'input'
+              'positional' => 'positional'
+              'switch' => 'flag'
+              'named' => 'named'
+              'output' => 'return'
+            })
           }
         }
       }

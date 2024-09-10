@@ -52,10 +52,11 @@ export def --env use [
     {
       about: {
         name: $packageMeta.name
-        generator: 'src:npm'
         version: $packageMeta.version
         text_format: 'markdown'
+        generator: 'src:npm'
         generator_command: $generatorCommand
+        language: 'javascript'
         license: (
           open (
             ['LICENSE', 'LICENSE.md', 'LICENSE.txt']

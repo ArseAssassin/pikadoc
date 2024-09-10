@@ -27,6 +27,7 @@ export def --env use [module:string] {
         text_format: 'rst'
         generator: 'src:python'
         generator_command: $generatorCommand
+        language: 'python'
       }
       |merge $parsed.about
       |merge {

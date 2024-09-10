@@ -17,6 +17,7 @@ Some **optional header fields** are useful for updating and archiving pkd files:
 
 - `description` - long text description of your documentation target. Can be the same as the contents of your `README.md`
 - `summary` - one line explanation of your documentation target
+- `language` - programming language used for syntax highlighting of code blocks
 - `generator_command` - command used to generate this documentation. Users can refer to this to generate up to date documentation against your repo
 - `generator_homepage` - homepage of the generator. Users can use this download latest version for generating up to date documentation
 
@@ -35,6 +36,7 @@ These fields are technically optional (pkd readers should consider them valid sy
 
 These fields are optional, but extremely helpful for end users:
 
+- `examples` - list of code examples on how to use this symbol
 - `signatures` - list of type signatures if your symbol is a `function`, `method`, `command` or other type of callable. To support language features such as method overloading, this value is a list of lists consisting of parameters, ending with a return value. That is to say, each type signature is a list of objects with the following optional fields:
   - `name` - name of the parameter
   - `description` - description of what the parameter is

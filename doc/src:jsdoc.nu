@@ -5,6 +5,11 @@ def parse-type [] {
     type:         $value.type?.names?.0?
     description:  $value.description?
     optional:     $value.optional?
+    kind:         (if ($value.optional? == true) {
+                    'optional'
+                  } else {
+                    'positional'
+                  })
   }
 }
 
@@ -30,7 +35,7 @@ def parse-from-jsdoc [] {
           $row.params
           |each { parse-type }
           |append (if ($row.returns?.0? != null) {
-            $row.returns.0|parse-type
+            $row.returns.0|parse-type|merge { kind: 'return' }
           } else if ($isConstructor) {
             [{ name: null, type: $row.name?, description: null }]
           } else {
@@ -50,7 +55,6 @@ def parse-from-jsdoc [] {
       examples: (
         $row.examples?
         |default []
-        |each {$"```javascript\n($in)\n```"}
       )
       ns: $row.memberof?
     }
@@ -96,6 +100,7 @@ export def --env use [
       text_format: 'markdown'
       generator: 'src:jsdoc'
       generator_command: $generatorCommand
+      language: 'javascript'
     }
     doctable: (do $env.PKD_CONFIG.npxCommand 'jsdoc' '-X' '-r' $absolutePath|parse-from-jsdoc)
   }} $generatorCommand

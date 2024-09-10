@@ -4,7 +4,7 @@
 # ### Example:
 #     ```> doc s python~3.13```
 #
-export def --env main [
+export def --env use [
   path:string # path to the file to use, including the version number
   ] {
   do --env $env.DOC_USE {||
@@ -30,7 +30,7 @@ export def --env main [
 }
 
 # Returns a list of doctables available in the pikadoc central repository.
-# See `doc s` for more information.
+# See `doc s use` for more information.
 export def --env index [] {
   index full
   |insert id {|row| $row.path|path basename|str substring ..-4}

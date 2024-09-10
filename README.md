@@ -6,6 +6,8 @@ PikaDoc is a human-readable, structured documentation format. `pkd`-files don't 
 
 Currently there are two PikaDoc clients: the `pikadoc` CLI maintained in this repository and the [web interface](https://tuomas.kanerva.info/pkdocs/) for reading docs stored in the [pkDocs central repository](https://github.com/ArseAssassin/pkdocs/tree/main/docs).
 
+You can [check out the demo here](/demo.gif).
+
 ## Quick start
 
 ### PikaDoc CLI

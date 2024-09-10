@@ -4,6 +4,9 @@ Here are some additional commands you might find useful:
 # Save a doctable in the filesystem
 doc save './doctable.pkd'
 
+# View source code for symbol
+doc view-source 0
+
 # Return a list of recently used doctables
 doc history
 

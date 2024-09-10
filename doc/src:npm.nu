@@ -1,7 +1,7 @@
 use helpers.nu
 use src:jsdoc.nu
 
-# Generates doctable for npm package `package`. Parses .md files
+# Generates doctable for npm package $packageName. Parses .md files
 # found in the package repository and attempts to parse jsdocs
 # if available.
 #

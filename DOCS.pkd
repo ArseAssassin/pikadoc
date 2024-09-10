@@ -346,45 +346,14 @@ generator: src:nushell
       description: null
       optional: false
       default: null
-- name: doc s
-  summary: |-
-    Mounts doctable with `name` for use from the pikadoc central repository.
-    To get a list of available doctables, see `doc s index`.
-  kind: command
-  description: |-
-    Mounts doctable with `name` for use from the pikadoc central repository.
-    To get a list of available doctables, see `doc s index`.
-
-    ### Example:
-        ```> doc s python~3.13```
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      rest: false
-      description: null
-      optional: false
-      default: null
-    - name: path
-      type: string
-      rest: false
-      description: path to the file to use, including the version number
-      optional: false
-      default: null
-    - name: null
-      type: any
-      rest: false
-      description: null
-      optional: false
-      default: null
 - name: doc s index
   summary: |-
     Returns a list of doctables available in the pikadoc central repository.
-    See `doc s` for more information.
+    See `doc s use` for more information.
   kind: command
   description: |-
     Returns a list of doctables available in the pikadoc central repository.
-    See `doc s` for more information.
+    See `doc s use` for more information.
   examples: []
   signatures:
   - - name: null
@@ -409,6 +378,37 @@ generator: src:nushell
       type: any
       rest: false
       description: null
+      optional: false
+      default: null
+    - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+- name: doc s use
+  summary: |-
+    Mounts doctable with `name` for use from the pikadoc central repository.
+    To get a list of available doctables, see `doc s index`.
+  kind: command
+  description: |-
+    Mounts doctable with `name` for use from the pikadoc central repository.
+    To get a list of available doctables, see `doc s index`.
+
+    ### Example:
+        ```> doc s python~3.13```
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      rest: false
+      description: null
+      optional: false
+      default: null
+    - name: path
+      type: string
+      rest: false
+      description: path to the file to use, including the version number
       optional: false
       default: null
     - name: null
@@ -710,12 +710,12 @@ generator: src:nushell
       default: null
 - name: doc src:npm use
   summary: |-
-    Generates doctable for npm package `package`. Parses .md files
+    Generates doctable for npm package $packageName. Parses .md files
     found in the package repository and attempts to parse jsdocs
     if available.
   kind: command
   description: |-
-    Generates doctable for npm package `package`. Parses .md files
+    Generates doctable for npm package $packageName. Parses .md files
     found in the package repository and attempts to parse jsdocs
     if available.
 

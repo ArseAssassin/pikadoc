@@ -5,12 +5,16 @@ export use tutor.nu
 export use src:devdocs.nu
 export use src:man.nu
 export use src:sqlite.nu
+export use src:psql.nu
 export use src:python.nu
 export use src:openapi.nu
 export use src:nushell.nu
 export use src:github.nu
 export use src:jsdoc.nu
 export use src:npm.nu
+
+export use history.nu
+export use bookmarks.nu
 
 # Returns a summarized table of available symbols in the
 # currently selected doctable.
@@ -49,6 +53,8 @@ export def --env main [
     return
   }
   if (($query|describe) == 'int') {
+    $query|history symbols add
+
     pkd-doctable|get $query|present
   } else if (($query|describe) == 'closure') {
     pkd-doctable
@@ -68,8 +74,8 @@ export def --env main [
     |insert dist {|row| (
       (($row.name|ansi strip|str downcase|str index-of $query|if ($in == -1) { 100 } else { $in }) * 100) +
       (($row.name|ansi strip|str distance $query)) * 100 +
-      (($row.summary|ansi strip|str downcase|find $query|length) * -10) +
-      ($row.description|ansi strip|str downcase|find $query|length) * -1
+      (($row.summary?|default ''|ansi strip|str downcase|find $query|length) * -10) +
+      ($row.description?|default ''|ansi strip|str downcase|find $query|length) * -1
     )}
     |sort-by dist
     |reject dist
@@ -81,6 +87,26 @@ export def --env main [
     |summarize-all
     |present-list
   }
+}
+
+export def history [] {
+  let docs = pkd-doctable|add-doc-ids
+
+  history symbols
+  |reverse
+  |each {|index| $docs|get $index}
+  |summarize-all
+  |present-list
+}
+
+export def bookmarks [] {
+  let docs = pkd-doctable|add-doc-ids
+
+  bookmarks current
+  |reverse
+  |each {|index| $docs|get $index}
+  |summarize-all
+  |present-list
 }
 
 # Searches the descriptions of all symbols in the current doctable for `query`. System grep is used for matching output.
@@ -207,7 +233,9 @@ export def --env use [docs, command?:string] {
   } else if ($type == 'string') {
     $docs|path expand|to nuon
   }
-  |add-to-history
+  |history doctables add
+
+  history symbols clear
 
   $"(pkd-doctable|length) symbols found\nUsing doctable ((pkd-about).name)~((pkd-about).version?)"
 }
@@ -249,10 +277,10 @@ def summarize-all [] {
   each {|| summarize}
 }
 
-alias _save = save
+# alias _save = save
 
 # Saves doctable in the filesystem.
-export def save [
+export def 'main save' [
   filepath: string        # path to use for saving the file
   --format: string='yaml' # format of the output - supports `yaml` and `md`
   --keepFiles             # keep references to local files
@@ -266,12 +294,12 @@ export def save [
       }
       |to yaml)]
     |str join "\n"
-    |_save -f $filepath
+    |save -f $filepath
   } else if ($format == 'md') {
     pkd-doctable
     |each {|symbol|
       let path = $filepath|path join ($symbol.name + '.md')
-      $symbol.description|_save -f $path
+      $symbol.description|save -f $path
       $path
     }
   }
@@ -304,7 +332,7 @@ def present-type [] {
 
     $"($types|take (($types|length) - 1)|str join ', ') -> ($types|last)"
   } else if ($name|str starts-with 'record') {
-    $"($type.name?)(if ($type.name? != null and $type.type? != null) { ':' })($type.type?)(if ($type.optional? == true) { '?' })(if ($type.rest? == true) {
+    $"($type.name?)(if (($type.name?|default '') != '' and ($type.type?|default '') != '') { ':' })($type.type?)(if ($type.optional? == true) { '?' })(if ($type.rest? == true) {
       '...'
     })(if ($type.default? != null) {
       '=' + $type.default
@@ -322,7 +350,7 @@ def present-param [] {
     $"> `($type)`\n"
   } else {
     ''
-  }) + $"> ($param.description)"
+  }) + $"> ($param.description?)"
 }
 
 def present-body [] {
@@ -330,7 +358,7 @@ def present-body [] {
   let params = $output.signatures?.0?
     |default []
     |do {take ((($in|length) - 1)|if ($in < 0) { 0 } else { $in })}
-    |where {(($in.description|default '') != '' and ($in.name|default '') != '')}
+    |where {(($in.description?|default '') != '' and ($in.name?|default '') != '')}
 
   ($output.description?|default '') + (
     $output
@@ -385,11 +413,13 @@ export def present [] {
   } else {
     $output|reject description?
   }
-  |reject examples? source?
+  |reject examples?
 
   let meta = (
     $trimmedOutput
     |maybe-update signatures {|| present-type }
+    |insert source_available {|row| $row.source? != null}
+    |reject source?
     |table --expand
   )
 
@@ -422,49 +452,12 @@ export def version [] {
   $env.PKD_VERSION
 }
 
-# Returns path to the history file that's currently in use
-export def history-file [] {
-  $"($env.PKD_CONFIG_HOME)/history.yml"
-}
-
-def _history [] {
-  if (not (history-file|path exists)) {
-    []|to yaml|_save (history-file)
-  }
-
-  open (history-file)
-}
-
-# Returns a list of the last 50 doctables selected with `doc use`
-export def history [] {
-  let history = _history
-  $history
-  |each {|| $"doc ($in)"}
-  |reverse
-}
-
-# Deletes the history file
-export def 'history clear' [] {
-  rm (history-file)
-}
-
-def add-to-history [] {
-  let cmd = $in
-  _history
-  |collect { ||
-    prepend $cmd
-    |uniq
-    |to yaml
-    |_save -f (history-file)
-  }
-}
-
 def cache-docs [name:string, docs:record] {
   cache init
 
   $docs
   |to msgpackz
-  |_save -f $"(cache repository)/($name)"
+  |save -f $"(cache repository)/($name)"
 
   while (du (cache repository)|get 0.apparent) > $env.PKD_CONFIG.cacheMaxSize {
     rm (ls (cache repository)|sort-by modified|first).name
@@ -483,9 +476,11 @@ def cache-docs [name:string, docs:record] {
 export def view-source [
   index:int # index of the symbol
 ] {
-  let symbol = pkd-doctable|get -i $index|get defined_in?
-  if ($symbol.file? != null and ($symbol.file?|path exists)) {
-    do (pkd-config pagerCommand) $symbol.file ($symbol.line?|default 0)
+  let symbol = pkd-doctable|get -i $index
+  if ($symbol.source? != null) {
+    $symbol.source|do (pkd-config pagerCommand)
+  } else if ($symbol.defined_in?.file? != null and ($symbol.defined_in?.file?|path exists)) {
+    do (pkd-config pagerCommand) $symbol.defined_in.file ($symbol.defined_in.line?|default 0)
   } else {
     print "Couldn't open sources for reading"
   }

@@ -26,12 +26,12 @@ $env.PKD_CONFIG = {
     let s = $in
     if ($file == null and $s != null) {
       if (($s|lines|length) >= (term size).rows) {
-        $s|less
+        $s|less -r
       } else {
         $s
       }
     } else if ($line == null) {
-      less $file
+      less -r $file
     } else {
       less $"+($line)" -N $"($file)"
     }

@@ -46,9 +46,18 @@ export def --env 'index full' [] {
 }
 
 def find-doc [path:string] {
-  index full
-  |find -c ['path'] $path
-  |each {
-    insert repoUrl {|| $"https://raw.githubusercontent.com/ArseAssassin/pkdocs/main/docs/($in.path|ansi strip)"}
+  let docs = (
+    index full
+    |find -c ['path'] $path
+    |each {
+      insert repoUrl {|| $"https://raw.githubusercontent.com/ArseAssassin/pkdocs/main/docs/($in.path|ansi strip)"}
+    }
+  )
+
+  let exactMatches = $docs|where {$in.path|ansi strip|str ends-with $"/($path).pkd"}
+  if ($exactMatches != []) {
+    $exactMatches
+  } else {
+    $docs
   }
 }

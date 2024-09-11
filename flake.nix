@@ -39,7 +39,7 @@
                 export PKD_CONFIG_HOME=$HOME"/.config/pikadoc"
                 mkdir -p $PKD_CONFIG_HOME
 
-                CONFIG=$PKD_CONFIG_HOME"/config.msgpackz"
+                CONFIG=$PKD_CONFIG_HOME"/config.nu"
                 if [ ! -f "$CONFIG" ]; then
                   cat ${nu-source}/crates/nu-utils/src/sample_config/default_config.nu|sed "s/show_banner: true/show_banner: false/g" > $CONFIG
                 fi

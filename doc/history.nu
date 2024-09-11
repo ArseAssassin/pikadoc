@@ -20,6 +20,7 @@ export def 'doctables clear' [] {
   doctables set []
 }
 
+# Adds $in to the doctable history
 export def 'doctables add' [] {
   let cmd = $in
   doctables set (
@@ -29,14 +30,17 @@ export def 'doctables add' [] {
   )
 }
 
+# Returns the list of recently viewed symbols
 export def symbols [] {
   $env.PKD_SYMBOL_HISTORY?|default []
 }
 
+# Clears the list of recently viewed symbols
 export def --env 'symbols clear' [] {
   $env.PKD_SYMBOL_HISTORY = []
 }
 
+# Adds $in to the list of recently viewed symbols
 export def --env 'symbols add' [] {
   let idx = $in
   $env.PKD_SYMBOL_HISTORY = (symbols|prepend $idx|uniq)

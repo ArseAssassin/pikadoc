@@ -37,7 +37,7 @@ export def --env index [] {
   |select name id version? generator
 }
 
-export def --env 'index full' [] {
+def --env 'index full' [] {
   if ($env.PKD_REPO_INDEX? == null) {
     $env.PKD_REPO_INDEX = (http get "https://raw.githubusercontent.com/ArseAssassin/pkdocs/main/docs/index.yml")
   }

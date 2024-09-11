@@ -18,18 +18,26 @@ def update [update:closure] {
   )
 }
 
+# Returns the list of bookmarked symbol indices in current doctable
 export def current [] {
   bookmarks|get -i (current-name)|default []
 }
 
-export def add [index?:int] {
+# Adds $index to the list of bookmarked symbols
+export def add [
+  index:int # index of the symbol to bookmark
+  ] {
   update { append $index|uniq }
 }
 
-export def remove [index:int] {
+# Removes $index from the list of bookmarked symbols
+export def remove [
+  index:int # index of the symbol to remove
+  ] {
   update { filter { $in != $index }  }
 }
 
+# Clears the bookmark list for this doctable
 export def clear [] {
   update {|| [] }
 }

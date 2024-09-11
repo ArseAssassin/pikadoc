@@ -60,9 +60,9 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc bookmarks
-  summary: ''
+  summary: Shows a summarized list of bookmarked symbols for this doctable
   kind: command
-  description: ''
+  description: Shows a summarized list of bookmarked symbols for this doctable
   examples: []
   signatures:
   - - name: null
@@ -78,9 +78,9 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc bookmarks add
-  summary: ''
+  summary: Adds $index to the list of bookmarked symbols
   kind: command
-  description: ''
+  description: Adds $index to the list of bookmarked symbols
   examples: []
   signatures:
   - - name: null
@@ -91,8 +91,8 @@ generator: src:nushell
       kind: input
     - name: index
       type: int
-      description: ''
-      optional: true
+      description: index of the symbol to bookmark
+      optional: false
       default: null
       kind: positional
     - name: null
@@ -102,9 +102,9 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc bookmarks clear
-  summary: ''
+  summary: Clears the bookmark list for this doctable
   kind: command
-  description: ''
+  description: Clears the bookmark list for this doctable
   examples: []
   signatures:
   - - name: null
@@ -120,9 +120,9 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc bookmarks current
-  summary: ''
+  summary: Returns the list of bookmarked symbol indices in current doctable
   kind: command
-  description: ''
+  description: Returns the list of bookmarked symbol indices in current doctable
   examples: []
   signatures:
   - - name: null
@@ -138,9 +138,9 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc bookmarks remove
-  summary: ''
+  summary: Removes $index from the list of bookmarked symbols
   kind: command
-  description: ''
+  description: Removes $index from the list of bookmarked symbols
   examples: []
   signatures:
   - - name: null
@@ -151,7 +151,7 @@ generator: src:nushell
       kind: input
     - name: index
       type: int
-      description: ''
+      description: index of the symbol to remove
       optional: false
       default: null
       kind: positional
@@ -313,9 +313,9 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc history
-  summary: ''
+  summary: Shows a summarized list of recently viewed symbols
   kind: command
-  description: ''
+  description: Shows a summarized list of recently viewed symbols
   examples: []
   signatures:
   - - name: null
@@ -349,9 +349,9 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc history doctables add
-  summary: ''
+  summary: Adds $in to the doctable history
   kind: command
-  description: ''
+  description: Adds $in to the doctable history
   examples: []
   signatures:
   - - name: null
@@ -385,9 +385,9 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc history symbols
-  summary: ''
+  summary: Returns the list of recently viewed symbols
   kind: command
-  description: ''
+  description: Returns the list of recently viewed symbols
   examples: []
   signatures:
   - - name: null
@@ -403,9 +403,9 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc history symbols add
-  summary: ''
+  summary: Adds $in to the list of recently viewed symbols
   kind: command
-  description: ''
+  description: Adds $in to the list of recently viewed symbols
   examples: []
   signatures:
   - - name: null
@@ -421,9 +421,9 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc history symbols clear
-  summary: ''
+  summary: Clears the list of recently viewed symbols
   kind: command
-  description: ''
+  description: Clears the list of recently viewed symbols
   examples: []
   signatures:
   - - name: null
@@ -490,9 +490,9 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc pkd-config
-  summary: ''
+  summary: Returns configuration value for $name
   kind: command
-  description: ''
+  description: Returns configuration value for $name
   examples: []
   signatures:
   - - name: null
@@ -564,24 +564,6 @@ generator: src:nushell
   description: |-
     Returns a list of doctables available in the pikadoc central repository.
     See `doc s use` for more information.
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: input
-    - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: return
-- name: doc s index full
-  summary: ''
-  kind: command
-  description: ''
   examples: []
   signatures:
   - - name: null
@@ -756,30 +738,6 @@ generator: src:nushell
       type: string
       description: name of the branch
       optional: true
-      default: null
-      kind: positional
-    - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: return
-- name: doc src:jsdoc index
-  summary: ''
-  kind: command
-  description: ''
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: input
-    - name: path
-      type: string
-      description: ''
-      optional: false
       default: null
       kind: positional
     - name: null
@@ -1001,9 +959,16 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc src:psql use
-  summary: ''
+  summary: Queries a PostgreSQL database for definitions. All tables, views and functions that can be found are mounted as a doctable.
   kind: command
-  description: ''
+  description: |-
+    Queries a PostgreSQL database for definitions. All tables, views and functions that can be found are mounted as a doctable.
+
+    ### Examples:
+    ```nushell
+    # Parses database 'my_database'.'schema' for definitions
+    > doc src:psql use 'public' '-d' 'my_database'
+    ```
   examples: []
   signatures:
   - - name: null
@@ -1014,13 +979,13 @@ generator: src:nushell
       kind: input
     - name: schema
       type: string
-      description: ''
+      description: name of the schema to use
       optional: false
       default: null
       kind: positional
     - name: args
       type: any
-      description: ''
+      description: rest of the arguments are passed to psql/pg_dump as-is
       optional: true
       default: null
       kind: null

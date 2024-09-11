@@ -89,6 +89,7 @@ export def --env main [
   }
 }
 
+# Shows a summarized list of recently viewed symbols
 export def history [] {
   let docs = pkd-doctable|add-doc-ids
 
@@ -99,6 +100,7 @@ export def history [] {
   |present-list
 }
 
+# Shows a summarized list of bookmarked symbols for this doctable
 export def bookmarks [] {
   let docs = pkd-doctable|add-doc-ids
 
@@ -483,6 +485,7 @@ export def view-source [
   }
 }
 
+# Returns configuration value for $name
 export def pkd-config [name:string] {
   $env.PKD_CONFIG|get $name
 }

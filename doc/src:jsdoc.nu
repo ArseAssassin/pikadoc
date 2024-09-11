@@ -69,14 +69,6 @@ export def is-jsdoc-module [path:string] {
   (grep -qs '\\* @' **/*.js -m1 --exclude-dir=*.js|complete|get exit_code) == 0
 }
 
-export def index [path:string] {
-  cd $path
-  grep '\\* @' **/*.js -l
-  |lines
-  |each { split row '/'|get 0 }
-  |uniq
-}
-
 # Parses doctable using `jsdoc -X`. For more details on how jsdoc is invoked, you can run:
 # `less $"($env.PKD_HOME)/doc/jsdoc-run"`
 #

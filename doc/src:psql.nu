@@ -51,7 +51,17 @@ def parse-psql-array [] {
   |split row ','
 }
 
-export def --env use [schema:string, ...args] {
+# Queries a PostgreSQL database for definitions. All tables, views and functions that can be found are mounted as a doctable.
+#
+# ### Examples:
+# ```nushell
+# # Parses database 'my_database'.'schema' for definitions
+# > doc src:psql use 'public' '-d' 'my_database'
+# ```
+export def --env use [
+  schema:string, # name of the schema to use
+  ...args        # rest of the arguments are passed to psql/pg_dump as-is
+  ] {
   do --env $env.DOC_USE {
     def exec-query [query:string] {
       psql -c $query --csv ...$args

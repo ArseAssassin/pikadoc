@@ -277,10 +277,8 @@ def summarize-all [] {
   each {|| summarize}
 }
 
-# alias _save = save
-
 # Saves doctable in the filesystem.
-export def 'main save' [
+export def 'doctable save' [
   filepath: string        # path to use for saving the file
   --format: string='yaml' # format of the output - supports `yaml` and `md`
   --keepFiles             # keep references to local files
@@ -303,7 +301,6 @@ export def 'main save' [
       $path
     }
   }
-
 }
 
 def map-record-values [block: closure] {

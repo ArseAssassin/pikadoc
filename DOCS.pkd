@@ -59,6 +59,108 @@ generator: src:nushell
       optional: false
       default: null
       kind: return
+- name: doc bookmarks
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc bookmarks add
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: index
+      type: int
+      description: ''
+      optional: true
+      default: null
+      kind: positional
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc bookmarks clear
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc bookmarks current
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc bookmarks remove
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: index
+      type: int
+      description: ''
+      optional: false
+      default: null
+      kind: positional
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
 - name: doc cache
   summary: |-
     Returns a list of doctables cached in the local filesystem.
@@ -174,7 +276,61 @@ generator: src:nushell
       optional: false
       default: null
       kind: return
+- name: doc doctable save
+  summary: Saves doctable in the filesystem.
+  kind: command
+  description: Saves doctable in the filesystem.
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: filepath
+      type: string
+      description: path to use for saving the file
+      optional: false
+      default: null
+      kind: positional
+    - name: format
+      type: string
+      description: format of the output - supports `yaml` and `md`
+      optional: true
+      default: yaml
+      kind: named
+    - name: keepFiles
+      type: bool
+      description: keep references to local files
+      optional: true
+      default: null
+      kind: flag
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
 - name: doc history
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc history doctables
   summary: Returns a list of the last 50 doctables selected with `doc use`
   kind: command
   description: Returns a list of the last 50 doctables selected with `doc use`
@@ -192,7 +348,25 @@ generator: src:nushell
       optional: false
       default: null
       kind: return
-- name: doc history clear
+- name: doc history doctables add
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc history doctables clear
   summary: Deletes the history file
   kind: command
   description: Deletes the history file
@@ -210,10 +384,46 @@ generator: src:nushell
       optional: false
       default: null
       kind: return
-- name: doc history-file
-  summary: Returns path to the history file that's currently in use
+- name: doc history symbols
+  summary: ''
   kind: command
-  description: Returns path to the history file that's currently in use
+  description: ''
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc history symbols add
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc history symbols clear
+  summary: ''
+  kind: command
+  description: ''
   examples: []
   signatures:
   - - name: null
@@ -411,42 +621,6 @@ generator: src:nushell
       optional: false
       default: null
       kind: positional
-    - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: return
-- name: doc save
-  summary: Saves doctable in the filesystem.
-  kind: command
-  description: Saves doctable in the filesystem.
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: input
-    - name: filepath
-      type: string
-      description: path to use for saving the file
-      optional: false
-      default: null
-      kind: positional
-    - name: format
-      type: string
-      description: format of the output - supports `yaml` and `md`
-      optional: true
-      default: yaml
-      kind: named
-    - name: keepFiles
-      type: bool
-      description: keep references to local files
-      optional: true
-      default: null
-      kind: flag
     - name: null
       type: any
       description: null
@@ -820,6 +994,36 @@ generator: src:nushell
       optional: false
       default: null
       kind: positional
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc src:psql use
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: schema
+      type: string
+      description: ''
+      optional: false
+      default: null
+      kind: positional
+    - name: args
+      type: any
+      description: ''
+      optional: true
+      default: null
+      kind: null
     - name: null
       type: any
       description: null

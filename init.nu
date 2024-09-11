@@ -38,4 +38,6 @@ $env.PKD_CONFIG = {
   }
 }
 
+alias 'doc save' = doc doctable save
+
 print ($"**Welcome to pikadoc** - to get started, type `doc tutor`"|glow -sauto)

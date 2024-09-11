@@ -1,6 +1,6 @@
-*It's like man pages, but for reference docs*
-
 # PikaDoc
+
+*It's like man pages, but for reference docs*
 
 PikaDoc is a human-readable, structured documentation format. `pkd`-files don't ship as HTML files, but as already indexed data tables, ready to be explored on the command line or your browser.
 
@@ -52,13 +52,15 @@ Development of PikaDoc is motivated by one belief: all code that runs on your co
 
 To assist in bringing this about, PikaDoc CLI provides a number of modules out of the box for generating documentation from offline as well as online sources:
 
-#### `doc s`
+### Central repository
 
 The pkDocs central repository holds documentation for 150+ technologies that are immediately ready to download for use. See [here](https://github.com/ArseAssassin/pkdocs/tree/main/docs/index.yml) for a full listing. These are also available using the [web client](https://tuomas.kanerva.info/pkdocs/).
 
 ```nushell
 > doc s use javascript
 ```
+
+### Documentation sources
 
 #### `doc src:github`
 
@@ -67,6 +69,24 @@ Downloads all `md` files from a GitHub repository and indexes them by filename.
 ```nushell
 > doc src:github use ArseAssassin/pikadoc
 ```
+
+#### `doc src:man`
+
+Parses available command line flags from manpages installed locally.
+
+```nushell
+> doc src:man use curl
+```
+
+#### `doc src:devdocs`
+
+Parses documentation from [DevDocs](https://devdocs.io).
+
+```nushell
+> doc src:devdocs use jq
+```
+
+### Programming languages
 
 #### `doc src:python`
 
@@ -84,12 +104,22 @@ Parses documentation from an npm package.
 > doc src:npm use ramda@0.30.1
 ```
 
-#### `doc src:man`
+#### `doc src:nushell`
 
-Parses available command line flags from manpages installed locally.
+Generates documentation from commands available in the current nushell session.
 
 ```nushell
-> doc src:man use curl
+> doc src:nushell use "doc"
+```
+
+### Databases and APIs
+
+#### `doc src:psql`
+
+Uses `psql` to parse definitions from a PostgreSQL database.
+
+```nushell
+> doc src:psql use 'public' '-d' 'my_database'
 ```
 
 #### `doc src:sqlite`
@@ -106,14 +136,6 @@ Generates documentation from a Swagger API definition file.
 
 ```nushell
 > doc src:openapi use "https://petstore.swagger.io/v2/swagger.json"
-```
-
-#### `doc src:nushell`
-
-Generates documentation from commands available in the current nushell session.
-
-```nushell
-> doc src:nushell use "doc"
 ```
 
 ## Documentation

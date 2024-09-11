@@ -4,21 +4,20 @@
   inputs = {
     nixpkgs.url = "nixpkgs/nixos-24.05";
     flake-utils.url = "github:numtide/flake-utils";
-    nu-plugin.url = "github:ArseAssassin/pikadoc-nushell-plugins";
     nu-source = {
       url = "github:nushell/nushell";
       flake = false;
     };
   };
 
-  outputs = { self, nixpkgs, flake-utils, nu-plugin, nu-source }:
+  outputs = { self, nixpkgs, flake-utils, nu-source }:
     flake-utils.lib.eachDefaultSystem
       (system:
         let
           pkgs = import nixpkgs {
             inherit system;
           };
-          version-number = "0.1.0-${if (self ? rev) then self.rev else "dirty"}";
+          version-number = "1.0.0-${if (self ? rev) then self.rev else "dirty"}";
         in
         rec {
           packages.pikadoc =
@@ -40,8 +39,6 @@
                 export PKD_CONFIG_HOME=$HOME"/.config/pikadoc"
                 mkdir -p $PKD_CONFIG_HOME
 
-                touch $PKD_CONFIG_HOME"/plugin.msgpackz"
-
                 CONFIG=$PKD_CONFIG_HOME"/config.msgpackz"
                 if [ ! -f "$CONFIG" ]; then
                   cat ${nu-source}/crates/nu-utils/src/sample_config/default_config.nu|sed "s/show_banner: true/show_banner: false/g" > $CONFIG
@@ -55,7 +52,7 @@
                   COMMAND_FLAG="-e"
                 fi
 
-                ${pkgs.nushell}/bin/nu $COMMAND_FLAG "source ${bootstrap}; $COMMAND" --plugin-config $PKD_CONFIG_HOME"/plugin.msgpackz"
+                ${pkgs.nushell}/bin/nu $COMMAND_FLAG "source ${bootstrap}; $COMMAND"
               '';
             in pkgs.stdenv.mkDerivation {
               buildInputs = [];

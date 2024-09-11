@@ -10,12 +10,6 @@ def download [name] {
   $it
 }
 
-def is-inline-section [] {
-  ($in
-  |query web --query 'address, article, aside, blockquote, canvas, dd, div, dl, dt, fieldset, fieldset, figcaption, figure, footer, form, h1, h2, h3, h4, h5,h6, header, hr, li, main, nav, noscript, ol, p, pre, section, table, tfoot, ul, video'
-  |length) <= 1
-}
-
 def merge-all [] {
   reduce --fold {} {|a, b|
     $a|merge $b
@@ -77,8 +71,8 @@ def generate-doc-index [entries:table, options:record] {
   |merge-all
   |merge { PIKADOC_COPYRIGHT: (
     $db.index
-    |query web --query '._attribution' --as-html
-    |last
+    |normalize-html
+    |xmlstarlet sel -t --copy-of "//*[@class='_attribution']"
     |pandoc -f html -t plain
   ) }
 }

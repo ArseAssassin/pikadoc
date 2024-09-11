@@ -52,7 +52,7 @@
                   COMMAND_FLAG="-e"
                 fi
 
-                ${pkgs.nushell}/bin/nu $COMMAND_FLAG "source ${bootstrap}; $COMMAND"
+                ${pkgs.nushell}/bin/nu --config $CONFIG $COMMAND_FLAG "source ${bootstrap}; $COMMAND"
               '';
             in pkgs.stdenv.mkDerivation {
               buildInputs = [];

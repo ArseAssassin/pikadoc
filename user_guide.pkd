@@ -255,9 +255,11 @@ license: MIT
 - name: 'Tutorial #1: What is PikaDoc?'
   kind: 'tutorial'
   description: |
-    PikaDoc is a human-readable, structured documentation format. The `pikadoc` CLI is a tool for rapidly generating and reading `pkd` doctables with full text search capabilities.
+    # Welcome to the PikaDoc CLI!
 
-    `pikadoc` runs inside a `nushell` environment, giving you powerful capabilities for querying and reading documentation. If you haven't used `nushell` before, you can learn more about it by typing `tutor`. You can then return to this tutorial by typing `doc tutor`.
+    PikaDoc is a human-readable, structured documentation format. The `pikadoc` CLI is a tool for rapidly generating and reading `pkd` doctables with advanced search features. This tutorial will go through the basics of reading and generating documentation using `pikadoc`.
+
+    `pikadoc` runs inside a `nushell` environment, giving you powerful capabilities for generating and querying documentation from a wide variety of sources. If you haven't used `nushell` before, you can learn more about it by typing `tutor`. You can then return to this tutorial by typing `doc tutor`.
 
 - name: 'Tutorial #2: Reading pikadocs'
   kind: 'tutorial'
@@ -279,11 +281,17 @@ license: MIT
 - name: 'Tutorial #3: Understanding the summary view'
   kind: 'tutorial'
   description: |
-    When `doc` returns a doctable, instead of showing full documentation it shows you a summarized view of the documentation symbols found. By default, search results are limited to 20 - to show more results you can type in `doc more`.
-
-    You can filter `doc` results by passing in a string as a query:
+    By default, search results returned by `doc` are limited to 20 - to show more results you can type in `doc more`.
 
     ```nushell
+    # Show more results from your last query
+    doc more
+    ```
+
+    To search for a specific query, you can use `doc <query>`
+
+    ```nushell
+    # Show search results matching 'src:'
     doc 'src:'
     ```
 
@@ -291,26 +299,25 @@ license: MIT
 
     ```nushell
     doc 0
-
-    # You can also pipe the output to a pager to make reading longer decriptions easier:
-    doc 0|less
     ```
 
 - name: 'Tutorial #4: Finding and generating docs'
   kind: 'tutorial'
   description: |
-    The PikaDoc central repository at the moment holds 150+ ready-made doctables for convenience. To get a list of available docs, you can type:
+    A great place to start looking for documentation is the PikaDoc central repository. It holds 150+ doctables, pre-generated for your convenince. To get a full list of featured documentation, you can use `doc s index`.
 
     ```nushell
     # Show a list of doctables available in the central repository
     doc s index
     ```
 
-    To mount one of the doctables for use, you can type `doc s use <name>`:
+    To use a doctable from the central repository, you can type `doc s use <name>`:
 
     ```nushell
-    # Mount `javascript` documentation for use and shows symbols matching `Intl.dateTimeFormat`
+    # Mount `javascript` documentation for use
     doc s use 'javascript'
+
+    # Show symbols matching `Intl.dateTimeFormat`
     doc 'Intl.dateTimeFormat'
     ```
 
@@ -322,12 +329,12 @@ license: MIT
     doc
     ```
 
-    To discover more generators, you can search for `doc` commands:
+    To discover more generators, you can list all available documentation sources:
 
     ```nushell
     # Show a list of usable generators
     doc src:nushell use doc
-    doc pkd-doctable|find src:|find use
+    doc 'src:'
     ```
 
     You can also use the `--help` flag to get help on any generator:
@@ -413,3 +420,4 @@ license: MIT
     # Show metadata about the currently mounted doctable
     doc pkd-about
     ```
+

@@ -306,11 +306,11 @@ license: MIT
     doc s index
     ```
 
-    To mount one of the doctables for use, you can type `doc s <name>`:
+    To mount one of the doctables for use, you can type `doc s use <name>`:
 
     ```nushell
     # Mount `javascript` documentation for use and shows symbols matching `Intl.dateTimeFormat`
-    doc s 'javascript'
+    doc s use 'javascript'
     doc 'Intl.dateTimeFormat'
     ```
 
@@ -320,13 +320,6 @@ license: MIT
     # Download and use files available in the pikadoc GitHub repo
     doc src:github use 'ArseAssassin/pikadoc'
     doc
-    ```
-
-    To remind yourself of doctables you've used recently, you can use `doc history`:
-
-    ```nushell
-    # Show a list of recently used doctables
-    doc history
     ```
 
     To discover more generators, you can search for `doc` commands:
@@ -344,8 +337,35 @@ license: MIT
     doc src:nushell use --help
     ```
 
+- name: 'Tutorial #5: Navigating between symbols'
+  kind: 'tutorial'
+  description: |
+    Numeric IDs can be difficult to memorize when switching between multiple symbols. The `doc history` command can be used to see a reminder which symbols you've viewed recently.
 
-- name: 'Tutorial #5: Advanced filtering'
+    ```nushell
+    # Show a summarized list of recent symbols
+    doc history
+    ```
+
+    It can be useful to bookmark certain symbols for future reference. You can use `doc bookmarks` for that.
+
+    ```nushell
+    # Bookmark symbols 10 and 11
+    doc bookmarks add 10
+    doc bookmarks add 11
+
+    # Show a list of all bookmarks for current doctable
+    doc bookmarks
+    ```
+
+    To see a list of recently used doctables, you can use `doc history doctables`.
+
+    ```nushell
+    # Show a list of recently used doctables
+    doc history doctables
+    ```
+
+- name: 'Tutorial #6: Advanced filtering'
   kind: 'tutorial'
   description: |
     Sometimes we can't find what we need by headlines alone. You can use `doc search` to search through entire symbol definitions:
@@ -384,17 +404,11 @@ license: MIT
     # View source code for symbol
     doc view-source 0
 
-    # Return a list of recently used doctables
-    doc history
-
     # Return a list of doctables cached in the local filesystem
     doc cache
 
     # Delete cached doctables
     doc cache clear
-
-    # Returns path to the directory used for storing cached doctables
-    doc cache repository
 
     # Show metadata about the currently mounted doctable
     doc pkd-about

@@ -9,6 +9,7 @@ def document-module [name:string] {
     summary:      ($in.usage|str trim)
     kind:         command
     description:  ($"($in.usage)\n\n($in.extra_usage)"|str trim)
+    source:       (view source $in.name)
     examples: (
       $in.examples?
       |each { $"```nushell\n# ($in.description)\n($in.example)\n# -> ($in.result|to nuon)\n```" }

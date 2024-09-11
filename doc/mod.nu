@@ -232,10 +232,8 @@ export def --env use [docs, command?:string] {
 
   if ($command != null) {
     $command
-  } else if ($type == 'string') {
-    $docs|path expand|to nuon
+    |history doctables add
   }
-  |history doctables add
 
   history symbols clear
 

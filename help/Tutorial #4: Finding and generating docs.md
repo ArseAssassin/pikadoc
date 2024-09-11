@@ -5,11 +5,11 @@ The PikaDoc central repository at the moment holds 150+ ready-made doctables for
 doc s index
 ```
 
-To mount one of the doctables for use, you can type `doc s <name>`:
+To mount one of the doctables for use, you can type `doc s use <name>`:
 
 ```nushell
 # Mount `javascript` documentation for use and shows symbols matching `Intl.dateTimeFormat`
-doc s 'javascript'
+doc s use 'javascript'
 doc 'Intl.dateTimeFormat'
 ```
 
@@ -19,13 +19,6 @@ We can also use `src:github` to download documentation for any project on GitHub
 # Download and use files available in the pikadoc GitHub repo
 doc src:github use 'ArseAssassin/pikadoc'
 doc
-```
-
-To remind yourself of doctables you've used recently, you can use `doc history`:
-
-```nushell
-# Show a list of recently used doctables
-doc history
 ```
 
 To discover more generators, you can search for `doc` commands:

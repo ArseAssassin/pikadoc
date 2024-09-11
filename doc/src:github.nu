@@ -128,11 +128,11 @@ export def --env use [
         name: $repo
         text_format: 'markdown'
         generator: 'src:github'
-        generator_command: $"src:github ($repoName)"
+        generator_command: $"src:github ($repoName) ($branchName)"
       }
       doctable: (
         [$mdDoctable, ($pkds|flatten)]|flatten
       )
     }
-  } $"src:github use ($repoName)"
+  } $"src:github use ($repoName) ($branchName)"
 }

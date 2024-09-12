@@ -404,7 +404,7 @@ export def present [] {
   let meta = (
     $trimmedOutput
     |maybe-update signatures {|| present-signatures }
-    |insert source_available {|row| $row.source? != null}
+    |insert source_available {|row| $row.source? != null or $row.defined_in != null}
     |reject source?
     |table --expand
   )

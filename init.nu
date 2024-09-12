@@ -61,7 +61,10 @@ let config = $env.config|upsert hooks {
     let output_type = $output|describe
 
     let is_output_list = (
-      ($output_type|str starts-with 'list<any') or
+      (
+        ($output_type|str starts-with 'list<any') and
+        ('#' in ($output|columns))
+      ) or
       ($output_type|str starts-with 'table<#: int')
     )
 

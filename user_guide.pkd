@@ -436,7 +436,7 @@ license: MIT
     # Save a doctable in the filesystem
     doc save './doctable.pkd'
 
-    # View source code for symbol
+    # View source code for symbol #0
     doc 0|doc view-source
 
     # Return a list of doctables cached in the local filesystem

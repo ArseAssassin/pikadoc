@@ -51,8 +51,13 @@ export def --env main [
     print "No docfile currently selected. Type `doc use <path>` to select a docfile to use."
     return
   }
-  $env.pkd.summarize_output = not $full
-  $env.pkd.page_output = not $all
+
+  if ($env.pkd.summarize_output == null) {
+    $env.pkd.summarize_output = not $full
+  }
+  if ($env.pkd.page_output == null) {
+    $env.pkd.page_output = not $all
+  }
 
   if ($all) {
     page results clear
@@ -103,23 +108,26 @@ export def --env bookmarks [] {
   |each {|index| $docs|get $index}
 }
 
-export def --env index [index?:int] {
-  let docId = pkd-doctable|get (
-    if ($index == null) {
-      history symbols|get 0
-    } else {
-      $index
-    }
-  )|get id?
+export def --env children [] {
+  let docId = get id?
 
   if ($docId != null) {
-    pkd-doctable
-    |add-doc-ids
+    main
     |where belongs_to? == $docId or id? == $docId
-    |summarize-all
-    |present-list
   } else {
     []
+  }
+}
+
+export def --env parent [] {
+  let docId = get belongs_to?
+
+  if ($docId != null) {
+    main
+    |where id? == $docId
+    |first
+  } else {
+    null
   }
 }
 
@@ -404,7 +412,7 @@ export def present [] {
   let meta = (
     $trimmedOutput
     |maybe-update signatures {|| present-signatures }
-    |insert source_available {|row| $row.source? != null or $row.defined_in != null}
+    |insert source_available {|row| $row.source? != null or $row.defined_in? != null}
     |reject source?
     |table --expand
   )

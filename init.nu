@@ -69,14 +69,14 @@ let config = $env.config|upsert hooks {
     )
 
     let should_page = (
-      $env.pkd.page_output and
+      $env.pkd.page_output == true and
       $is_output_list and
       ($output|length) > $env.PKD_CONFIG.table_max_rows
     )
-    let should_summarize = $env.pkd.summarize_output
+    let should_summarize = $env.pkd.summarize_output == true
 
-    $env.pkd.page_output = false
-    $env.pkd.summarize_output = false
+    $env.pkd.page_output = null
+    $env.pkd.summarize_output = null
 
     if ($should_summarize and ($output_type|str starts-with 'record<#: int')) {
       $output.'#'|doc history symbols add
@@ -89,7 +89,6 @@ let config = $env.config|upsert hooks {
       }
       |if ($should_page) {
         let results = $in
-        print $results
         doc page results use $results
         doc page
       } else {

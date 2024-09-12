@@ -281,6 +281,24 @@ generator: src:nushell
       optional: false
       default: null
       kind: return
+- name: doc children
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
 - name: doc doctable save
   summary: Saves doctable in the filesystem.
   kind: command
@@ -443,30 +461,6 @@ generator: src:nushell
       optional: false
       default: null
       kind: return
-- name: doc index
-  summary: ''
-  kind: command
-  description: ''
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: input
-    - name: index
-      type: int
-      description: ''
-      optional: true
-      default: null
-      kind: positional
-    - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: return
 - name: doc page
   summary: Shows current page of search results
   kind: command
@@ -557,6 +551,24 @@ generator: src:nushell
       optional: false
       default: null
       kind: positional
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc parent
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
     - name: null
       type: any
       description: null

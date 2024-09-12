@@ -93,7 +93,14 @@ export def --env use [path:string] {
               |each { parse-signature }
             )
             description: ($xml|parse-description)
-            inherits_from: [$xml.attributes.inherits?]
+            inherits_from: (
+              $xml.attributes.inherits?
+              |if ($in != null) {
+                [$in]
+              } else {
+                $in
+              }
+            )
           }] ++ (
             get-content 'methods'
             |each {|method| ({

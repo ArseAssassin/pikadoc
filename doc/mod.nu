@@ -16,54 +16,45 @@ export use src:godot.nu
 
 export use history.nu
 export use bookmarks.nu
+export use page.nu
 
-# Returns a summarized table of available symbols in the
-# currently selected doctable.
+# Filters current doctable using $query. If $query is null, returns full list of all symbols in current doctable.
 #
-# If a `string` is passed as an argument, doctable will be
-# filtered by `name` and `summary`. If an `int` is passed
-# as an argument, only the selected symbol is presented.
-# If a closure is passed as an argument, it'll be used to
-# filter the full doctable before being summarized and paged.
+# By default search results are paged according to `$env.PKD_CONFIG.table_max_rows` (use `doc page next` to show more results). In addition, all results are summarized using `$env.PKD_CONFIG.summarize_command`.
+#
+# If flag `--full` is passed, symbols returned by your command will be displayed without applying any formatting to the output. If flag `--all` is passed, all results will be shown without using the pager.
 #
 # ### Examples:
+#
 # ```nushell
-# # Return list of all symbols in current doctable
-# > doc
+# # Return paged list of all symbols in doc
+# doc
 #
-# # Filter symbols by name in current doctable
-# > doc 'add'
+# # Return list of all symbols matching string 'src:'
+# doc 'src:'
 #
-# # Show symbol at index 3
-# > doc 3
+# # Show symbol #4
+# doc|get 4
 #
-# # Filter symbols by namespace
-# > doc {|| where ns == 'inspect'}
+# # Dump the entire doctable formatted as a table
+# doc --full --all
 #
-# # Show symbols that are either functions or classes
-# > doc {|| where kind in ['function', 'class']}
-#
-# # Show symbols that have a summary
-# > doc {|| where summary != ''}
+# # Dump the raw data table for symbol #10
+# doc --full|get 10
 # ```
 export def --env main [
-  query? # name/index/closure to query for
+  query?:string # query to search for
+  --full        # show full, raw results from doctable
+  --all         # show all results without paging
 ] {
   if (('PKD_CURRENT' in $env) != true) {
     print "No docfile currently selected. Type `doc use <path>` to select a docfile to use."
     return
   }
-  if (($query|describe) == 'int') {
-    $query|history symbols add
+  $env.pkd.summarize_output = not $full
+  $env.pkd.page_output = not $all
 
-    pkd-doctable|get $query|present
-  } else if (($query|describe) == 'closure') {
-    pkd-doctable
-    |add-doc-ids
-    |do $query
-    |summarize-all
-    |present-list
-  } else if ($query != null) {
+  if ($query != null) {
     let query = ($query|str downcase)
     let search = (
       pkd-doctable
@@ -80,36 +71,36 @@ export def --env main [
     )}
     |sort-by dist
     |reject dist
-    |summarize-all
-    |present-list
   } else {
     pkd-doctable
     |add-doc-ids
-    |summarize-all
-    |present-list
   }
 }
 
-# Shows a summarized list of recently viewed symbols
+# Shows full text for symbol `$index`
+export def --env show [
+  index:int # index of the symbols, as indicated by `#` in doctable output
+  --full    # show full, raw table of the symbol
+  ] {
+    main --full=$full|get $index
+}
+
+# Returns a table of recently used symbols
 export def --env history [] {
-  let docs = pkd-doctable|add-doc-ids
+  let docs = main
 
   history symbols
   |reverse
   |each {|index| $docs|get $index}
-  |summarize-all
-  |present-list
 }
 
-# Shows a summarized list of bookmarked symbols for this doctable
+# Returns a table of bookmarked symbols
 export def --env bookmarks [] {
-  let docs = pkd-doctable|add-doc-ids
+  let docs = main
 
   bookmarks current
   |reverse
   |each {|index| $docs|get $index}
-  |summarize-all
-  |present-list
 }
 
 export def --env index [index?:int] {
@@ -192,23 +183,6 @@ def --env paginate [resultLines:int, newResults=false] {
   }
 }
 
-# Shows more results from the last search. If `index` is passed as an argument, the given result will be selected from the last result set and presented as a whole.
-#
-# Examples
-#
-# # Show more results from the last search
-#   ```doc more```
-#
-# # Show result number 8
-#   ```doc more 8```
-export def --env more [index?:int] {
-  if ($index != null) {
-    $env.PKD_RESULTS|get ($index)|present
-  } else {
-    $env.PKD_RESULTS|paginate (result-lines)
-  }
-}
-
 # Sets the current doctable.
 #
 # `docs` is either a file in the local filesystem or a pikadoc table.
@@ -271,15 +245,7 @@ export def pkd-doctable [] {
   $env.PKD_CURRENT.doctable
 }
 
-def show [] {
-  less -S --chop-long-lines
-}
-
-def "from pkd" [] {
-  from yaml
-}
-
-def summarize [] {
+export def summarize [] {
   select '#'? ns? name? kind? summary?
   |if ($in.ns? == null) {
     update ns ''
@@ -294,10 +260,6 @@ def summarize [] {
   |trim-record-whitespace
 }
 
-def summarize-all [] {
-  each {|| summarize}
-}
-
 # Saves doctable in the filesystem.
 export def 'doctable save' [
   filepath: string        # path to use for saving the file
@@ -309,7 +271,7 @@ export def 'doctable save' [
       pkd-doctable|if ($keepFiles) {
         $in
       } else {
-        reject -i defined_in
+        reject -i defined_in source
       }
       |to yaml)]
     |str join "\n"
@@ -422,10 +384,6 @@ def present-body [] {
   )
 }
 
-def pager [] {
-  $in|do (pkd-config pagerCommand)
-}
-
 # Presents the symbol passed in as input as tidily formatted output.
 # Useful for showing the results of custom queries.
 #
@@ -464,7 +422,6 @@ export def present [] {
   } else {
     $"($meta)\n\n($output.description?)"
   }
-  |pager
 }
 
 def maybe-update [name, value] {
@@ -487,28 +444,25 @@ def cache-docs [name:string, docs:record] {
   |to msgpackz
   |save -f $"(cache repository)/($name)"
 
-  while (du (cache repository)|get 0.apparent) > $env.PKD_CONFIG.cacheMaxSize {
+  while (du (cache repository)|get 0.apparent) > $env.PKD_CONFIG.cache_max_size {
     rm (ls (cache repository)|sort-by modified|first).name
   }
 }
 
-# If symbol selected with `index` has sources available
-# (`$symbol.defined_in.file` can be found in the filesystem), opens it
-# for reading using `$env.PKD_CONFIG.pagerCommand`.
+# Tries to open sources for symbol $in for viewing. Searches `$symbol.defined_in` and `$symbol.source`. `$env.PKD_CONFIG.pager_command` is used to show the results.
 #
 # ### Examples:
 # ```nushell
-# # Show sources for symbol 0 using `less`
-# doc view-source 0
+# # Show sources for symbol #0
+# doc|get 0|doc view-source
 # ```
-export def view-source [
-  index:int # index of the symbol
-] {
-  let symbol = pkd-doctable|get -i $index
+export def view-source [] {
+  let symbol = $in
+
   if ($symbol.source? != null) {
-    $symbol.source|do (pkd-config pagerCommand)
+    $symbol.source|do (pkd-config pager_command)
   } else if ($symbol.defined_in?.file? != null and ($symbol.defined_in?.file?|path exists)) {
-    do (pkd-config pagerCommand) $symbol.defined_in.file ($symbol.defined_in.line?|default 0)
+    do (pkd-config pager_command) $symbol.defined_in.file ($symbol.defined_in.line?|default 0)
   } else {
     print "Couldn't open sources for reading"
   }

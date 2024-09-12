@@ -24,14 +24,14 @@ export def init [] {
 #
 # Calling this manually shouldn't be necessary as pikadoc
 # automatically clears old files when cache size surpasses
-# `$env.PKD_CONFIG.cacheMaxSize`.
+# `$env.PKD_CONFIG.cache_max_size`.
 #
 # The default max cache size is 100Mb.
 #
 # Examples
 #
 # # adjust max cache size
-# let pkdConfig = $env.PKD_CONFIG|merge { cacheMaxSize: ('200Mb'|into filesize) }; $env.PKD_CONFIG = $pkdConfig
+# let pkdConfig = $env.PKD_CONFIG|merge { cache_max_size: ('200Mb'|into filesize) }; $env.PKD_CONFIG = $pkdConfig
 export def clear [] {
   init
 

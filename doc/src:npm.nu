@@ -35,7 +35,7 @@ export def --env use [
     cd $tempProject
 
     let install = (
-      do $env.PKD_CONFIG.npmCommand "install" "--no-save" $package
+      do $env.PKD_CONFIG.npm_command "install" "--no-save" $package
       |complete
     )
 

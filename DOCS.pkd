@@ -5,82 +5,33 @@ generator: src:nushell
 
 ---
 - name: doc
-  summary: |-
-    Returns a summarized table of available symbols in the
-    currently selected doctable.
+  summary: Filters current doctable using $query. If $query is null, returns full list of all symbols in current doctable.
   kind: command
   description: |-
-    Returns a summarized table of available symbols in the
-    currently selected doctable.
+    Filters current doctable using $query. If $query is null, returns full list of all symbols in current doctable.
 
-    If a `string` is passed as an argument, doctable will be
-    filtered by `name` and `summary`. If an `int` is passed
-    as an argument, only the selected symbol is presented.
-    If a closure is passed as an argument, it'll be used to
-    filter the full doctable before being summarized and paged.
+    By default search results are paged according to `$env.PKD_CONFIG.table_max_rows` (use `doc page next` to show more results). In addition, all results are summarized using `$env.PKD_CONFIG.summarize_command`.
+
+    If flag `--full` is passed, symbols returned by your command will be displayed without applying any formatting to the output. If flag `--all` is passed, all results will be shown without using the pager.
 
     ### Examples:
+
     ```nushell
-    # Return list of all symbols in current doctable
-    > doc
+    # Return paged list of all symbols in doc
+    doc
 
-    # Filter symbols by name in current doctable
-    > doc 'add'
+    # Return list of all symbols matching string 'src:'
+    doc 'src:'
 
-    # Show symbol at index 3
-    > doc 3
+    # Show symbol #4
+    doc|get 4
 
-    # Filter symbols by namespace
-    > doc {|| where ns == 'inspect'}
+    # Dump the entire doctable formatted as a table
+    doc --full --all
 
-    # Show symbols that are either functions or classes
-    > doc {|| where kind in ['function', 'class']}
-
-    # Show symbols that have a summary
-    > doc {|| where summary != ''}
+    # Dump the raw data table for symbol #10
+    doc --full|get 10
     ```
-  source: |-
-    def doc [ query?: any ] {
-      if (('PKD_CURRENT' in $env) != true) {
-        print "No docfile currently selected. Type `doc use <path>` to select a docfile to use."
-        return
-      }
-      if (($query|describe) == 'int') {
-        $query|history symbols add
-
-        pkd-doctable|get $query|present
-      } else if (($query|describe) == 'closure') {
-        pkd-doctable
-        |add-doc-ids
-        |do $query
-        |summarize-all
-        |present-list
-      } else if ($query != null) {
-        let query = ($query|str downcase)
-        let search = (
-          pkd-doctable
-          |add-doc-ids
-          |find $query -c ['name', 'summary']
-        )
-
-        $search
-        |insert dist {|row| (
-          (($row.name|ansi strip|str downcase|str index-of $query|if ($in == -1) { 100 } else { $in }) * 100) +
-          (($row.name|ansi strip|str distance $query)) * 100 +
-          (($row.summary?|default ''|ansi strip|str downcase|find $query|length) * -10) +
-          ($row.description?|default ''|ansi strip|str downcase|find $query|length) * -1
-        )}
-        |sort-by dist
-        |reject dist
-        |summarize-all
-        |present-list
-      } else {
-        pkd-doctable
-        |add-doc-ids
-        |summarize-all
-        |present-list
-      }
-    }
   examples: []
   signatures:
   - - name: null
@@ -90,11 +41,23 @@ generator: src:nushell
       default: null
       kind: input
     - name: query
-      type: any
-      description: name/index/closure to query for
+      type: string
+      description: query to search for
       optional: true
       default: null
       kind: positional
+    - name: full
+      type: bool
+      description: show full, raw results from doctable
+      optional: true
+      default: null
+      kind: flag
+    - name: all
+      type: bool
+      description: show all results without paging
+      optional: true
+      default: null
+      kind: flag
     - name: null
       type: any
       description: null
@@ -102,19 +65,9 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc bookmarks
-  summary: Shows a summarized list of bookmarked symbols for this doctable
+  summary: Returns a table of bookmarked symbols
   kind: command
-  description: Shows a summarized list of bookmarked symbols for this doctable
-  source: |-
-    def "doc bookmarks" [] {
-      let docs = pkd-doctable|add-doc-ids
-
-      bookmarks current
-      |reverse
-      |each {|index| $docs|get $index}
-      |summarize-all
-      |present-list
-    }
+  description: Returns a table of bookmarked symbols
   examples: []
   signatures:
   - - name: null
@@ -133,10 +86,6 @@ generator: src:nushell
   summary: Adds $index to the list of bookmarked symbols
   kind: command
   description: Adds $index to the list of bookmarked symbols
-  source: |-
-    def "doc bookmarks add" [ index: int ] {
-      update { append $index|uniq }
-    }
   examples: []
   signatures:
   - - name: null
@@ -161,10 +110,6 @@ generator: src:nushell
   summary: Clears the bookmark list for this doctable
   kind: command
   description: Clears the bookmark list for this doctable
-  source: |-
-    def "doc bookmarks clear" [] {
-      update {|| [] }
-    }
   examples: []
   signatures:
   - - name: null
@@ -183,10 +128,6 @@ generator: src:nushell
   summary: Returns the list of bookmarked symbol indices in current doctable
   kind: command
   description: Returns the list of bookmarked symbol indices in current doctable
-  source: |-
-    def "doc bookmarks current" [] {
-      bookmarks|get -i (current-name)|default []
-    }
   examples: []
   signatures:
   - - name: null
@@ -205,10 +146,6 @@ generator: src:nushell
   summary: Removes $index from the list of bookmarked symbols
   kind: command
   description: Removes $index from the list of bookmarked symbols
-  source: |-
-    def "doc bookmarks remove" [ index: int ] {
-      update { filter { $in != $index }  }
-    }
   examples: []
   signatures:
   - - name: null
@@ -239,11 +176,6 @@ generator: src:nushell
     Returns a list of doctables cached in the local filesystem.
     `cache path` returns the directory used for storing files.
     See `doc cache clear` for details on cache management.
-  source: |-
-    def "doc cache" [] {
-      init
-      ls -s (repository)
-    }
   examples: []
   signatures:
   - - name: null
@@ -269,20 +201,14 @@ generator: src:nushell
 
     Calling this manually shouldn't be necessary as pikadoc
     automatically clears old files when cache size surpasses
-    `$env.PKD_CONFIG.cacheMaxSize`.
+    `$env.PKD_CONFIG.cache_max_size`.
 
     The default max cache size is 100Mb.
 
     Examples
 
     # adjust max cache size
-    let pkdConfig = $env.PKD_CONFIG|merge { cacheMaxSize: ('200Mb'|into filesize) }; $env.PKD_CONFIG = $pkdConfig
-  source: |-
-    def "doc cache clear" [] {
-      init
-
-      rm -f ((repository) + '/*'|into glob)
-    }
+    let pkdConfig = $env.PKD_CONFIG|merge { cache_max_size: ('200Mb'|into filesize) }; $env.PKD_CONFIG = $pkdConfig
   examples: []
   signatures:
   - - name: null
@@ -301,10 +227,6 @@ generator: src:nushell
   summary: Escapes special characters in input command to use it as a valid Unix path
   kind: command
   description: Escapes special characters in input command to use it as a valid Unix path
-  source: |-
-    def "doc cache command-to-id" [] {
-      str replace -a '/' '__'
-    }
   examples: []
   signatures:
   - - name: null
@@ -323,12 +245,6 @@ generator: src:nushell
   summary: Initializes cache
   kind: command
   description: Initializes cache
-  source: |-
-    def "doc cache init" [] {
-      if (not (repository|path exists)) {
-        mkdir (repository)
-      }
-    }
   examples: []
   signatures:
   - - name: null
@@ -351,10 +267,6 @@ generator: src:nushell
   description: |-
     Returns the path to the cache directory that's currently
     being used.
-  source: |-
-    def "doc cache repository" [] {
-      $"($env.PKD_CONFIG_HOME)/doc-cache"
-    }
   examples: []
   signatures:
   - - name: null
@@ -373,27 +285,6 @@ generator: src:nushell
   summary: Saves doctable in the filesystem.
   kind: command
   description: Saves doctable in the filesystem.
-  source: |-
-    def "doc doctable save" [ filepath: string --format: string --keepFiles ] {
-      if ($format == 'yaml') {
-        ['---', (pkd-about|to yaml), '---', (
-          pkd-doctable|if ($keepFiles) {
-            $in
-          } else {
-            reject -i defined_in
-          }
-          |to yaml)]
-        |str join "\n"
-        |save -f $filepath
-      } else if ($format == 'md') {
-        pkd-doctable
-        |each {|symbol|
-          let path = $filepath|path join ($symbol.name + '.md')
-          $symbol.description|save -f $path
-          $path
-        }
-      }
-    }
   examples: []
   signatures:
   - - name: null
@@ -427,19 +318,9 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc history
-  summary: Shows a summarized list of recently viewed symbols
+  summary: Returns a table of recently used symbols
   kind: command
-  description: Shows a summarized list of recently viewed symbols
-  source: |-
-    def "doc history" [] {
-      let docs = pkd-doctable|add-doc-ids
-
-      history symbols
-      |reverse
-      |each {|index| $docs|get $index}
-      |summarize-all
-      |present-list
-    }
+  description: Returns a table of recently used symbols
   examples: []
   signatures:
   - - name: null
@@ -458,12 +339,6 @@ generator: src:nushell
   summary: Returns a list of the last 50 doctables selected with `doc use`
   kind: command
   description: Returns a list of the last 50 doctables selected with `doc use`
-  source: |-
-    def "doc history doctables" [] {
-      doctables value
-      |each {|| $"doc ($in)"}
-      |reverse
-    }
   examples: []
   signatures:
   - - name: null
@@ -482,15 +357,6 @@ generator: src:nushell
   summary: Adds $in to the doctable history
   kind: command
   description: Adds $in to the doctable history
-  source: |-
-    def "doc history doctables add" [] {
-      let cmd = $in
-      doctables set (
-        doctables value
-        |prepend $cmd
-        |uniq
-      )
-    }
   examples: []
   signatures:
   - - name: null
@@ -509,10 +375,6 @@ generator: src:nushell
   summary: Deletes the history file
   kind: command
   description: Deletes the history file
-  source: |-
-    def "doc history doctables clear" [] {
-      doctables set []
-    }
   examples: []
   signatures:
   - - name: null
@@ -531,10 +393,6 @@ generator: src:nushell
   summary: Returns the list of recently viewed symbols
   kind: command
   description: Returns the list of recently viewed symbols
-  source: |-
-    def "doc history symbols" [] {
-      $env.PKD_SYMBOL_HISTORY?|default []
-    }
   examples: []
   signatures:
   - - name: null
@@ -553,11 +411,6 @@ generator: src:nushell
   summary: Adds $in to the list of recently viewed symbols
   kind: command
   description: Adds $in to the list of recently viewed symbols
-  source: |-
-    def "doc history symbols add" [] {
-      let idx = $in
-      $env.PKD_SYMBOL_HISTORY = (symbols|prepend $idx|uniq)
-    }
   examples: []
   signatures:
   - - name: null
@@ -576,10 +429,6 @@ generator: src:nushell
   summary: Clears the list of recently viewed symbols
   kind: command
   description: Clears the list of recently viewed symbols
-  source: |-
-    def "doc history symbols clear" [] {
-      $env.PKD_SYMBOL_HISTORY = []
-    }
   examples: []
   signatures:
   - - name: null
@@ -598,26 +447,6 @@ generator: src:nushell
   summary: ''
   kind: command
   description: ''
-  source: |-
-    def "doc index" [ index?: int ] {
-      let docId = pkd-doctable|get (
-        if ($index == null) {
-          history symbols|get 0
-        } else {
-          $index
-        }
-      )|get id?
-
-      if ($docId != null) {
-        pkd-doctable
-        |add-doc-ids
-        |where belongs_to? == $docId or id? == $docId
-        |summarize-all
-        |present-list
-      } else {
-        []
-      }
-    }
   examples: []
   signatures:
   - - name: null
@@ -638,27 +467,10 @@ generator: src:nushell
       optional: false
       default: null
       kind: return
-- name: doc more
-  summary: Shows more results from the last search. If `index` is passed as an argument, the given result will be selected from the last result set and presented as a whole.
+- name: doc page
+  summary: ''
   kind: command
-  description: |-
-    Shows more results from the last search. If `index` is passed as an argument, the given result will be selected from the last result set and presented as a whole.
-
-    Examples
-
-    # Show more results from the last search
-      ```doc more```
-
-    # Show result number 8
-      ```doc more 8```
-  source: |-
-    def "doc more" [ index?: int ] {
-      if ($index != null) {
-        $env.PKD_RESULTS|get ($index)|present
-      } else {
-        $env.PKD_RESULTS|paginate (result-lines)
-      }
-    }
+  description: ''
   examples: []
   signatures:
   - - name: null
@@ -667,10 +479,82 @@ generator: src:nushell
       optional: false
       default: null
       kind: input
-    - name: index
-      type: int
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc page next
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc page previous
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc page results clear
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc page results use
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: results
+      type: any
       description: ''
-      optional: true
+      optional: false
       default: null
       kind: positional
     - name: null
@@ -683,10 +567,6 @@ generator: src:nushell
   summary: Returns the header section for the currently mounted doctable
   kind: command
   description: Returns the header section for the currently mounted doctable
-  source: |-
-    def "doc pkd-about" [] {
-      $env.PKD_CURRENT.about
-    }
   examples: []
   signatures:
   - - name: null
@@ -705,10 +585,6 @@ generator: src:nushell
   summary: Returns configuration value for $name
   kind: command
   description: Returns configuration value for $name
-  source: |-
-    def "doc pkd-config" [ name: string ] {
-      $env.PKD_CONFIG|get $name
-    }
   examples: []
   signatures:
   - - name: null
@@ -733,10 +609,6 @@ generator: src:nushell
   summary: Returns the body section for the currently mounted doctable
   kind: command
   description: Returns the body section for the currently mounted doctable
-  source: |-
-    def "doc pkd-doctable" [] {
-      $env.PKD_CURRENT.doctable
-    }
   examples: []
   signatures:
   - - name: null
@@ -762,42 +634,6 @@ generator: src:nushell
 
     ### Example:
         ```> doc pkd-doctable|get 0|doc present```
-  source: |-
-    def "doc present" [] {
-      let output = $in
-        |trim-record-whitespace
-
-      let trimmedOutput = if ($output.summary? == '' or ($output.summary?|default ''|str trim) ==
-          ($output.description?|default ''|str trim)) {
-        $output|reject summary? description?
-      } else {
-        $output|reject description?
-      }
-      |reject examples?
-
-      let meta = (
-        $trimmedOutput
-        |maybe-update signatures {|| present-signatures }
-        |insert source_available {|row| $row.source? != null}
-        |reject source?
-        |table --expand
-      )
-
-      if ((pkd-about).text_format? == 'markdown') {
-        let body = (
-          $output
-          |present-body
-          |glow -s auto
-          |complete
-          |get stdout
-        )
-
-        $"($meta)\n\n($body)"
-      } else {
-        $"($meta)\n\n($output.description?)"
-      }
-      |pager
-    }
   examples: []
   signatures:
   - - name: null
@@ -820,12 +656,6 @@ generator: src:nushell
   description: |-
     Returns a list of doctables available in the pikadoc central repository.
     See `doc s use` for more information.
-  source: |-
-    def "doc s index" [] {
-      index full
-      |insert id {|row| $row.path|path basename|str substring ..-4}
-      |select name id version? generator
-    }
   examples: []
   signatures:
   - - name: null
@@ -851,29 +681,6 @@ generator: src:nushell
 
     ### Example:
         ```> doc s python~3.13```
-  source: |-
-    def "doc s use" [ path: string ] {
-      do --env $env.DOC_USE {||
-        let matches = find-doc $path
-        if (($matches|length) != 1) {
-          print (
-            $matches
-            |select name path version? generator
-          )
-          print $"Found ($matches|length) results when searching for `($path)`"
-          print $"Type `doc s $path` to specify results"
-          return
-        } else {
-          let docs = http get ($matches.0.repoUrl)|from yaml
-
-          {
-            about: ($docs|get 0)
-            doctable: ($docs|get 1)
-          }
-        }
-
-      } $"s ($path|str downcase)"
-    }
   examples: []
   signatures:
   - - name: null
@@ -898,31 +705,6 @@ generator: src:nushell
   summary: Searches the descriptions of all symbols in the current doctable for `query`. System grep is used for matching output.
   kind: command
   description: Searches the descriptions of all symbols in the current doctable for `query`. System grep is used for matching output.
-  source: |-
-    def "doc search" [ query: string ] {
-      if (('PKD_CURRENT' in $env) != true) {
-        print "No docfile currently selected. Type `doc use <path>` to select a docfile to use."
-        return
-      }
-
-      pkd-doctable
-      |add-doc-ids
-      |find ($query) -c ['description']
-      |insert ranking {|row| (
-        $row.description
-        |ansi strip
-        |grep -F -i -o $query
-        |lines
-        |length
-      ) * -1}
-      |sort-by ranking
-      |insert results {|row|
-        $row.description
-        |grep -F -i $query -A0 -B0 --group-separator='...' -m 5
-      }
-      |select '#' name results
-      |present-list
-    }
   examples: []
   signatures:
   - - name: null
@@ -943,6 +725,36 @@ generator: src:nushell
       optional: false
       default: null
       kind: return
+- name: doc show
+  summary: Shows full text for symbol `$index`
+  kind: command
+  description: Shows full text for symbol `$index`
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: index
+      type: int
+      description: index of the symbols, as indicated by `#` in doctable output
+      optional: false
+      default: null
+      kind: positional
+    - name: full
+      type: bool
+      description: show full, raw table of the symbol
+      optional: true
+      default: null
+      kind: flag
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
 - name: doc src:devdocs index
   summary: |-
     Retrieves a list of available documentation files from devdocs.io
@@ -951,11 +763,6 @@ generator: src:nushell
   description: |-
     Retrieves a list of available documentation files from devdocs.io
     and returns them as a table
-  source: |-
-    def "doc src:devdocs index" [] {
-      http get https://devdocs.io/docs.json
-      |select name slug version? links?.home?
-    }
   examples: []
   signatures:
   - - name: null
@@ -984,33 +791,6 @@ generator: src:nushell
     use `doc s` over this when possible. If `options` is passed,
     `$options.stripElements` should be an XPath selector that's used
     to strip unnecessary elements from the HTML input.
-  source: |-
-    def "doc src:devdocs use" [ slug: string options: record = {} ] {
-      let metadata = index|where {|| $in.slug == $slug}|get 0?
-      let generatorCommand = $"src:devdocs use ($slug) (if ($options != {}) { $options } else { null })"
-
-      if ($metadata == null) {
-        print $"Couldn't find devdocs with the slug ($slug)"
-      } else {
-        do --env $env.DOC_USE {||
-          let docs = (format (download $slug) $options)
-          {
-            about: {
-              name: $metadata.name
-              slug: $slug
-              text_format: 'markdown'
-              generator: 'src:devdocs'
-              generator_command: 'src:devdocs'
-              version: $metadata.version
-              copyright: $docs.copyright
-              homepage: $metadata.links_home
-            },
-            doctable: $docs.doctable
-          }
-        }  $generatorCommand
-      }
-
-    }
   examples: []
   signatures:
   - - name: null
@@ -1062,123 +842,6 @@ generator: src:nushell
     # Use the docs available in the nushell GitHub repository
     > doc src:github use nushell
     ```
-  source: |-
-    def "doc src:github use" [ repoName: string branchName?: string ] {
-      do --env $env.DOC_USE {||
-        let repo = if ('/' in $repoName) {
-          $repoName
-        } else {
-          http get $"https://api.github.com/search/repositories?q=($repoName)&per_page=1"
-          |get items.0.full_name
-        }
-
-        let branch = if ($branchName == null) {
-          let metadata = http get $"https://api.github.com/repos/($repo)"
-          $metadata.default_branch
-        } else {
-          $branchName
-        }
-
-        let fileTree = (
-          http get $"https://api.github.com/repos/($repo)/git/trees/($branch)?recursive=true"
-          |get tree
-        )
-        let docs = (
-          $fileTree
-          |where {|| ($in.path|str ends-with -i '.md') and not ($in.path|str starts-with '.github') and ($in.path|find -i -r 'test.*/') == null}
-        )
-        let pkds = (
-          $fileTree
-          |where {($in.path|str ends-with -i '.pkd')}
-          |each {|pkd|
-            print -n .
-
-            let doc = download-file $repo $branch $pkd.path|from yaml
-
-            $doc.1
-            |each {|symbol|
-              $symbol|merge { belongs_to: $doc.0.name }
-            }
-          }
-        )
-
-        let mdDoctable = (
-          $docs
-          |each {|md|
-            print -n .
-
-            $md
-            |merge {
-              doc: (download-file $repo $branch $md.path)
-              url: $"https://github.com/($repo)/blob/($branch)/($md.path)"
-            }}
-            # Disabled for now. GitHub incorrectly reports wiki as enabled for many
-            # repositories, causing clone to fail.
-            #
-            # |if ($metadata.has_wiki) {
-            #   $in
-            #   |append (do {
-            #     let repoPath = "/tmp/" + ($repo|parse '{user}/{name}'|get 0.name) + '.wiki/'
-
-            #     print ''
-            #     print $"Repository has wiki enabled, cloning into ($repoPath)"
-
-            #     git -C /tmp/ clone $"https://github.com/($repo).wiki.git"
-
-            #     cd $repoPath
-            #     let wikiPages = (
-            #       ls **/*.md
-            #       |each {|| {
-            #         path: $in.name
-            #         ns: 'wiki'
-            #         url: $"https://github.com/($repo)/wiki/($in.name|str substring ..-3)"
-            #         doc: (open $"($repoPath)($in.name)")
-            #       }}
-            #     )
-
-            #     cd /
-            #     rm -rf $repoPath
-
-            #     $wikiPages
-            #   })
-            # } else {
-            #   $in
-            # }
-            |each {|md| ({
-              name: $md.path
-              description: $md.doc
-              ns: $md.ns?
-              kind: 'user guide'
-              url: $md.url
-              summary: (
-                $md.doc
-                |pandoc -f gfm -t html --wrap=none
-                |hxnormalize -x
-                |hxunent -b
-                |xmlstarlet select -t --value-of '//p[contains(., '.')][1]'
-                |lines
-                |each {|| str trim}
-                |str join ' '
-                |split row '.'
-                |get 0
-                |str trim
-              )
-            })}
-        )
-
-        {
-          about: {
-            name: $repo
-            text_format: 'markdown'
-            generator: 'src:github'
-            generator_command: $"src:github ($repoName) ($branchName)"
-          }
-          doctable: (
-            [$mdDoctable, ($pkds|flatten)]|flatten
-          )
-        }
-      } $"src:github use ($repoName) ($branchName)"
-    }
   examples: []
   signatures:
   - - name: null
@@ -1209,76 +872,6 @@ generator: src:nushell
   summary: ''
   kind: command
   description: ''
-  source: |-
-    def "doc src:godot use" [ path: string ] {
-      do --env $env.DOC_USE {
-        cd $path
-
-        {
-          about: {
-            name: 'godot'
-            text_format: 'markdown'
-          },
-          doctable: (
-            ls *.xml
-            |each {|file|
-              let xml = open $file.name
-
-              def get-content [field:string] {
-                $xml.content
-                |where tag == $field
-                |get 0?.content?
-                |default []
-              }
-
-              [{
-                kind: $xml.tag
-                name: $xml.attributes.name
-                id: $xml.attributes.name
-                summary: (get-content 'brief_description'|get 0?.content?)
-                signatures: (
-                  get-content 'constructors'
-                  |get content
-                  |each { parse-signature }
-                )
-                description: ($xml|parse-description)
-                inherits_from: [$xml.attributes.inherits?]
-              }] ++ (
-                get-content 'methods'
-                |each {|method| ({
-                    kind: 'method'
-                    name: $"($xml.attributes.name).($method.attributes.name)"
-                    signatures: [($method.content|parse-signature)]
-                    belongs_to: $xml.attributes.name
-                  }|add-text-fields ($method.content|where tag == 'description'|get 0?))
-                }
-              ) ++ (
-                get-content 'operators'
-                |each {|method| ({
-                    kind: 'operator'
-                    name: $"($xml.attributes.name).($method.attributes.name)"
-                    signatures: [($method.content|parse-signature)]
-                    belongs_to: $xml.attributes.name
-                  }|add-text-fields ($method.content|where tag == 'description'|get 0?))
-                }
-              ) ++ (
-                get-content 'members'
-                |each {|member|
-                  ({
-                    kind: 'property'
-                    name: $"($xml.attributes.name).($member.attributes.name)"
-                    type: $member.attributes.type
-                    default: $member.attributes.default?
-                    belongs_to: $xml.attributes.name
-                  }|add-text-fields $member)
-              }
-              )
-            }
-            |flatten
-          )
-        }
-      }
-    }
   examples: []
   signatures:
   - - name: null
@@ -1307,11 +900,6 @@ generator: src:nushell
   description: |-
     Attempts to detect whether given path contains any jsdoc annotations
     in .js files.
-  source: |-
-    def "doc src:jsdoc is-jsdoc-module" [ path: string ] {
-      cd $path
-      (grep -qs '\\* @' **/*.js -m1 --exclude-dir=*.js|complete|get exit_code) == 0
-    }
   examples: []
   signatures:
   - - name: null
@@ -1346,25 +934,6 @@ generator: src:nushell
     # Mount jsdocs for ramda.js
     > doc src:jsdoc use node_modules/ramda/src/
     ```
-  source: |-
-    def "doc src:jsdoc use" [ filepath: string ] {
-      if (not (is-jsdoc-module $filepath)) {
-        return $"($filepath) doesn't seem to be a jsdoc module. See `doc src:jsdoc is-jsdoc-module` for details"
-      }
-
-      let absolutePath = $filepath|path expand
-      let generatorCommand = $"src:jsdoc use ($absolutePath|to nuon)"
-      do --env $env.DOC_USE {{
-        about: {
-          name: $filepath
-          text_format: 'markdown'
-          generator: 'src:jsdoc'
-          generator_command: $generatorCommand
-          language: 'javascript'
-        }
-        doctable: (do $env.PKD_CONFIG.npxCommand '--yes' 'jsdoc' '-X' '-r' $absolutePath|parse-from-jsdoc)
-      }} $generatorCommand
-    }
   examples: []
   signatures:
   - - name: null
@@ -1397,19 +966,6 @@ generator: src:nushell
     ```nushell
     > doc src:man use "cat"
     ```
-  source: |-
-    def "doc src:man use" [ it: string ] {
-      let generatorCommand = $"src:man use ($it)"
-      do --env $env.DOC_USE {{
-        about: {
-          name: $it
-          text_format: 'plain'
-          generator: 'src:man'
-          generator_command: $generatorCommand
-        }
-        doctable: (man -Rutf8 $it|do {groff -man -T utf8}|complete|get stdout|parse)
-      }} $generatorCommand
-    }
   examples: []
   signatures:
   - - name: null
@@ -1449,85 +1005,6 @@ generator: src:nushell
     # Generate docs for an old version
     > doc src:npm use ramda@0.29.1
     ```
-  source: |-
-    def "doc src:npm use" [ packageName: string ] {
-      let package = if (not ('@' in $packageName) and ('package.json'|path exists)) {
-        let packageJson = open 'package.json'
-        let dependencies = $packageJson.devDependencies|merge $packageJson.dependencies
-
-        if ($packageName in $dependencies) {
-          $"($packageName)@($dependencies|get $packageName)"
-        }
-      } else {
-        $packageName
-      }
-      let generatorCommand = $"src:npm use ($package|to nuon)"
-      do --env $env.DOC_USE {
-        let tempProject = '/tmp/pikadoc-npm'
-        let packageName = $package|split row '@'|first
-
-        mkdir $tempProject
-        cd $tempProject
-
-        let install = (
-          do $env.PKD_CONFIG.npmCommand "install" "--no-save" $package
-          |complete
-        )
-
-        if ($install.exit_code != 0) {
-          print $install
-          print "Something went wrong during npm install"
-          return
-        }
-        cd ("node_modules"|path join $packageName)
-
-        let packageMeta = open package.json
-        let mainDir = $packageMeta.main?|default '.'|path dirname
-
-        {
-          about: {
-            name: $packageMeta.name
-            version: $packageMeta.version
-            text_format: 'markdown'
-            generator: 'src:npm'
-            generator_command: $generatorCommand
-            language: 'javascript'
-            license: (
-              open (
-                ['LICENSE', 'LICENSE.md', 'LICENSE.txt']
-                |where {path exists}
-                |first
-              )
-            )
-          }
-          doctable: ((
-            ls **/*.md
-            |each {
-              let file = $in.name
-              let md = (open $file)
-
-              {
-                name: $file
-                kind: 'user guide'
-                defined_in: {
-                  file: ($file|path expand)
-                }
-                description: $md
-                summary: ($md|helpers markdown-to-summary)
-              }
-            }
-          ) ++ (if (src:jsdoc is-jsdoc-module $mainDir) {
-            do {||
-              src:jsdoc use $mainDir
-              $env.PKD_CURRENT.doctable
-            }
-          } else {
-            []
-          }))
-        }
-      } $generatorCommand
-
-    }
   examples: []
   signatures:
   - - name: null
@@ -1555,17 +1032,6 @@ generator: src:nushell
     Generates doctable from nushell module with `name` and selects it as the current doctable
 
     Example: doc src:nushell use "doc"
-  source: |-
-    def "doc src:nushell use" [ name: string ] {
-      do --env $env.DOC_USE {
-        about: {
-          name: $name
-          text_format: 'markdown'
-          generator: 'src:nushell'
-        }
-        doctable: (document-module $name)
-      }
-    }
   examples: []
   signatures:
   - - name: null
@@ -1595,35 +1061,6 @@ generator: src:nushell
     `in` is a record parsed from a valid Swagger .json/.yaml file
 
     Example: http get 'https://petstore.swagger.io/v2/swagger.json'|doc src:openapi parse-from-swagger
-  source: |-
-    def "doc src:openapi parse-from-swagger" [] {
-      let $doc = $in
-
-      ($doc|get paths|items {|path, def|
-        [
-          (parse-from-path GET $path $def.get?)
-          (parse-from-path POST $path $def.post?)
-        ]|filter {|| $in != null}
-      }|flatten) ++ (
-        $doc
-        |get definitions
-        |items {|name, def|
-          {
-            name: $name,
-            kind: 'schema'
-            namespace: definitions
-            parameters: ($def.properties|items {|name, param| {
-              name: $name,
-              type: (normalize-type $param)
-              subtypes: (normalize-subtypes $param)
-              examples: ($param.example?|if ($in != null) {
-                [$in]
-              })
-            }})
-          }
-        }
-      )
-    }
   examples: []
   signatures:
   - - name: null
@@ -1647,19 +1084,6 @@ generator: src:nushell
     `url` is fetched using a GET request
 
     Example: doc src:openapi use "https://petstore.swagger.io/v2/swagger.json"
-  source: |-
-    def "doc src:openapi use" [ url: string ] {
-      let generatorCommand = $"src:openapi use ($url)"
-      do --env $env.DOC_USE {{
-        about: {
-          name: $url
-          text_format: 'gfm'
-          generator: 'src:openapi'
-          generator_command: $generatorCommand
-        },
-        doctable: (http get $url|parse-from-swagger)
-      }} $generatorCommand
-    }
   examples: []
   signatures:
   - - name: null
@@ -1691,107 +1115,6 @@ generator: src:nushell
     # Parses database 'my_database'.'schema' for definitions
     > doc src:psql use 'public' '-d' 'my_database'
     ```
-  source: |-
-    def "doc src:psql use" [ schema: string ...args:any] {
-      do --env $env.DOC_USE {
-        def exec-query [query:string] {
-          psql -c $query --csv ...$args
-        }
-        let tables = (
-          exec-query (tables-query $schema)
-          |from csv
-          |each {|row|
-            let table = $"($row.table_catalog).($row.table_schema)"
-            {
-              ns: $table
-              name: $row.table_name
-              description: ("```sql\n" +
-                (pg_dump -t $"($row.table_schema).($row.table_name)" --schema-only ...$args
-                |lines
-                |where {|row| not (
-                  ($row|str starts-with '--') or
-                  ($row|str starts-with 'SELECT ') or
-                  ($row|str starts-with 'SET ')
-                )}
-                |str join "\n"
-                |str replace -a "\n\n" "\n"
-                |str trim)
-                + "\n```")
-              kind: (match $row.table_type
-                { "VIEW" => 'view',
-                  _ => "table" }
-              )
-              columns: (columns-get $schema $args $row.table_name)
-            }
-          }
-        )
-
-        let columns = (columns-get $schema $args)
-
-        let functions = (
-          exec-query (functions-query $schema)
-          |from csv
-          |each {|row|
-            let argtypes = (
-              (($row.proargtypes|split row ' ') ++ [$row.prorettype])
-              |each {into string}
-            )
-            let argtypeNames = (
-              $argtypes
-              |uniq
-              |filter {$in != ''}
-              |do {
-                let types = $in
-
-                exec-query (type-names-query $types)
-                |from csv
-                |each {|row|
-                  { ($row.oid|into string): $row.typname }
-                }
-              }
-              |reduce --fold {} {|a, b| $a|merge $b}
-            )
-            let argnames = (
-              $row.proargnames
-              |parse-psql-array
-            ) ++ (0..|each {''}|take (($argtypes|length) - ($row.proargnames|length)))
-
-            let args = (
-              $argtypes|zip $argnames
-              |each {|row|
-                {
-                  name: $row.1
-                  type: ($argtypeNames|get -i $row.0)
-                }
-              }
-            )
-
-            {
-              ns: $row.nspname
-              name: $row.proname
-              kind: 'function'
-              signatures: [
-                ($args|each { merge {kind: 'positional'} })
-              ]
-              description: ("```sql\n" + $row.prosrc + "\n```")
-            }
-          }
-        )
-
-        {
-          about: {
-            name: $"psql: ($schema) ($args|str join ' ')"
-            text_format: 'markdown'
-            language: 'sql'
-          }
-          doctable: (
-            $tables ++ $columns ++ $functions
-            |sort-by name
-          )
-        }
-
-      }
-    }
   examples: []
   signatures:
   - - name: null
@@ -1819,10 +1142,10 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc src:python use
-  summary: Generates a doctable from Python `$module`. Invokes `$env.PKD_CONFIG.pythonCommand` to run a script using `python3` found using PATH. Doesn't install packages.
+  summary: Generates a doctable from Python `$module`. Invokes `$env.PKD_CONFIG.python_command` to run a script using `python3` found using PATH. Doesn't install packages.
   kind: command
   description: |-
-    Generates a doctable from Python `$module`. Invokes `$env.PKD_CONFIG.pythonCommand` to run a script using `python3` found using PATH. Doesn't install packages.
+    Generates a doctable from Python `$module`. Invokes `$env.PKD_CONFIG.python_command` to run a script using `python3` found using PATH. Doesn't install packages.
 
     ### Examples:
     ```nushell
@@ -1832,45 +1155,6 @@ generator: src:nushell
     # Generates a doctable from a locally installed package
     > doc src:python use flask
     ```
-  source: |-
-    def "doc src:python use" [ module: string ] {
-      let generatorCommand = $"src:python use ($module|to nuon)"
-
-      do --env $env.DOC_USE {||
-        let parsed = (
-          do $env.PKD_CONFIG.pythonCommand $"($env.PKD_HOME)/doc/src:python.py" $module
-          |lines
-          |last
-          |from json
-        )
-
-        let description = $parsed.about?.description?|default ''
-
-        {
-          about: ({
-            name: $module
-            text_format: 'rst'
-            generator: 'src:python'
-            generator_command: $generatorCommand
-            language: 'python'
-          }
-          |merge $parsed.about
-          |merge {
-            description: (
-              match ($parsed.packageMetadata?.descriptionContentType) {
-                'text/x-rst' => { $description|pandoc -f rst -tgfm-raw_html }
-                'text/markdown' => { $description|pandoc -f gfm -tgfm-raw_html }
-                _ => { $description }
-              }
-            )
-          }
-          )
-          doctable: (
-            $parsed.doctable
-          )
-        }
-      } $generatorCommand
-    }
   examples: []
   signatures:
   - - name: null
@@ -1900,27 +1184,6 @@ generator: src:nushell
     `in` is a valid sqlite database.
 
     Example: open my-database.db|doc src:sqlite parse-from-db
-  source: |-
-    def "doc src:sqlite parse-from-db" [] {
-      let $db = $in
-      let tables = $db|query db 'SELECT type, name, sql FROM sqlite_master WHERE name not like "sqlite_%"'
-
-      $tables|each {|tbl| {
-        name: $tbl.name
-        columns:
-          ($db
-            |query db $"PRAGMA table_info\(($tbl.name)\)"
-            |each {|col| {
-              name: $col.name
-              type: $col.type
-              default: $col.dflt_value
-              nullable: ($col.notnull == 0)
-              pk: ($col.pk == 1)
-            }})
-        source: $tbl.sql
-        kind: (if ($tbl.type == 'index') { 'index' } else { 'table' })
-      }}
-    }
   examples: []
   signatures:
   - - name: null
@@ -1944,17 +1207,6 @@ generator: src:nushell
     `db` is a path to your sqlite database
 
     Example: doc src:sqlite use ./my-database.db
-  source: |-
-    def "doc src:sqlite use" [ db: any ] {
-      do --env $env.DOC_USE {
-        about: {
-          name: $db
-          text_format: 'text'
-          generator: 'src:sqlite'
-        }
-        doctable: (open $db|parse-from-db)
-      } $"src:sqlite use ($db)"
-    }
   examples: []
   signatures:
   - - name: null
@@ -1975,28 +1227,28 @@ generator: src:nushell
       optional: false
       default: null
       kind: return
+- name: doc summarize
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
 - name: doc tutor
   summary: Shows the pikadoc tutorial.
   kind: command
   description: Shows the pikadoc tutorial.
-  source: |-
-    def "doc tutor" [ page: int = 1 ] {
-      do --env $env.DOC_USE $"($env.PKD_HOME)/user_guide.pkd"
-
-      let tutorials = (
-        $env.PKD_CURRENT.doctable
-        |zip 0..
-        |each {|row| $row.0|merge { '#': $row.1 }}
-        |where {$in.name|str starts-with 'Tutorial'}
-      )
-      print (do --env $env.DOC ($tutorials|get ($page - 1)|get '#'))
-
-      if ($page < ($tutorials|length)) {
-        print ($"Page ($page)/($tutorials|length). Type `doc tutor ($page + 1)` to show the next page")
-      } else {
-        print ($"Page ($page)/($tutorials|length). For more information about specific commands, use `doc <command> --help`.")
-      }
-    }
   examples: []
   signatures:
   - - name: null
@@ -2032,47 +1284,6 @@ generator: src:nushell
 
     # Use a docfile downloaded from a server
       ```doc use (http get 'https://raw.githubusercontent.com/ArseAssassin/pikadoc/master/reference-docs.pkd'|from yaml)```
-  source: |-
-    def "doc use" [ docs: any command?: string ] {
-      let type = $docs|describe
-      let commandId = $command|default ''|cache command-to-id
-
-      if ($type == 'string') {
-        let file = (open $docs|from yaml)
-        $env.PKD_CURRENT = {
-          about: $file.0
-          doctable: $file.1
-        }
-      } else if ($type == 'closure') {
-        $env.PKD_CURRENT = if ($commandId in (cache|get name)) {
-          open $"(cache repository)/($commandId)"|from msgpackz
-        } else {
-          let result = do $docs
-          if ($result == null) {
-            return
-          } else {
-            $result
-          }
-        }
-      } else if ($type == 'nothing') {
-        return
-      } else {
-        $env.PKD_CURRENT = $docs
-      }
-
-      if ($command != null) {
-        cache-docs $commandId $env.PKD_CURRENT
-      }
-
-      if ($command != null) {
-        $command
-        |history doctables add
-      }
-
-      history symbols clear
-
-      $"(pkd-doctable|length) symbols found\nUsing doctable ((pkd-about).name)~((pkd-about).version?)"
-    }
   examples: []
   signatures:
   - - name: null
@@ -2103,10 +1314,6 @@ generator: src:nushell
   summary: Returns current pikadoc version
   kind: command
   description: Returns current pikadoc version
-  source: |-
-    def "doc version" [] {
-      $env.PKD_VERSION
-    }
   examples: []
   signatures:
   - - name: null
@@ -2122,32 +1329,16 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc view-source
-  summary: |-
-    If symbol selected with `index` has sources available
-    (`$symbol.defined_in.file` can be found in the filesystem), opens it
-    for reading using `$env.PKD_CONFIG.pagerCommand`.
+  summary: Tries to open sources for symbol $in for viewing. Searches `$symbol.defined_in` and `$symbol.source`. `$env.PKD_CONFIG.pager_command` is used to show the results.
   kind: command
   description: |-
-    If symbol selected with `index` has sources available
-    (`$symbol.defined_in.file` can be found in the filesystem), opens it
-    for reading using `$env.PKD_CONFIG.pagerCommand`.
+    Tries to open sources for symbol $in for viewing. Searches `$symbol.defined_in` and `$symbol.source`. `$env.PKD_CONFIG.pager_command` is used to show the results.
 
     ### Examples:
     ```nushell
-    # Show sources for symbol 0 using `less`
-    doc view-source 0
+    # Show sources for symbol #0
+    doc|get 0|doc view-source
     ```
-  source: |-
-    def "doc view-source" [ index: int ] {
-      let symbol = pkd-doctable|get -i $index
-      if ($symbol.source? != null) {
-        $symbol.source|do (pkd-config pagerCommand)
-      } else if ($symbol.defined_in?.file? != null and ($symbol.defined_in?.file?|path exists)) {
-        do (pkd-config pagerCommand) $symbol.defined_in.file ($symbol.defined_in.line?|default 0)
-      } else {
-        print "Couldn't open sources for reading"
-      }
-    }
   examples: []
   signatures:
   - - name: null
@@ -2156,12 +1347,6 @@ generator: src:nushell
       optional: false
       default: null
       kind: input
-    - name: index
-      type: int
-      description: index of the symbol
-      optional: false
-      default: null
-      kind: positional
     - name: null
       type: any
       description: null

@@ -94,6 +94,6 @@ export def --env use [
       generator_command: $generatorCommand
       language: 'javascript'
     }
-    doctable: (do $env.PKD_CONFIG.npxCommand '--yes' 'jsdoc' '-X' '-r' $absolutePath|parse-from-jsdoc)
+    doctable: (do $env.PKD_CONFIG.npx_command '--yes' 'jsdoc' '-X' '-r' $absolutePath|parse-from-jsdoc)
   }} $generatorCommand
 }

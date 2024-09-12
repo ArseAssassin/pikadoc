@@ -1,4 +1,4 @@
-# Generates a doctable from Python `$module`. Invokes `$env.PKD_CONFIG.pythonCommand` to run a script using `python3` found using PATH. Doesn't install packages.
+# Generates a doctable from Python `$module`. Invokes `$env.PKD_CONFIG.python_command` to run a script using `python3` found using PATH. Doesn't install packages.
 #
 # ### Examples:
 # ```nushell
@@ -13,7 +13,7 @@ export def --env use [module:string] {
 
   do --env $env.DOC_USE {||
     let parsed = (
-      do $env.PKD_CONFIG.pythonCommand $"($env.PKD_HOME)/doc/src:python.py" $module
+      do $env.PKD_CONFIG.python_command $"($env.PKD_HOME)/doc/src:python.py" $module
       |lines
       |last
       |from json

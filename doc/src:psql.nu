@@ -149,9 +149,10 @@ export def --env use [
 
     {
       about: {
-        name: $"psql: ($schema) ($args|str join ' ')"
+        name: $"($schema)"
         text_format: 'markdown'
         language: 'sql'
+        generator: 'src:psql'
       }
       doctable: (
         $tables ++ $columns ++ $functions

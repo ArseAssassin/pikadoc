@@ -5,7 +5,7 @@ def document-module [name:string] {
   scope commands
   |where {get name|str starts-with $name}
   |each {{
-    name:         $in.name
+    name:         $"($in.name)"
     summary:      ($in.usage|str trim)
     kind:         command
     description:  ($"($in.usage)\n\n($in.extra_usage)"|str trim)

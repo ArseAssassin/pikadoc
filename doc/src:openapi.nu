@@ -55,7 +55,7 @@ def parse-from-path [method, path, it] {
 # `in` is a record parsed from a valid Swagger .json/.yaml file
 #
 # Example: http get 'https://petstore.swagger.io/v2/swagger.json'|doc src:openapi parse-from-swagger
-export def parse-from-swagger [] {
+def parse-from-swagger [] {
   let $doc = $in
 
   ($doc|get paths|items {|path, def|

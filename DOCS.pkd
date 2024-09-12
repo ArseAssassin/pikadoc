@@ -1034,29 +1034,6 @@ generator: src:nushell
       optional: false
       default: null
       kind: return
-- name: doc src:openapi parse-from-swagger
-  summary: Returns documentation for a REST endpoint defined in a .json/.yaml file.
-  kind: command
-  description: |-
-    Returns documentation for a REST endpoint defined in a .json/.yaml file.
-
-    `in` is a record parsed from a valid Swagger .json/.yaml file
-
-    Example: http get 'https://petstore.swagger.io/v2/swagger.json'|doc src:openapi parse-from-swagger
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: input
-    - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: return
 - name: doc src:openapi use
   summary: Generates doctable from `url` to a valid Swagger .json/.ymal file and selects it as the current doctable
   kind: command

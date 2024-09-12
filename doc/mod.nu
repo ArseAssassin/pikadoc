@@ -18,7 +18,7 @@ export use history.nu
 export use bookmarks.nu
 export use page.nu
 
-# Filters current doctable using $query. If $query is null, returns full list of all symbols in current doctable.
+# Filters current doctable using $query. If $query is null, returns full list of all symbols in current doctable. If $query is `int`, gets symbol with that index.
 #
 # By default search results are paged according to `$env.PKD_CONFIG.table_max_rows` (use `doc page next` to show more results). In addition, all results are summarized using `$env.PKD_CONFIG.summarize_command`.
 #
@@ -34,7 +34,7 @@ export use page.nu
 # doc 'src:'
 #
 # # Show symbol #4
-# doc|get 4
+# doc 4
 #
 # # Dump the entire doctable formatted as a table
 # doc --full --all
@@ -43,7 +43,7 @@ export use page.nu
 # doc --full|get 10
 # ```
 export def --env main [
-  query?:string # query to search for
+  query?        # (string) query to search for, (int) symbol to select
   --full        # show full, raw results from doctable
   --all         # show all results without paging
 ] {
@@ -54,7 +54,15 @@ export def --env main [
   $env.pkd.summarize_output = not $full
   $env.pkd.page_output = not $all
 
-  if ($query != null) {
+  if ($all) {
+    page results clear
+  }
+
+  if (($query|describe) == 'int') {
+    pkd-doctable
+    |add-doc-ids
+    |get $query
+  } else if (($query|describe) == 'string') {
     let query = ($query|str downcase)
     let search = (
       pkd-doctable
@@ -75,14 +83,6 @@ export def --env main [
     pkd-doctable
     |add-doc-ids
   }
-}
-
-# Shows full text for symbol `$index`
-export def --env show [
-  index:int # index of the symbols, as indicated by `#` in doctable output
-  --full    # show full, raw table of the symbol
-  ] {
-    main --full=$full|get $index
 }
 
 # Returns a table of recently used symbols
@@ -123,15 +123,16 @@ export def --env index [index?:int] {
   }
 }
 
-# Searches the descriptions of all symbols in the current doctable for `query`. System grep is used for matching output.
-export def --env search [query:string] {
+# Searches the descriptions of all symbols in the current doctable for $query. System grep is used for matching output.
+export def --env search [
+  query:string # query to search for
+  ] {
   if (('PKD_CURRENT' in $env) != true) {
     print "No docfile currently selected. Type `doc use <path>` to select a docfile to use."
     return
   }
 
-  pkd-doctable
-  |add-doc-ids
+  main --full
   |find ($query) -c ['description']
   |insert ranking {|row| (
     $row.description
@@ -146,7 +147,6 @@ export def --env search [query:string] {
     |grep -F -i $query -A0 -B0 --group-separator='...' -m 5
   }
   |select '#' name results
-  |present-list
 }
 
 def add-doc-ids [] {

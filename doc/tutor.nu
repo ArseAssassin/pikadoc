@@ -10,7 +10,7 @@ export def main [
     |each {|row| $row.0|merge { '#': $row.1 }}
     |where {$in.name|str starts-with 'Tutorial'}
   )
-  print (do --env $env.DOC ($tutorials|get ($page - 1)|get '#'))
+  print ($tutorials|get $page|do $env.PKD_CONFIG.present_symbol_command)
 
   if ($page < ($tutorials|length)) {
     print ($"Page ($page)/($tutorials|length). Type `doc tutor ($page + 1)` to show the next page")

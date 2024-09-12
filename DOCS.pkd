@@ -5,10 +5,10 @@ generator: src:nushell
 
 ---
 - name: doc
-  summary: Filters current doctable using $query. If $query is null, returns full list of all symbols in current doctable.
+  summary: Filters current doctable using $query. If $query is null, returns full list of all symbols in current doctable. If $query is `int`, gets symbol with that index.
   kind: command
   description: |-
-    Filters current doctable using $query. If $query is null, returns full list of all symbols in current doctable.
+    Filters current doctable using $query. If $query is null, returns full list of all symbols in current doctable. If $query is `int`, gets symbol with that index.
 
     By default search results are paged according to `$env.PKD_CONFIG.table_max_rows` (use `doc page next` to show more results). In addition, all results are summarized using `$env.PKD_CONFIG.summarize_command`.
 
@@ -24,7 +24,7 @@ generator: src:nushell
     doc 'src:'
 
     # Show symbol #4
-    doc|get 4
+    doc 4
 
     # Dump the entire doctable formatted as a table
     doc --full --all
@@ -41,8 +41,8 @@ generator: src:nushell
       default: null
       kind: input
     - name: query
-      type: string
-      description: query to search for
+      type: any
+      description: (string) query to search for, (int) symbol to select
       optional: true
       default: null
       kind: positional
@@ -83,9 +83,9 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc bookmarks add
-  summary: Adds $index to the list of bookmarked symbols
+  summary: Adds $index to the list of bookmarked symbols. If $index is not defined, add the last symbol viewed
   kind: command
-  description: Adds $index to the list of bookmarked symbols
+  description: Adds $index to the list of bookmarked symbols. If $index is not defined, add the last symbol viewed
   examples: []
   signatures:
   - - name: null
@@ -97,7 +97,7 @@ generator: src:nushell
     - name: index
       type: int
       description: index of the symbol to bookmark
-      optional: false
+      optional: true
       default: null
       kind: positional
     - name: null
@@ -468,9 +468,9 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc page
-  summary: ''
+  summary: Shows current page of search results
   kind: command
-  description: ''
+  description: Shows current page of search results
   examples: []
   signatures:
   - - name: null
@@ -486,9 +486,9 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc page next
-  summary: ''
+  summary: Browses to the next page of search results. `doc more` is an alias of this
   kind: command
-  description: ''
+  description: Browses to the next page of search results. `doc more` is an alias of this
   examples: []
   signatures:
   - - name: null
@@ -504,9 +504,9 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc page previous
-  summary: ''
+  summary: Browses to the previous page of search results
   kind: command
-  description: ''
+  description: Browses to the previous page of search results
   examples: []
   signatures:
   - - name: null
@@ -522,9 +522,9 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc page results clear
-  summary: ''
+  summary: Clears current results from the pager
   kind: command
-  description: ''
+  description: Clears current results from the pager
   examples: []
   signatures:
   - - name: null
@@ -540,9 +540,9 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc page results use
-  summary: ''
+  summary: Mounts $results for use by the pager
   kind: command
-  description: ''
+  description: Mounts $results for use by the pager
   examples: []
   signatures:
   - - name: null
@@ -702,9 +702,9 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc search
-  summary: Searches the descriptions of all symbols in the current doctable for `query`. System grep is used for matching output.
+  summary: Searches the descriptions of all symbols in the current doctable for $query. System grep is used for matching output.
   kind: command
-  description: Searches the descriptions of all symbols in the current doctable for `query`. System grep is used for matching output.
+  description: Searches the descriptions of all symbols in the current doctable for $query. System grep is used for matching output.
   examples: []
   signatures:
   - - name: null
@@ -715,40 +715,10 @@ generator: src:nushell
       kind: input
     - name: query
       type: string
-      description: ''
+      description: query to search for
       optional: false
       default: null
       kind: positional
-    - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: return
-- name: doc show
-  summary: Shows full text for symbol `$index`
-  kind: command
-  description: Shows full text for symbol `$index`
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: input
-    - name: index
-      type: int
-      description: index of the symbols, as indicated by `#` in doctable output
-      optional: false
-      default: null
-      kind: positional
-    - name: full
-      type: bool
-      description: show full, raw table of the symbol
-      optional: true
-      default: null
-      kind: flag
     - name: null
       type: any
       description: null

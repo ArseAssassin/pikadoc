@@ -7,21 +7,33 @@ export def parse-from-db [] {
   let $db = $in
   let tables = $db|query db 'SELECT type, name, sql FROM sqlite_master WHERE name not like "sqlite_%"'
 
-  $tables|each {|tbl| {
-    name: $tbl.name
-    columns:
-      ($db
-        |query db $"PRAGMA table_info\(($tbl.name)\)"
-        |each {|col| {
-          name: $col.name
-          type: $col.type
-          default: $col.dflt_value
-          nullable: ($col.notnull == 0)
-          pk: ($col.pk == 1)
-        }})
-    source: $tbl.sql
-    kind: (if ($tbl.type == 'index') { 'index' } else { 'table' })
-  }}
+  $tables|each {|tbl|
+    let columns = (
+      $db
+      |query db $"PRAGMA table_info\(($tbl.name)\)"
+      |each {|col| {
+        name: $col.name
+        type: $col.type
+        default: $col.dflt_value
+        nullable: ($col.notnull == 0)
+        pk: ($col.pk == 1)
+      }}
+    )
+
+    [{
+      name: $tbl.name
+      columns: $columns
+      source: $tbl.sql
+      kind: (if ($tbl.type == 'index') { 'index' } else { 'table' })
+    }] ++ (
+      $columns
+      |each {|col| $col|merge {
+        name: $"($tbl.name).($col.name)"
+        kind: 'column'
+      }}
+    )
+  }
+  |flatten
 }
 
 # Queries a sqlite database for its tables and selects the output as the current doctable

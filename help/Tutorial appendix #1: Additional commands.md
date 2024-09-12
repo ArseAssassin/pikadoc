@@ -7,7 +7,7 @@ Here are some additional commands you might find useful:
 doc save './doctable.pkd'
 
 # View source code for symbol
-doc view-source 0
+doc 0|doc view-source
 
 # Return a list of doctables cached in the local filesystem
 doc cache

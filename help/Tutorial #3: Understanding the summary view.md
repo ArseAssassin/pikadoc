@@ -21,8 +21,9 @@ The result list view includes the column `#` as the index of the symbol. To view
 
 ```nushell
 # Show full description for symbol #0
-doc|get 0
+doc 0
 
-# `doc show` can be used as well
-doc show 0
+# Symbol can be selected from a list as well
+doc|get 0
+doc|first
 ```

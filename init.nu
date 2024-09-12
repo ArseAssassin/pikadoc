@@ -51,7 +51,6 @@ $env.PKD_CONFIG = {
   }
   summarize_command: {
     each { select '#'? ns? name? kind? summary? }
-    |table -i false
   }
   table_max_rows: 20
 }
@@ -62,7 +61,7 @@ let config = $env.config|upsert hooks {
     let output_type = $output|describe
 
     let is_output_list = (
-      ($output_type|str starts-with 'list<') or
+      ($output_type|str starts-with 'list<any') or
       ($output_type|str starts-with 'table<#: int')
     )
 
@@ -80,22 +79,21 @@ let config = $env.config|upsert hooks {
       $output.'#'|doc history symbols add
       $output|do $env.PKD_CONFIG.present_symbol_command
     } else if ($is_output_list) {
-      if ($should_page) {
-        doc page results use $output
-        doc page
+      if ($should_summarize) {
+        $output|do $env.PKD_CONFIG.summarize_command
       } else {
         $output
       }
-      |if ($should_summarize) {
-        do $env.PKD_CONFIG.summarize_command
+      |if ($should_page) {
+        let results = $in
+        print $results
+        doc page results use $results
+        doc page
       } else {
         $in
       }
+      |table -i false
     } else {
-      if ($is_output_list) {
-        doc page results clear
-      }
-
       $output
     }
   }
@@ -106,6 +104,8 @@ $env.pkd = {
   summarize_output: false
   page_output: false
   symbol_history: []
+  cursor: 0
+  results: null
 }
 
 alias 'doc save' = doc doctable save

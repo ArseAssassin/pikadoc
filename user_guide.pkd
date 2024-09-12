@@ -306,10 +306,11 @@ license: MIT
 
     ```nushell
     # Show full description for symbol #0
-    doc|get 0
+    doc 0
 
-    # `doc show` can be used as well
-    doc show 0
+    # Symbol can be selected from a list as well
+    doc|get 0
+    doc|first
     ```
 
 - name: 'Tutorial #4: Finding and generating docs'
@@ -403,8 +404,8 @@ license: MIT
     Sometimes we can't find what we need by headlines alone. You can use `doc search` to search through entire symbol definitions:
 
     ```nushell
-    # Show all symbols with `zip` in the description
-    doc search 'zip'
+    # Show all symbols with `use` in the description
+    doc search 'use'
     ```
 
     Sometimes it's useful to filter symbols by their header metadata. A closure can be passed to `doc` query any field in the full doctable.
@@ -412,7 +413,7 @@ license: MIT
     ```nushell
     # Show all tables with a column named `date`
     doc src:sqlite use ./path-to.db
-    doc {|| where {'date' in ($in.columns|get name)}}
+    doc|where {'date' in ($in.columns|get name)}
     ```
 
     When you query symbols with `doc`, the results are transformed to make them easier to read. Flag `--full` can be used to show the raw symbol when planning queries for advanced filters:
@@ -436,7 +437,7 @@ license: MIT
     doc save './doctable.pkd'
 
     # View source code for symbol
-    doc view-source 0
+    doc 0|doc view-source
 
     # Return a list of doctables cached in the local filesystem
     doc cache

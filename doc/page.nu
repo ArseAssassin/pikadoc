@@ -1,11 +1,15 @@
+# Shows current page of search results
 export def --env main [] {
-  $env.pkd.summarize_output = true
-
-  $env.pkd.results
-  |skip $env.pkd.cursor
-  |take $env.PKD_CONFIG.table_max_rows
+  if ($env.pkd?.results? == null) {
+    "No more results. Use `doc` to search current doctable."
+  } else {
+    $env.pkd.results
+    |skip $env.pkd.cursor
+    |take $env.PKD_CONFIG.table_max_rows
+  }
 }
 
+# Browses to the next page of search results. `doc more` is an alias of this
 export def --env next [] {
   $env.pkd.cursor += $env.PKD_CONFIG.table_max_rows
   let output = main
@@ -18,6 +22,7 @@ export def --env next [] {
   $output
 }
 
+# Browses to the previous page of search results
 export def --env previous [] {
   $env.pkd.cursor -= $env.PKD_CONFIG.table_max_rows
   if ($env.pkd.cursor < 0) {
@@ -26,11 +31,13 @@ export def --env previous [] {
   main
 }
 
+# Mounts $results for use by the pager
 export def --env 'results use' [results] {
   $env.pkd.results = $results
   $env.pkd.cursor = 0
 }
 
+# Clears current results from the pager
 export def --env 'results clear' [] {
-  results use []
+  results use null
 }

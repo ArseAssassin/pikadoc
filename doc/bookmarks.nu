@@ -1,4 +1,5 @@
 use helpers.nu
+use history.nu
 
 def current-name [] {
   $env.PKD_CURRENT.about.name
@@ -23,11 +24,17 @@ export def current [] {
   bookmarks|get -i (current-name)|default []
 }
 
-# Adds $index to the list of bookmarked symbols
+# Adds $index to the list of bookmarked symbols. If $index is not defined, add the last symbol viewed
 export def add [
-  index:int # index of the symbol to bookmark
+  index?:int # index of the symbol to bookmark
   ] {
-  update { append $index|uniq }
+
+  let _index = if ($index == null) {
+    history symbols|last
+  } else {
+    $index
+  }
+  update { append $_index|uniq }
 }
 
 # Removes $index from the list of bookmarked symbols

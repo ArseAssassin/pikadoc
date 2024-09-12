@@ -12,6 +12,7 @@ export use src:nushell.nu
 export use src:github.nu
 export use src:jsdoc.nu
 export use src:npm.nu
+export use src:godot.nu
 
 export use history.nu
 export use bookmarks.nu
@@ -90,7 +91,7 @@ export def --env main [
 }
 
 # Shows a summarized list of recently viewed symbols
-export def history [] {
+export def --env history [] {
   let docs = pkd-doctable|add-doc-ids
 
   history symbols
@@ -101,7 +102,7 @@ export def history [] {
 }
 
 # Shows a summarized list of bookmarked symbols for this doctable
-export def bookmarks [] {
+export def --env bookmarks [] {
   let docs = pkd-doctable|add-doc-ids
 
   bookmarks current
@@ -109,6 +110,26 @@ export def bookmarks [] {
   |each {|index| $docs|get $index}
   |summarize-all
   |present-list
+}
+
+export def --env index [index?:int] {
+  let docId = pkd-doctable|get (
+    if ($index == null) {
+      history symbols|get 0
+    } else {
+      $index
+    }
+  )|get id?
+
+  if ($docId != null) {
+    pkd-doctable
+    |add-doc-ids
+    |where belongs_to? == $docId or id? == $docId
+    |summarize-all
+    |present-list
+  } else {
+    []
+  }
 }
 
 # Searches the descriptions of all symbols in the current doctable for `query`. System grep is used for matching output.
@@ -319,24 +340,34 @@ def trim-record-whitespace [] {
 
 def present-type [] {
   let type = $in
-  let name = $type|describe
-  if ($name == 'list<list<any>>' or ($name|str starts-with 'list<table<')) {
-    $type
-    |each { present-type }
-    |str join "\n"
-  } else if ($name == 'list<any>' or ($name|str starts-with 'table<')) {
-    let types = $type|each { present-type }
+  $"($type.name?)(if (($type.name?|default '') != '' and ($type.type?|default '') != '') { ':' })($type.type?)(if ($type.optional? == true) { '?' })(if ($type.rest? == true) {
+    '...'
+  })(if ($type.default? != null) {
+    '=' + $type.default
+  })"
+}
 
-    $"($types|take (($types|length) - 1)|str join ', ') -> ($types|last)"
-  } else if ($name|str starts-with 'record') {
-    $"($type.name?)(if (($type.name?|default '') != '' and ($type.type?|default '') != '') { ':' })($type.type?)(if ($type.optional? == true) { '?' })(if ($type.rest? == true) {
-      '...'
-    })(if ($type.default? != null) {
-      '=' + $type.default
-    })"
-  } else {
-    $in
+def present-signatures [] {
+  each {|sig|
+    (
+      $sig
+      |where kind != 'return'
+      |each { present-type }
+      |str join ", "
+    ) + (
+      $sig
+      |where kind == 'return'
+      |each { present-type }
+      |str join ", "
+      |if ($in != '') {
+        ' -> ' + $in
+      } else {
+        $in
+      }
+    )
+    |str trim
   }
+  |str join "\n"
 }
 
 def present-param [] {
@@ -414,7 +445,7 @@ export def present [] {
 
   let meta = (
     $trimmedOutput
-    |maybe-update signatures {|| present-type }
+    |maybe-update signatures {|| present-signatures }
     |insert source_available {|row| $row.source? != null}
     |reject source?
     |table --expand

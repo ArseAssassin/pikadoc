@@ -1,3 +1,5 @@
+# Finding and generating docs
+
 A great place to start looking for documentation is the PikaDoc central repository. It holds 150+ doctables, pre-generated for your convenince. To get a full list of featured documentation, you can use `doc s index`.
 
 ```nushell
@@ -16,6 +18,14 @@ doc 'Intl.dateTimeFormat'
 ```
 
 We can also use `src:github` to download documentation for any project on GitHub:
+
+```nushell
+# Mount `javascript` documentation for use
+doc s use 'javascript'
+
+# Show symbols matching `Intl.dateTimeFormat`
+doc 'Intl.dateTimeFormat'
+```
 
 ```nushell
 # Download and use files available in the pikadoc GitHub repo

@@ -1,3 +1,5 @@
+# Navigating between symbols
+
 Numeric IDs can be difficult to memorize when switching between multiple symbols. The `doc history` command can be used to see a reminder which symbols you've viewed recently.
 
 ```nushell

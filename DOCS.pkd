@@ -594,6 +594,50 @@ generator: src:nushell
       optional: false
       default: null
       kind: return
+- name: doc index
+  summary: ''
+  kind: command
+  description: ''
+  source: |-
+    def "doc index" [ index?: int ] {
+      let docId = pkd-doctable|get (
+        if ($index == null) {
+          history symbols|get 0
+        } else {
+          $index
+        }
+      )|get id?
+
+      if ($docId != null) {
+        pkd-doctable
+        |add-doc-ids
+        |where belongs_to? == $docId or id? == $docId
+        |summarize-all
+        |present-list
+      } else {
+        []
+      }
+    }
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: index
+      type: int
+      description: ''
+      optional: true
+      default: null
+      kind: positional
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
 - name: doc more
   summary: Shows more results from the last search. If `index` is passed as an argument, the given result will be selected from the last result set and presented as a whole.
   kind: command
@@ -733,7 +777,7 @@ generator: src:nushell
 
       let meta = (
         $trimmedOutput
-        |maybe-update signatures {|| present-type }
+        |maybe-update signatures {|| present-signatures }
         |insert source_available {|row| $row.source? != null}
         |reject source?
         |table --expand
@@ -1153,6 +1197,100 @@ generator: src:nushell
       type: string
       description: name of the branch
       optional: true
+      default: null
+      kind: positional
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc src:godot use
+  summary: ''
+  kind: command
+  description: ''
+  source: |-
+    def "doc src:godot use" [ path: string ] {
+      do --env $env.DOC_USE {
+        cd $path
+
+        {
+          about: {
+            name: 'godot'
+            text_format: 'markdown'
+          },
+          doctable: (
+            ls *.xml
+            |each {|file|
+              let xml = open $file.name
+
+              def get-content [field:string] {
+                $xml.content
+                |where tag == $field
+                |get 0?.content?
+                |default []
+              }
+
+              [{
+                kind: $xml.tag
+                name: $xml.attributes.name
+                id: $xml.attributes.name
+                summary: (get-content 'brief_description'|get 0?.content?)
+                signatures: (
+                  get-content 'constructors'
+                  |get content
+                  |each { parse-signature }
+                )
+                description: ($xml|parse-description)
+                inherits_from: [$xml.attributes.inherits?]
+              }] ++ (
+                get-content 'methods'
+                |each {|method| ({
+                    kind: 'method'
+                    name: $"($xml.attributes.name).($method.attributes.name)"
+                    signatures: [($method.content|parse-signature)]
+                    belongs_to: $xml.attributes.name
+                  }|add-text-fields ($method.content|where tag == 'description'|get 0?))
+                }
+              ) ++ (
+                get-content 'operators'
+                |each {|method| ({
+                    kind: 'operator'
+                    name: $"($xml.attributes.name).($method.attributes.name)"
+                    signatures: [($method.content|parse-signature)]
+                    belongs_to: $xml.attributes.name
+                  }|add-text-fields ($method.content|where tag == 'description'|get 0?))
+                }
+              ) ++ (
+                get-content 'members'
+                |each {|member|
+                  ({
+                    kind: 'property'
+                    name: $"($xml.attributes.name).($member.attributes.name)"
+                    type: $member.attributes.type
+                    default: $member.attributes.default?
+                    belongs_to: $xml.attributes.name
+                  }|add-text-fields $member)
+              }
+              )
+            }
+            |flatten
+          )
+        }
+      }
+    }
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: path
+      type: string
+      description: ''
+      optional: false
       default: null
       kind: positional
     - name: null

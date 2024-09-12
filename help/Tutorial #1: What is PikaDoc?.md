@@ -1,4 +1,4 @@
-# Welcome to the PikaDoc CLI!
+# What is PikaDoc?
 
 PikaDoc is a human-readable, structured documentation format. The `pikadoc` CLI is a tool for rapidly generating and reading `pkd` doctables with advanced search features. This tutorial will go through the basics of reading and generating documentation using `pikadoc`.
 

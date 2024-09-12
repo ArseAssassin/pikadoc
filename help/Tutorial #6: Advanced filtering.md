@@ -1,3 +1,5 @@
+# Advanced filtering
+
 Sometimes we can't find what we need by headlines alone. You can use `doc search` to search through entire symbol definitions:
 
 ```nushell
@@ -20,4 +22,4 @@ When you query symbols with `doc`, the results are transformed to make them easi
 doc pkd-doctable|get 0
 ```
 
-This covers the basics of reading and generating doctables using pikadoc. If you're curious about advanced usage, feel free to keep working through this tutorial.
+This covers the basics of reading and generating doctables using pikadoc. If you're curious about more advanced usage, feel free to keep working through this tutorial.

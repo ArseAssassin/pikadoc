@@ -1,3 +1,5 @@
+# Appendix: Additional commands
+
 Here are some additional commands you might find useful:
 
 ```nushell

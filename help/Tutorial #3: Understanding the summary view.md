@@ -1,3 +1,5 @@
+# Understanding the summary view
+
 By default, search results returned by `doc` are limited to 20 - to show more results you can type in `doc more`.
 
 ```nushell

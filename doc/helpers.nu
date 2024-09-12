@@ -30,3 +30,4 @@ export def 'profile get' [name:string, defaultValue:any] {
 export def 'profile set' [name:string, value:any] {
   profile|merge {$name: $value}|to yaml|save -f (profile file)
 }
+

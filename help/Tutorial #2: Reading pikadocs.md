@@ -1,3 +1,5 @@
+# Reading pikadocs
+
 The simplest possible pikadoc command is `doc`. If you try running it now, you should see a notice telling you that no doctable has been selected for use. To change that, we can run a pikadoc generator to mount one:
 
 ```nushell

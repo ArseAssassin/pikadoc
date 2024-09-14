@@ -81,16 +81,22 @@ let config = $env.config|upsert hooks {
       $env.pkd.page_output == true and
       $env.pkd.skip_pager != true
     )
+    let should_skip_pager = $env.pkd.skip_pager? == true
+
     let should_summarize = $env.pkd.summarize_output == true
 
-    let output = if (
+    $env.pkd.page_output = true
+    $env.pkd.summarize_output = true
+    $env.pkd.skip_pager = false
+
+    if (
       $should_summarize and
       ($output_type|str starts-with 'record<#: int')
     ) {
       $output.'#'|doc history symbols add
       $output|do $env.PKD_CONFIG.present_symbol_command
     } else if ($is_output_list) {
-      if (not $env.pkd.skip_pager) {
+      if (not $should_skip_pager) {
         doc page results clear
       }
 
@@ -116,12 +122,6 @@ let config = $env.config|upsert hooks {
     } else {
       $output
     }
-
-    $env.pkd.page_output = true
-    $env.pkd.summarize_output = true
-    $env.pkd.skip_pager = false
-
-    $output
   }
 }
 $env.config = $config

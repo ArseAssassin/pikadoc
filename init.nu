@@ -50,7 +50,16 @@ $env.PKD_CONFIG = {
     |do $env.PKD_CONFIG.pager_command
   }
   summarize_command: {
-    each { select '#'? ns? name? kind? summary? }
+    let table = $in
+
+    if ('signatures' in ($table|columns)) {
+      $table
+      |upsert signatures {|row| $row.signatures?|default []|doc present-signatures }
+      |select '#'? ns? name? kind? summary? signatures?
+    } else {
+      $table
+      |select '#'? ns? name? kind? summary?
+    }
   }
   table_max_rows: 20
 }
@@ -70,27 +79,36 @@ let config = $env.config|upsert hooks {
 
     let should_page = (
       $env.pkd.page_output == true and
-      $is_output_list and
-      ($output|length) > $env.PKD_CONFIG.table_max_rows
+      $env.pkd.skip_pager != true
     )
     let should_summarize = $env.pkd.summarize_output == true
 
-    $env.pkd.page_output = null
-    $env.pkd.summarize_output = null
-
-    if ($should_summarize and ($output_type|str starts-with 'record<#: int')) {
+    let output = if (
+      $should_summarize and
+      ($output_type|str starts-with 'record<#: int')
+    ) {
       $output.'#'|doc history symbols add
       $output|do $env.PKD_CONFIG.present_symbol_command
     } else if ($is_output_list) {
-      if ($should_summarize) {
-        $output|do $env.PKD_CONFIG.summarize_command
-      } else {
-        $output
+      if (not $env.pkd.skip_pager) {
+        doc page results clear
       }
+
+      $output
       |if ($should_page) {
         let results = $in
-        doc page results use $results
-        doc page
+
+        if (($output|length) > $env.PKD_CONFIG.table_max_rows) {
+          doc page results use $results $should_summarize
+          doc page
+        } else {
+          $results
+        }
+      } else {
+        $in
+      }
+      |if ($should_summarize) {
+        do $env.PKD_CONFIG.summarize_command
       } else {
         $in
       }
@@ -98,19 +116,33 @@ let config = $env.config|upsert hooks {
     } else {
       $output
     }
+
+    $env.pkd.page_output = true
+    $env.pkd.summarize_output = true
+    $env.pkd.skip_pager = false
+
+    $output
   }
 }
 $env.config = $config
 
 $env.pkd = {
-  summarize_output: false
-  page_output: false
+  summarize_output: true
+  page_output: true
   symbol_history: []
   cursor: 0
+  page_summarize: true
+  skip_pager: false
   results: null
 }
 
 alias 'doc save' = doc doctable save
 alias 'doc more' = doc page next
+
+source (if ('~/.config/pikadoc/pikadocrc.nu'|path exists) {
+  '~/.config/pikadoc/pikadocrc.nu'
+} else {
+  'pikadocrc.example.nu'
+})
 
 print ($"**Welcome to pikadoc** - to get started, type `doc tutor`"|glow -sauto)

@@ -62,13 +62,15 @@ def parse-body-text [] {
 }
 
 export def --env use [path:string] {
+  let generator_command = $"src:godot ($path|to nuon)"
   do --env $env.DOC_USE {
     cd $path
 
     {
       about: {
         name: 'godot'
-        text_format: 'markdown'
+        generator: 'src:godot'
+        generator_command: $generator_command
       },
       doctable: (
         ls *.xml
@@ -129,11 +131,23 @@ export def --env use [path:string] {
                 default: $member.attributes.default?
                 belongs_to: $xml.attributes.name
               }|add-text-fields $member)
-          }
-          )
+          }) ++ (
+            get-content 'constants'
+            |each {|constant|
+              ({
+                kind: (if ($constant.attributes.enum?) != null {
+                  'enum'
+                } else {
+                  'constant'
+                })
+                name: $"($xml.attributes.name).($constant.attributes.enum?|if ($in != null) { $in + '.' })($constant.attributes.name)"
+                value: $constant.attributes.value?
+                belongs_to: $xml.attributes.name
+              }|add-text-fields $constant)
+          })
         }
         |flatten
       )
     }
-  }
+  } $generator_command
 }

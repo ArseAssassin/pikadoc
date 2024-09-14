@@ -43,36 +43,24 @@ export use page.nu
 # doc --full|get 10
 # ```
 export def --env main [
-  query?        # (string) query to search for, (int) symbol to select
-  --full        # show full, raw results from doctable
-  --all         # show all results without paging
+  query? # (string) query to search for, (int) symbol to select
 ] {
-  if (('PKD_CURRENT' in $env) != true) {
-    print "No docfile currently selected. Type `doc use <path>` to select a docfile to use."
-    return
-  }
-
-  if ($env.pkd.summarize_output == null) {
-    $env.pkd.summarize_output = not $full
-  }
-  if ($env.pkd.page_output == null) {
-    $env.pkd.page_output = not $all
-  }
-
-  if ($all) {
-    page results clear
+  let input = $in
+  let docs = if ($input != null) {
+    $input
+  } else if ('PKD_CURRENT' in $env) {
+    pkd-doctable
+    |add-doc-ids
+  } else {
+    return "No docfile currently selected. Type `doc use <path>` to select a docfile to use."
   }
 
   if (($query|describe) == 'int') {
-    pkd-doctable
-    |add-doc-ids
-    |get $query
+    $docs|where {$in.'#' == ($query)}|first
   } else if (($query|describe) == 'string') {
     let query = ($query|str downcase)
     let search = (
-      pkd-doctable
-      |add-doc-ids
-      |find $query -c ['name', 'summary']
+      $docs|find $query -c ['name', 'summary']
     )
 
     $search
@@ -85,9 +73,30 @@ export def --env main [
     |sort-by dist
     |reject dist
   } else {
-    pkd-doctable
-    |add-doc-ids
+    $docs
   }
+}
+
+# Controls displayed output. If `--all` is set, displayed results won't be paged. If `--full` is set, symbols won't be summarized or formatted for output.
+#
+# ### Examples:
+# ```nushell
+# # Dump all symbols formatted as a raw table
+# doc|doc output --full --all
+#
+# # Dump the raw data table for symbol #10
+# doc|get 10|doc output --full
+# ```
+export def --env output [
+  --all
+  --full
+  ] {
+  let result = $in
+
+  $env.pkd.page_output = not $all
+  $env.pkd.summarize_output = not $full
+
+  $result
 }
 
 # Returns a table of recently used symbols
@@ -140,8 +149,8 @@ export def --env search [
     return
   }
 
-  main --full
-  |find ($query) -c ['description']
+  main
+  |find $query -c ['description']
   |insert ranking {|row| (
     $row.description
     |ansi strip
@@ -150,11 +159,12 @@ export def --env search [
     |length
   ) * -1}
   |sort-by ranking
-  |insert results {|row|
+  |insert matches {|row|
     $row.description
     |grep -F -i $query -A0 -B0 --group-separator='...' -m 5
   }
-  |select '#' name results
+  |select '#' name matches
+  |output --full
 }
 
 def add-doc-ids [] {
@@ -317,7 +327,7 @@ def present-type [] {
   })"
 }
 
-def present-signatures [] {
+export def present-signatures [] {
   each {|sig|
     (
       $sig

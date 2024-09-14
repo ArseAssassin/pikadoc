@@ -37,6 +37,7 @@
                 export PKD_VERSION=${version-number}
                 export PKD_HOME=${src}
                 export PKD_CONFIG_HOME=$HOME"/.config/pikadoc"
+
                 mkdir -p $PKD_CONFIG_HOME
 
                 CONFIG=$PKD_CONFIG_HOME"/config.nu"

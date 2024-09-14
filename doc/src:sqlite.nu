@@ -24,6 +24,7 @@ export def parse-from-db [] {
       name: $tbl.name
       columns: $columns
       source: $tbl.sql
+      description: $"```sql\n($tbl.sql|str trim)\n```"
       kind: (if ($tbl.type == 'index') { 'index' } else { 'table' })
     }] ++ (
       $columns
@@ -45,8 +46,9 @@ export def --env use [db] {
   do --env $env.DOC_USE {
     about: {
       name: $db
-      text_format: 'text'
+      text_format: 'markdown'
       generator: 'src:sqlite'
+      language: 'sql'
     }
     doctable: (open $db|parse-from-db)
   } $"src:sqlite use ($db)"

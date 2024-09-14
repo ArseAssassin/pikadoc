@@ -46,18 +46,6 @@ generator: src:nushell
       optional: true
       default: null
       kind: positional
-    - name: full
-      type: bool
-      description: show full, raw results from doctable
-      optional: true
-      default: null
-      kind: flag
-    - name: all
-      type: bool
-      description: show all results without paging
-      optional: true
-      default: null
-      kind: flag
     - name: null
       type: any
       description: null
@@ -461,6 +449,46 @@ generator: src:nushell
       optional: false
       default: null
       kind: return
+- name: doc output
+  summary: Controls displayed output. If `--all` is set, displayed results won't be paged. If `--full` is set, symbols won't be summarized or formatted for output.
+  kind: command
+  description: |-
+    Controls displayed output. If `--all` is set, displayed results won't be paged. If `--full` is set, symbols won't be summarized or formatted for output.
+
+    ### Examples:
+    ```nushell
+    # Dump all symbols formatted as a raw table
+    doc|doc output --full --all
+
+    # Dump the raw data table for symbol #10
+    doc|get 10|doc output --full
+    ```
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: all
+      type: bool
+      description: ''
+      optional: true
+      default: null
+      kind: flag
+    - name: full
+      type: bool
+      description: ''
+      optional: true
+      default: null
+      kind: flag
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
 - name: doc page
   summary: Shows current page of search results
   kind: command
@@ -550,6 +578,12 @@ generator: src:nushell
       description: ''
       optional: false
       default: null
+      kind: positional
+    - name: should_summarize
+      type: bool
+      description: ''
+      optional: true
+      default: true
       kind: positional
     - name: null
       type: any
@@ -646,6 +680,24 @@ generator: src:nushell
 
     ### Example:
         ```> doc pkd-doctable|get 0|doc present```
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc present-signatures
+  summary: ''
+  kind: command
+  description: ''
   examples: []
   signatures:
   - - name: null

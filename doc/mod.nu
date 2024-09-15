@@ -117,6 +117,7 @@ export def --env bookmarks [] {
   |each {|index| $docs|get $index}
 }
 
+# Returns the children of symbol `$in` as indicated by `belongs_to`
 export def --env children [] {
   let docId = get id?
 
@@ -128,6 +129,7 @@ export def --env children [] {
   }
 }
 
+# Returns the parent of symbol `$in` as indicated by `belongs_to`
 export def --env parent [] {
   let docId = get belongs_to?
 
@@ -263,6 +265,7 @@ export def pkd-doctable [] {
   $env.PKD_CURRENT.doctable
 }
 
+# Creates a string summary of symbol `$in`
 export def summarize [] {
   select '§'? ns? name? kind? summary?
   |if ($in.ns? == null) {
@@ -323,10 +326,11 @@ def present-type [] {
   $"($type.name?)(if (($type.name?|default '') != '' and ($type.type?|default '') != '') { ':' })($type.type?)(if ($type.optional? == true) { '?' })(if ($type.rest? == true) {
     '...'
   })(if ($type.default? != null) {
-    '=' + $type.default
+    '=' + ($type.default|to nuon)
   })"
 }
 
+# Presents symbol signatures `$in` as a string
 export def present-signatures [] {
   each {|sig|
     (
@@ -467,7 +471,7 @@ def cache-docs [name:string, docs:record] {
   }
 }
 
-# Tries to open sources for symbol $in for viewing. Searches `$symbol.defined_in` and `$symbol.source`. `$env.PKD_CONFIG.pager_command` is used to show the results.
+# Show sources for symbol $in. Fails if `$symbol.defined_in` and `$symbol.source` are undefined. `$env.PKD_CONFIG.pager_command` is used to show the results.
 #
 # ### Examples:
 # ```nushell
@@ -491,6 +495,7 @@ export def pkd-config [name:string] {
   $env.PKD_CONFIG|get $name
 }
 
-export def 'use help' [] {
+# Mounts pikadoc user guide as the current doctable
+export def --env help [] {
   do --env $env.DOC_USE ($env.PKD_HOME|path join 'user_guide.pkd')
 }

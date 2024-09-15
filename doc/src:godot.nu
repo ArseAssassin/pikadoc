@@ -61,6 +61,7 @@ def parse-body-text [] {
   |trim-triple-newlines
 }
 
+# Parses Godot game engine documentation for a doctable. $path should be a directory path to the engine's documentation XML files - for Godot 4 this is `/doc/classes/`.
 export def --env use [path:string] {
   let generator_command = $"src:godot ($path|to nuon)"
   do --env $env.DOC_USE {

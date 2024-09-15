@@ -2,7 +2,7 @@
 export def main [
   page:int=1 # page to show
 ] {
-  do --env $env.DOC_USE $"($env.PKD_HOME)/user_guide.pkd"
+  help
 
   let tutorials = (
     $env.PKD_CURRENT.doctable
@@ -10,7 +10,7 @@ export def main [
     |each {|row| $row.0|merge { '§': $row.1 }}
     |where {$in.name|str starts-with 'Tutorial'}
   )
-  print ($tutorials|get $page|do $env.PKD_CONFIG.present_symbol_command)
+  print ($tutorials|get ($page - 1)|do $env.PKD_CONFIG.present_symbol_command)
 
   if ($page < ($tutorials|length)) {
     print ($"Page ($page)/($tutorials|length). Type `doc tutor ($page + 1)` to show the next page")

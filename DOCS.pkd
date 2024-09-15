@@ -270,9 +270,9 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc children
-  summary: ''
+  summary: Returns the children of symbol `$in` as indicated by `belongs_to`
   kind: command
-  description: ''
+  description: Returns the children of symbol `$in` as indicated by `belongs_to`
   examples: []
   signatures:
   - - name: null
@@ -317,6 +317,24 @@ generator: src:nushell
       optional: true
       default: null
       kind: flag
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc help
+  summary: Mounts pikadoc user guide as the current doctable
+  kind: command
+  description: Mounts pikadoc user guide as the current doctable
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
     - name: null
       type: any
       description: null
@@ -450,9 +468,15 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc lib add
-  summary: ''
+  summary: Adds a doctable to the current library. `$mount` is a closure used to mount the correct doctable. If `$mount` is null, currently mounted doctable is used instead.
   kind: command
-  description: ''
+  description: |-
+    Adds a doctable to the current library. `$mount` is a closure used to mount the correct doctable. If `$mount` is null, currently mounted doctable is used instead.
+
+    ### Examples:
+    ```nushell
+    doc lib add { doc s use html }
+    ```
   examples: []
   signatures:
   - - name: null
@@ -474,9 +498,9 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc lib index
-  summary: ''
+  summary: Lists all doctables in the current library
   kind: command
-  description: ''
+  description: Lists all doctables in the current library
   examples: []
   signatures:
   - - name: null
@@ -492,9 +516,16 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc lib query
-  summary: ''
+  summary: Run `$query` against every doctable in the library. Sorts results by `relevance`. For every result, prefix `ns` with the source doctable name.
   kind: command
-  description: ''
+  description: |-
+    Run `$query` against every doctable in the library. Sorts results by `relevance`. For every result, prefix `ns` with the source doctable name.
+
+    ### Examples:
+    ```nushell
+    # Search all doctables in the current library for 'add'
+    doc lib query {doc add}
+    ```
   examples: []
   signatures:
   - - name: null
@@ -515,10 +546,54 @@ generator: src:nushell
       optional: false
       default: null
       kind: return
-- name: doc lib use
-  summary: ''
+- name: doc lib remove
+  summary: Removes `$doctable` from the current library. If `$doctable` is a string, it's used to match the name of the selected doctable. If `$doctable` is an int, it's matched with the `#` of the doctable, as returned by `doc lib index`.
   kind: command
-  description: ''
+  description: |-
+    Removes `$doctable` from the current library. If `$doctable` is a string, it's used to match the name of the selected doctable. If `$doctable` is an int, it's matched with the `#` of the doctable, as returned by `doc lib index`.
+
+    ### Examples:
+    ```nushell
+    # Removes doctable #0 from the current library
+    doc lib remove 0
+
+    # Removes doctable html from the current library
+    doc lib remove 'html'
+    ```
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: doctable
+      type: any
+      description: ''
+      optional: false
+      default: null
+      kind: positional
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc lib use
+  summary: Mounts `$doctable` as the current doctable. If `$doctable` is a string, it's used to match the name of the selected doctable. If `$doctable` is an int, it's matched with the `#` of the doctable, as returned by `doc lib index`.
+  kind: command
+  description: |-
+    Mounts `$doctable` as the current doctable. If `$doctable` is a string, it's used to match the name of the selected doctable. If `$doctable` is an int, it's matched with the `#` of the doctable, as returned by `doc lib index`.
+
+    ### Examples:
+    ```nushell
+    # Mount the first doctable in the current library
+    doc lib use 0
+
+    # Mount doctable named html in the current library
+    doc lib use html
+    ```
   examples: []
   signatures:
   - - name: null
@@ -682,9 +757,9 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc parent
-  summary: ''
+  summary: Returns the parent of symbol `$in` as indicated by `belongs_to`
   kind: command
-  description: ''
+  description: Returns the parent of symbol `$in` as indicated by `belongs_to`
   examples: []
   signatures:
   - - name: null
@@ -785,9 +860,9 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc present-signatures
-  summary: ''
+  summary: Presents symbol signatures `$in` as a string
   kind: command
-  description: ''
+  description: Presents symbol signatures `$in` as a string
   examples: []
   signatures:
   - - name: null
@@ -993,9 +1068,9 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc src:godot use
-  summary: ''
+  summary: Parses Godot game engine documentation for a doctable. $path should be a directory path to the engine's documentation XML files - for Godot 4 this is `/doc/classes/`.
   kind: command
-  description: ''
+  description: Parses Godot game engine documentation for a doctable. $path should be a directory path to the engine's documentation XML files - for Godot 4 this is `/doc/classes/`.
   examples: []
   signatures:
   - - name: null
@@ -1017,9 +1092,12 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc src:html use
-  summary: ''
+  summary: Attempts to parse all .html files under $path into a doctable. For internal links and page sectioning to work correctly, $path needs to be the root path of the HTML files - that is to say, if pages link to `manual/index.html`, `$path + 'manual/index.html'` must point to that file.
   kind: command
-  description: ''
+  description: |-
+    Attempts to parse all .html files under $path into a doctable. For internal links and page sectioning to work correctly, $path needs to be the root path of the HTML files - that is to say, if pages link to `manual/index.html`, `$path + 'manual/index.html'` must point to that file.
+
+    If $options includes `language`, all code blocks in the Markdown output are highlighted with that language. If $options includes `stripElements`, it is parsed as an XPath and used to remove elements that should not be included in the input.
   examples: []
   signatures:
   - - name: null
@@ -1030,13 +1108,13 @@ generator: src:nushell
       kind: input
     - name: path
       type: string
-      description: ''
+      description: directory path under which .html are located
       optional: false
       default: null
       kind: positional
     - name: options
       type: record
-      description: ''
+      description: additional parser options
       optional: true
       default: {}
       kind: positional
@@ -1359,9 +1437,9 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc summarize
-  summary: ''
+  summary: Creates a string summary of symbol `$in`
   kind: command
-  description: ''
+  description: Creates a string summary of symbol `$in`
   examples: []
   signatures:
   - - name: null
@@ -1441,24 +1519,6 @@ generator: src:nushell
       optional: false
       default: null
       kind: return
-- name: doc use help
-  summary: ''
-  kind: command
-  description: ''
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: input
-    - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: return
 - name: doc version
   summary: Returns current pikadoc version
   kind: command
@@ -1478,10 +1538,10 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc view-source
-  summary: Tries to open sources for symbol $in for viewing. Searches `$symbol.defined_in` and `$symbol.source`. `$env.PKD_CONFIG.pager_command` is used to show the results.
+  summary: Show sources for symbol $in. Fails if `$symbol.defined_in` and `$symbol.source` are undefined. `$env.PKD_CONFIG.pager_command` is used to show the results.
   kind: command
   description: |-
-    Tries to open sources for symbol $in for viewing. Searches `$symbol.defined_in` and `$symbol.source`. `$env.PKD_CONFIG.pager_command` is used to show the results.
+    Show sources for symbol $in. Fails if `$symbol.defined_in` and `$symbol.source` are undefined. `$env.PKD_CONFIG.pager_command` is used to show the results.
 
     ### Examples:
     ```nushell

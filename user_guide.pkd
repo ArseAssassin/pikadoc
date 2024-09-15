@@ -442,7 +442,7 @@ license: MIT
 
     This covers the basics of reading and generating doctables using pikadoc. If you're curious about more advanced usage, feel free to keep working through this tutorial.
 
-- name: 'Tutorial appendix #1: Additional commands'
+- name: 'Tutorial appendix: Additional commands'
   kind: 'tutorial'
   description: |
     # Appendix: Additional commands

@@ -22,7 +22,13 @@ def subheader-query [name] {
   $"//*[@id=\"(($name))\" or @name=\"(($name))\"][1]"
 }
 
-export def --env use [path:string, options:record={}] {
+# Attempts to parse all .html files under $path into a doctable. For internal links and page sectioning to work correctly, $path needs to be the root path of the HTML files - that is to say, if pages link to `manual/index.html`, `$path + 'manual/index.html'` must point to that file.
+#
+# If $options includes `language`, all code blocks in the Markdown output are highlighted with that language. If $options includes `stripElements`, it is parsed as an XPath and used to remove elements that should not be included in the input.
+export def --env use [
+  path:string,          # directory path under which .html are located
+  options:record={}     # additional parser options
+  ] {
   do --env $env.DOC_USE {
     cd $path
 

@@ -13,6 +13,7 @@ export use src:github.nu
 export use src:jsdoc.nu
 export use src:npm.nu
 export use src:godot.nu
+export use src:html.nu
 
 export use history.nu
 export use bookmarks.nu

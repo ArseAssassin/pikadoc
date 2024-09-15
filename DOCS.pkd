@@ -926,6 +926,36 @@ generator: src:nushell
       optional: false
       default: null
       kind: return
+- name: doc src:html use
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: path
+      type: string
+      description: ''
+      optional: false
+      default: null
+      kind: positional
+    - name: options
+      type: record
+      description: ''
+      optional: true
+      default: {}
+      kind: positional
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
 - name: doc src:jsdoc is-jsdoc-module
   summary: |-
     Attempts to detect whether given path contains any jsdoc annotations

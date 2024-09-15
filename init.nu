@@ -31,6 +31,9 @@ $env.PKD_CONFIG = {
   npx_command: {|...args:string|
     run-external 'npx' ...$args
   }
+  tidy_command: {||
+   tidy -c --output-xhtml yes --doctype omit
+  }
   pager_command: {|file?:string, line?:int|
     let s = $in
     if ($file == null and $s != null) {

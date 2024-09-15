@@ -110,6 +110,9 @@ export def --env use [
             kind: 'page'
             id: $page.name
             ns: $page.name
+            defined_in: {
+              file: ($page.name|path expand)
+            }
           }] ++ (
             $sectioned_doc
             |split row '    PIKADOC_PAGE_BREAK ::: '

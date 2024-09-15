@@ -5,18 +5,18 @@ generator: src:nushell
 
 ---
 - name: doc
-  summary: Filters current doctable using $query. If $query is null, returns full list of all symbols in current doctable. If $query is `int`, gets symbol with that index.
+  summary: Filters current doctable using $query. If $query is null, returns full list of all symbols in current doctable. If $query is `int`, returns symbol with that index.
   kind: command
   description: |-
-    Filters current doctable using $query. If $query is null, returns full list of all symbols in current doctable. If $query is `int`, gets symbol with that index.
+    Filters current doctable using $query. If $query is null, returns full list of all symbols in current doctable. If $query is `int`, returns symbol with that index.
 
     By default search results are paged according to `$env.PKD_CONFIG.table_max_rows` (use `doc page next` to show more results). In addition, all results are summarized using `$env.PKD_CONFIG.summarize_command`.
 
-    If flag `--full` is passed, symbols returned by your command will be displayed without applying any formatting to the output. If flag `--all` is passed, all results will be shown without using the pager.
+    By default, additional filtering is done when displaying symbols. See `doc output` for more information.
 
     ### Examples:
 
-    ```nushell
+    ```nu
     # Return paged list of all symbols in doc
     doc
 
@@ -25,14 +25,8 @@ generator: src:nushell
 
     # Show symbol #4
     doc 4
-
-    # Dump the entire doctable formatted as a table
-    doc --full --all
-
-    # Dump the raw data table for symbol #10
-    doc --full|get 10
     ```
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -56,7 +50,7 @@ generator: src:nushell
   summary: Returns a table of bookmarked symbols
   kind: command
   description: Returns a table of bookmarked symbols
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -74,7 +68,7 @@ generator: src:nushell
   summary: Adds $index to the list of bookmarked symbols. If $index is not defined, add the last symbol viewed
   kind: command
   description: Adds $index to the list of bookmarked symbols. If $index is not defined, add the last symbol viewed
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -98,7 +92,7 @@ generator: src:nushell
   summary: Clears the bookmark list for this doctable
   kind: command
   description: Clears the bookmark list for this doctable
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -116,7 +110,7 @@ generator: src:nushell
   summary: Returns the list of bookmarked symbol indices in current doctable
   kind: command
   description: Returns the list of bookmarked symbol indices in current doctable
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -134,7 +128,7 @@ generator: src:nushell
   summary: Removes $index from the list of bookmarked symbols
   kind: command
   description: Removes $index from the list of bookmarked symbols
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -164,7 +158,7 @@ generator: src:nushell
     Returns a list of doctables cached in the local filesystem.
     `cache path` returns the directory used for storing files.
     See `doc cache clear` for details on cache management.
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -197,7 +191,7 @@ generator: src:nushell
 
     # adjust max cache size
     let pkdConfig = $env.PKD_CONFIG|merge { cache_max_size: ('200Mb'|into filesize) }; $env.PKD_CONFIG = $pkdConfig
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -215,7 +209,7 @@ generator: src:nushell
   summary: Escapes special characters in input command to use it as a valid Unix path
   kind: command
   description: Escapes special characters in input command to use it as a valid Unix path
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -233,7 +227,7 @@ generator: src:nushell
   summary: Initializes cache
   kind: command
   description: Initializes cache
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -255,7 +249,7 @@ generator: src:nushell
   description: |-
     Returns the path to the cache directory that's currently
     being used.
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -273,7 +267,7 @@ generator: src:nushell
   summary: Returns the children of symbol `$in` as indicated by `belongs_to`
   kind: command
   description: Returns the children of symbol `$in` as indicated by `belongs_to`
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -287,11 +281,660 @@ generator: src:nushell
       optional: false
       default: null
       kind: return
-- name: doc doctable save
+- name: doc help
+  summary: Mounts pikadoc user guide as the current doctable
+  kind: command
+  description: Mounts pikadoc user guide as the current doctable
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc history
+  summary: Returns a table of recently used symbols
+  kind: command
+  description: Returns a table of recently used symbols
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc history doctables
+  summary: Returns a list of the last 50 doctables selected with `doc use`
+  kind: command
+  description: Returns a list of the last 50 doctables selected with `doc use`
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc history doctables add
+  summary: Adds $in to the doctable history
+  kind: command
+  description: Adds $in to the doctable history
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc history doctables clear
+  summary: Deletes the history file
+  kind: command
+  description: Deletes the history file
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc history symbols
+  summary: Returns the list of recently viewed symbols
+  kind: command
+  description: Returns the list of recently viewed symbols
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc history symbols add
+  summary: Adds $in to the list of recently viewed symbols
+  kind: command
+  description: Adds $in to the list of recently viewed symbols
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc history symbols clear
+  summary: Clears the list of recently viewed symbols
+  kind: command
+  description: Clears the list of recently viewed symbols
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc lib
+  summary: Allows you to query any doctable in the current library. `$doctable` is the name or index of the doctable. `$query` works similarly as when calling `doc`.
+  kind: command
+  description: Allows you to query any doctable in the current library. `$doctable` is the name or index of the doctable. `$query` works similarly as when calling `doc`.
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: doctable
+      type: any
+      description: ''
+      optional: false
+      default: null
+      kind: positional
+    - name: query
+      type: any
+      description: ''
+      optional: true
+      default: null
+      kind: positional
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc lib add
+  summary: Adds a doctable to the current library. `$mount` is a closure used to mount the correct doctable. If `$mount` is null, currently mounted doctable is used instead.
+  kind: command
+  description: |-
+    Adds a doctable to the current library. `$mount` is a closure used to mount the correct doctable. If `$mount` is null, currently mounted doctable is used instead.
+
+    ### Examples:
+    ```nu
+    doc lib add { doc s use html }
+    ```
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: mount
+      type: closure()
+      description: ''
+      optional: true
+      default: null
+      kind: positional
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc lib clear
+  summary: Clears all doctables from the current library
+  kind: command
+  description: Clears all doctables from the current library
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc lib index
+  summary: Lists all doctables in the current library
+  kind: command
+  description: Lists all doctables in the current library
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc lib load
+  summary: Loads a saved `$library_file` and replaces the current library with it. Assumes that all doctables are stored in relative path to `$library_file`.
+  kind: command
+  description: Loads a saved `$library_file` and replaces the current library with it. Assumes that all doctables are stored in relative path to `$library_file`.
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: library_file
+      type: string
+      description: ''
+      optional: false
+      default: null
+      kind: positional
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc lib query
+  summary: Run `$query` against every doctable in the library. Sorts results by `relevance`. For every result, prefix `ns` with the source doctable name.
+  kind: command
+  description: |-
+    Run `$query` against every doctable in the library. Sorts results by `relevance`. For every result, prefix `ns` with the source doctable name.
+
+    ### Examples:
+    ```nu
+    # Search all doctables in the current library for 'add'
+    doc lib query {doc 'module'}
+    ```
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: query
+      type: closure()
+      description: query to run for each doctable
+      optional: false
+      default: null
+      kind: positional
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc lib remove
+  summary: Removes `$doctable` from the current library. If `$doctable` is a string, it's used to match the name of the selected doctable. If `$doctable` is an int, it's matched with the `#` of the doctable, as returned by `doc lib index`.
+  kind: command
+  description: |-
+    Removes `$doctable` from the current library. If `$doctable` is a string, it's used to match the name of the selected doctable. If `$doctable` is an int, it's matched with the `#` of the doctable, as returned by `doc lib index`.
+
+    ### Examples:
+    ```nu
+    # Removes doctable #0 from the current library
+    doc lib remove 0
+
+    # Removes doctable html from the current library
+    doc lib remove 'html'
+    ```
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: doctable
+      type: any
+      description: ''
+      optional: false
+      default: null
+      kind: positional
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc lib save
+  summary: Saves current library into `$library_file` with all doctables in the current library. If `$doc_path` is passed, it's joined to `$library_file` to get the directory where pkd files should be saved.
+  kind: command
+  description: Saves current library into `$library_file` with all doctables in the current library. If `$doc_path` is passed, it's joined to `$library_file` to get the directory where pkd files should be saved.
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: library_file
+      type: string
+      description: ''
+      optional: false
+      default: null
+      kind: positional
+    - name: doc_path
+      type: string
+      description: ''
+      optional: true
+      default: ''
+      kind: positional
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc lib use
+  summary: Mounts `$doctable` as the current doctable. If `$doctable` is a string, it's used to match the name of the selected doctable. If `$doctable` is an int, it's matched with the `#` of the doctable, as returned by `doc lib index`.
+  kind: command
+  description: |-
+    Mounts `$doctable` as the current doctable. If `$doctable` is a string, it's used to match the name of the selected doctable. If `$doctable` is an int, it's matched with the `#` of the doctable, as returned by `doc lib index`.
+
+    ### Examples:
+    ```nu
+    # Mount the first doctable in the current library
+    doc lib use 0
+
+    # Mount doctable named html in the current library
+    doc lib use html
+    ```
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: doctable
+      type: any
+      description: ''
+      optional: false
+      default: null
+      kind: positional
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc next
+  summary: Selects next symbol in current doctable
+  kind: command
+  description: Selects next symbol in current doctable
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc output
+  summary: Controls displayed output. If `--all` is set, displayed results won't be paged. If `--full` is set, symbols won't be summarized or formatted for output.
+  kind: command
+  description: |-
+    Controls displayed output. If `--all` is set, displayed results won't be paged. If `--full` is set, symbols won't be summarized or formatted for output.
+
+    ### Examples:
+    ```nu
+    # Dump all symbols formatted as a raw table
+    doc|doc output --full --all
+
+    # Dump the raw data table for symbol #10
+    doc|get 10|doc output --full
+    ```
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: all
+      type: bool
+      description: ''
+      optional: true
+      default: null
+      kind: flag
+    - name: full
+      type: bool
+      description: ''
+      optional: true
+      default: null
+      kind: flag
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc page
+  summary: Shows current page of search results
+  kind: command
+  description: Shows current page of search results
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc page next
+  summary: Browses to the next page of search results. `doc more` is an alias of this
+  kind: command
+  description: Browses to the next page of search results. `doc more` is an alias of this
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc page previous
+  summary: Browses to the previous page of search results
+  kind: command
+  description: Browses to the previous page of search results
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc page results clear
+  summary: Clears current results from the pager
+  kind: command
+  description: Clears current results from the pager
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc page results use
+  summary: Mounts $results for use by the pager
+  kind: command
+  description: Mounts $results for use by the pager
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: results
+      type: any
+      description: ''
+      optional: false
+      default: null
+      kind: positional
+    - name: should_summarize
+      type: bool
+      description: ''
+      optional: true
+      default: true
+      kind: positional
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc parent
+  summary: Returns the parent of symbol `$in` as indicated by `belongs_to`
+  kind: command
+  description: Returns the parent of symbol `$in` as indicated by `belongs_to`
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc pkd about
+  summary: Returns the header section for the currently mounted doctable
+  kind: command
+  description: Returns the header section for the currently mounted doctable
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc pkd config
+  summary: Returns configuration value for $name
+  kind: command
+  description: Returns configuration value for $name
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: name
+      type: string
+      description: ''
+      optional: false
+      default: null
+      kind: positional
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc pkd doctable
+  summary: Returns the body section for the currently mounted doctable
+  kind: command
+  description: Returns the body section for the currently mounted doctable
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc pkd full
+  summary: Returns the current doctable, unabridged
+  kind: command
+  description: Returns the current doctable, unabridged
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc pkd save
   summary: Saves doctable in the filesystem.
   kind: command
   description: Saves doctable in the filesystem.
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -323,161 +966,22 @@ generator: src:nushell
       optional: false
       default: null
       kind: return
-- name: doc help
-  summary: Mounts pikadoc user guide as the current doctable
-  kind: command
-  description: Mounts pikadoc user guide as the current doctable
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: input
-    - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: return
-- name: doc history
-  summary: Returns a table of recently used symbols
-  kind: command
-  description: Returns a table of recently used symbols
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: input
-    - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: return
-- name: doc history doctables
-  summary: Returns a list of the last 50 doctables selected with `doc use`
-  kind: command
-  description: Returns a list of the last 50 doctables selected with `doc use`
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: input
-    - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: return
-- name: doc history doctables add
-  summary: Adds $in to the doctable history
-  kind: command
-  description: Adds $in to the doctable history
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: input
-    - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: return
-- name: doc history doctables clear
-  summary: Deletes the history file
-  kind: command
-  description: Deletes the history file
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: input
-    - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: return
-- name: doc history symbols
-  summary: Returns the list of recently viewed symbols
-  kind: command
-  description: Returns the list of recently viewed symbols
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: input
-    - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: return
-- name: doc history symbols add
-  summary: Adds $in to the list of recently viewed symbols
-  kind: command
-  description: Adds $in to the list of recently viewed symbols
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: input
-    - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: return
-- name: doc history symbols clear
-  summary: Clears the list of recently viewed symbols
-  kind: command
-  description: Clears the list of recently viewed symbols
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: input
-    - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: return
-- name: doc lib add
-  summary: Adds a doctable to the current library. `$mount` is a closure used to mount the correct doctable. If `$mount` is null, currently mounted doctable is used instead.
+- name: doc pkd use
+  summary: Sets the current doctable.
   kind: command
   description: |-
-    Adds a doctable to the current library. `$mount` is a closure used to mount the correct doctable. If `$mount` is null, currently mounted doctable is used instead.
+    Sets the current doctable.
 
-    ### Examples:
-    ```nushell
-    doc lib add { doc s use html }
-    ```
-  examples: []
+    `docs` is either a file in the local filesystem or a pikadoc table.
+
+    Examples
+
+    # Use a docfile from local filesystem
+      ```doc use my-doc-file.pkd```
+
+    # Use a docfile downloaded from a server
+      ```doc use (http get 'https://raw.githubusercontent.com/ArseAssassin/pikadoc/master/reference-docs.pkd'|from yaml)```
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -485,329 +989,16 @@ generator: src:nushell
       optional: false
       default: null
       kind: input
-    - name: mount
-      type: closure()
-      description: ''
-      optional: true
-      default: null
-      kind: positional
-    - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: return
-- name: doc lib index
-  summary: Lists all doctables in the current library
-  kind: command
-  description: Lists all doctables in the current library
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: input
-    - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: return
-- name: doc lib query
-  summary: Run `$query` against every doctable in the library. Sorts results by `relevance`. For every result, prefix `ns` with the source doctable name.
-  kind: command
-  description: |-
-    Run `$query` against every doctable in the library. Sorts results by `relevance`. For every result, prefix `ns` with the source doctable name.
-
-    ### Examples:
-    ```nushell
-    # Search all doctables in the current library for 'add'
-    doc lib query {doc add}
-    ```
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: input
-    - name: query
-      type: closure()
-      description: ''
-      optional: false
-      default: null
-      kind: positional
-    - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: return
-- name: doc lib remove
-  summary: Removes `$doctable` from the current library. If `$doctable` is a string, it's used to match the name of the selected doctable. If `$doctable` is an int, it's matched with the `#` of the doctable, as returned by `doc lib index`.
-  kind: command
-  description: |-
-    Removes `$doctable` from the current library. If `$doctable` is a string, it's used to match the name of the selected doctable. If `$doctable` is an int, it's matched with the `#` of the doctable, as returned by `doc lib index`.
-
-    ### Examples:
-    ```nushell
-    # Removes doctable #0 from the current library
-    doc lib remove 0
-
-    # Removes doctable html from the current library
-    doc lib remove 'html'
-    ```
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: input
-    - name: doctable
+    - name: docs
       type: any
       description: ''
       optional: false
       default: null
       kind: positional
-    - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: return
-- name: doc lib use
-  summary: Mounts `$doctable` as the current doctable. If `$doctable` is a string, it's used to match the name of the selected doctable. If `$doctable` is an int, it's matched with the `#` of the doctable, as returned by `doc lib index`.
-  kind: command
-  description: |-
-    Mounts `$doctable` as the current doctable. If `$doctable` is a string, it's used to match the name of the selected doctable. If `$doctable` is an int, it's matched with the `#` of the doctable, as returned by `doc lib index`.
-
-    ### Examples:
-    ```nushell
-    # Mount the first doctable in the current library
-    doc lib use 0
-
-    # Mount doctable named html in the current library
-    doc lib use html
-    ```
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: input
-    - name: doctable
-      type: any
-      description: ''
-      optional: false
-      default: null
-      kind: positional
-    - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: return
-- name: doc output
-  summary: Controls displayed output. If `--all` is set, displayed results won't be paged. If `--full` is set, symbols won't be summarized or formatted for output.
-  kind: command
-  description: |-
-    Controls displayed output. If `--all` is set, displayed results won't be paged. If `--full` is set, symbols won't be summarized or formatted for output.
-
-    ### Examples:
-    ```nushell
-    # Dump all symbols formatted as a raw table
-    doc|doc output --full --all
-
-    # Dump the raw data table for symbol #10
-    doc|get 10|doc output --full
-    ```
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: input
-    - name: all
-      type: bool
-      description: ''
-      optional: true
-      default: null
-      kind: flag
-    - name: full
-      type: bool
-      description: ''
-      optional: true
-      default: null
-      kind: flag
-    - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: return
-- name: doc page
-  summary: Shows current page of search results
-  kind: command
-  description: Shows current page of search results
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: input
-    - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: return
-- name: doc page next
-  summary: Browses to the next page of search results. `doc more` is an alias of this
-  kind: command
-  description: Browses to the next page of search results. `doc more` is an alias of this
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: input
-    - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: return
-- name: doc page previous
-  summary: Browses to the previous page of search results
-  kind: command
-  description: Browses to the previous page of search results
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: input
-    - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: return
-- name: doc page results clear
-  summary: Clears current results from the pager
-  kind: command
-  description: Clears current results from the pager
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: input
-    - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: return
-- name: doc page results use
-  summary: Mounts $results for use by the pager
-  kind: command
-  description: Mounts $results for use by the pager
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: input
-    - name: results
-      type: any
-      description: ''
-      optional: false
-      default: null
-      kind: positional
-    - name: should_summarize
-      type: bool
-      description: ''
-      optional: true
-      default: true
-      kind: positional
-    - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: return
-- name: doc parent
-  summary: Returns the parent of symbol `$in` as indicated by `belongs_to`
-  kind: command
-  description: Returns the parent of symbol `$in` as indicated by `belongs_to`
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: input
-    - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: return
-- name: doc pkd-about
-  summary: Returns the header section for the currently mounted doctable
-  kind: command
-  description: Returns the header section for the currently mounted doctable
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: input
-    - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: return
-- name: doc pkd-config
-  summary: Returns configuration value for $name
-  kind: command
-  description: Returns configuration value for $name
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: input
-    - name: name
+    - name: command
       type: string
       description: ''
-      optional: false
+      optional: true
       default: null
       kind: positional
     - name: null
@@ -816,11 +1007,11 @@ generator: src:nushell
       optional: false
       default: null
       kind: return
-- name: doc pkd-doctable
-  summary: Returns the body section for the currently mounted doctable
+- name: doc pkd version
+  summary: Returns current pikadoc version
   kind: command
-  description: Returns the body section for the currently mounted doctable
-  examples: []
+  description: Returns current pikadoc version
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -835,17 +1026,16 @@ generator: src:nushell
       default: null
       kind: return
 - name: doc present
-  summary: |-
-    Presents the symbol passed in as input as tidily formatted output.
-    Useful for showing the results of custom queries.
+  summary: Presents the symbol `$in` as formatted output.
   kind: command
   description: |-
-    Presents the symbol passed in as input as tidily formatted output.
-    Useful for showing the results of custom queries.
+    Presents the symbol `$in` as formatted output.
 
-    ### Example:
-        ```> doc pkd-doctable|get 0|doc present```
-  examples: []
+    ### Examples:
+    ```nu
+    doc|get 0|doc present
+    ```
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -863,7 +1053,25 @@ generator: src:nushell
   summary: Presents symbol signatures `$in` as a string
   kind: command
   description: Presents symbol signatures `$in` as a string
-  examples: []
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc previous
+  summary: Selects previous symbol in current doctable
+  kind: command
+  description: Selects previous symbol in current doctable
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -885,7 +1093,7 @@ generator: src:nushell
   description: |-
     Returns a list of doctables available in the pikadoc central repository.
     See `doc s use` for more information.
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -910,7 +1118,7 @@ generator: src:nushell
 
     ### Example:
         ```> doc s python~3.13```
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -934,7 +1142,7 @@ generator: src:nushell
   summary: Searches the descriptions of all symbols in the current doctable for $query. System grep is used for matching output.
   kind: command
   description: Searches the descriptions of all symbols in the current doctable for $query. System grep is used for matching output.
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -962,7 +1170,7 @@ generator: src:nushell
   description: |-
     Retrieves a list of available documentation files from devdocs.io
     and returns them as a table
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -990,7 +1198,7 @@ generator: src:nushell
     use `doc s` over this when possible. If `options` is passed,
     `$options.stripElements` should be an XPath selector that's used
     to strip unnecessary elements from the HTML input.
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -1034,14 +1242,14 @@ generator: src:nushell
     not passed an argument, default branch of the project is chosen.
 
     ### Examples:
-    ```nushell
+    ```nu
     # Use the docs available in the pikadoc GitHub repository
     > doc src:github use ArseAssassin/pikadoc
 
     # Use the docs available in the nushell GitHub repository
     > doc src:github use nushell
     ```
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -1071,7 +1279,7 @@ generator: src:nushell
   summary: Parses Godot game engine documentation for a doctable. $path should be a directory path to the engine's documentation XML files - for Godot 4 this is `/doc/classes/`.
   kind: command
   description: Parses Godot game engine documentation for a doctable. $path should be a directory path to the engine's documentation XML files - for Godot 4 this is `/doc/classes/`.
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -1098,7 +1306,7 @@ generator: src:nushell
     Attempts to parse all .html files under $path into a doctable. For internal links and page sectioning to work correctly, $path needs to be the root path of the HTML files - that is to say, if pages link to `manual/index.html`, `$path + 'manual/index.html'` must point to that file.
 
     If $options includes `language`, all code blocks in the Markdown output are highlighted with that language. If $options includes `stripElements`, it is parsed as an XPath and used to remove elements that should not be included in the input.
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -1132,7 +1340,7 @@ generator: src:nushell
   description: |-
     Attempts to detect whether given path contains any jsdoc annotations
     in .js files.
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -1162,11 +1370,11 @@ generator: src:nushell
     `less $"($env.PKD_HOME)/doc/jsdoc-run"`
 
     ### Examples:
-    ```nushell
+    ```nu
     # Mount jsdocs for ramda.js
     > doc src:jsdoc use node_modules/ramda/src/
     ```
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -1195,10 +1403,10 @@ generator: src:nushell
     Takes the name of the manual entry as an argument and parses the command line options for that entry. The generated doctable is selected as the current doctable.
 
     ### Examples:
-    ```nushell
+    ```nu
     > doc src:man use "cat"
     ```
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -1209,6 +1417,30 @@ generator: src:nushell
     - name: it
       type: string
       description: name of the man page
+      optional: false
+      default: null
+      kind: positional
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc src:md use
+  summary: Loads all .md files from $path and parses them into a doctable.
+  kind: command
+  description: Loads all .md files from $path and parses them into a doctable.
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: path
+      type: string
+      description: ''
       optional: false
       default: null
       kind: positional
@@ -1230,14 +1462,14 @@ generator: src:nushell
     if available.
 
     ### Examples:
-    ```nushell
+    ```nu
     # Generate docs for ramda.js npm package
     > doc src:npm use ramda
 
     # Generate docs for an old version
     > doc src:npm use ramda@0.29.1
     ```
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -1264,7 +1496,7 @@ generator: src:nushell
     Generates doctable from nushell module with `name` and selects it as the current doctable
 
     Example: doc src:nushell use "doc"
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -1293,7 +1525,7 @@ generator: src:nushell
     `url` is fetched using a GET request
 
     Example: doc src:openapi use "https://petstore.swagger.io/v2/swagger.json"
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -1320,11 +1552,11 @@ generator: src:nushell
     Queries a PostgreSQL database for definitions. All tables, views and functions that can be found are mounted as a doctable.
 
     ### Examples:
-    ```nushell
+    ```nu
     # Parses database 'my_database'.'schema' for definitions
     > doc src:psql use 'public' '-d' 'my_database'
     ```
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -1357,14 +1589,14 @@ generator: src:nushell
     Generates a doctable from Python `$module`. Invokes `$env.PKD_CONFIG.python_command` to run a script using `python3` found using PATH. Doesn't install packages.
 
     ### Examples:
-    ```nushell
+    ```nu
     # Generates a doctable from a locally installed package
     > doc src:python use flask
 
     # Generates a doctable from a locally installed package
     > doc src:python use flask
     ```
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -1393,7 +1625,7 @@ generator: src:nushell
     `in` is a valid sqlite database.
 
     Example: open my-database.db|doc src:sqlite parse-from-db
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -1416,7 +1648,7 @@ generator: src:nushell
     `db` is a path to your sqlite database
 
     Example: doc src:sqlite use ./my-database.db
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -1440,7 +1672,7 @@ generator: src:nushell
   summary: Creates a string summary of symbol `$in`
   kind: command
   description: Creates a string summary of symbol `$in`
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -1458,7 +1690,7 @@ generator: src:nushell
   summary: Shows the pikadoc tutorial.
   kind: command
   description: Shows the pikadoc tutorial.
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any
@@ -1478,65 +1710,6 @@ generator: src:nushell
       optional: false
       default: null
       kind: return
-- name: doc use
-  summary: Sets the current doctable.
-  kind: command
-  description: |-
-    Sets the current doctable.
-
-    `docs` is either a file in the local filesystem or a pikadoc table.
-
-    Examples
-
-    # Use a docfile from local filesystem
-      ```doc use my-doc-file.pkd```
-
-    # Use a docfile downloaded from a server
-      ```doc use (http get 'https://raw.githubusercontent.com/ArseAssassin/pikadoc/master/reference-docs.pkd'|from yaml)```
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: input
-    - name: docs
-      type: any
-      description: ''
-      optional: false
-      default: null
-      kind: positional
-    - name: command
-      type: string
-      description: ''
-      optional: true
-      default: null
-      kind: positional
-    - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: return
-- name: doc version
-  summary: Returns current pikadoc version
-  kind: command
-  description: Returns current pikadoc version
-  examples: []
-  signatures:
-  - - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: input
-    - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: return
 - name: doc view-source
   summary: Show sources for symbol $in. Fails if `$symbol.defined_in` and `$symbol.source` are undefined. `$env.PKD_CONFIG.pager_command` is used to show the results.
   kind: command
@@ -1544,11 +1717,11 @@ generator: src:nushell
     Show sources for symbol $in. Fails if `$symbol.defined_in` and `$symbol.source` are undefined. `$env.PKD_CONFIG.pager_command` is used to show the results.
 
     ### Examples:
-    ```nushell
+    ```nu
     # Show sources for symbol §0
     doc|get 0|doc view-source
     ```
-  examples: []
+  examples: null
   signatures:
   - - name: null
       type: any

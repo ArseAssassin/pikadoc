@@ -72,7 +72,7 @@ def parse [] {
 # Takes the name of the manual entry as an argument and parses the command line options for that entry. The generated doctable is selected as the current doctable.
 #
 # ### Examples:
-# ```nushell
+# ```nu
 # > doc src:man use "cat"
 # ```
 export def --env use [

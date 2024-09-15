@@ -73,7 +73,7 @@ export def is-jsdoc-module [path:string] {
 # `less $"($env.PKD_HOME)/doc/jsdoc-run"`
 #
 # ### Examples:
-# ```nushell
+# ```nu
 # # Mount jsdocs for ramda.js
 # > doc src:jsdoc use node_modules/ramda/src/
 # ```

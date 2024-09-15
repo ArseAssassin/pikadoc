@@ -5,7 +5,7 @@
 # # Filters input to only symbols that can return values of type `$type`
 # #
 # # ### Examples:
-# # ```nushell
+# # ```nu
 # # doc|where-returns 'int'
 # # ```
 # def where-returns [type:string] {

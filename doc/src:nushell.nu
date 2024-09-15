@@ -3,16 +3,20 @@
 # `name` is the name of the module to document
 def document-module [name:string] {
   scope commands
-  |where {get name|str starts-with $name}
+  |where name starts-with $name
   |each {{
     name:         $"($in.name)"
     summary:      ($in.usage|str trim)
     kind:         command
     description:  ($"($in.usage)\n\n($in.extra_usage)"|str trim)
-    source:       (view source $in.name)
+    source:       (try {
+                    view source $in.name
+                  })
     examples: (
-      $in.examples?
-      |each { $"```nushell\n# ($in.description)\n($in.example)\n# -> ($in.result|to nuon)\n```" }
+      try {
+        $in.examples?
+        |each { $"```nu\n# ($in.description)\n($in.example)\n# -> ($in.result|to nuon)\n```" }
+      }
     )
     signatures: (
       $in.signatures
@@ -49,10 +53,16 @@ def document-module [name:string] {
 # Example: doc src:nushell use "doc"
 export def --env use [
   name:string # the name of the module to document
-] {
+  ] {
   do --env $env.DOC_USE {
     about: {
-      name: $name
+      name: (
+        if ($name != '') {
+          $name
+        } else {
+          'nushell all'
+        }
+      )
       text_format: 'markdown'
       generator: 'src:nushell'
     }

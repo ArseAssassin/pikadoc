@@ -6,7 +6,7 @@ For pikadoc specific configuration, you can examine `$env.PKD_CONFIG`. The value
 
 To persistently change these values, you can use the `pikadocrc.nu`-file. To get started, you can type:
 
-```nushell
+```nu
 cp -n ($env.PKD_HOME|path join 'pikadocrc.example.nu') ($env.PKD_CONFIG_HOME|path join 'pikadocrc.nu')
 ```
 

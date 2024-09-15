@@ -32,5 +32,5 @@ export def 'profile set' [name:string, value:any] {
 }
 
 export def 'doctable id' [] {
-  get about|$"($in.name)~($in.version)"
+  get about|$"($in.name)~($in.version?)"
 }

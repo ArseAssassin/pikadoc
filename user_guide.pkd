@@ -52,7 +52,7 @@ license: MIT
 
     The best way to learn `pikadoc` is by going through the interactive tutorial:
 
-    ```nushell
+    ```nu
     # Inside the `pikadoc` shell
     doc tutor
     ```
@@ -73,7 +73,7 @@ license: MIT
 
     The pkDocs central repository holds documentation for 150+ technologies that are immediately ready to download for use. See [here](https://github.com/ArseAssassin/pkdocs/tree/main/docs/index.yml) for a full listing. These are also available using the [web client](https://tuomas.kanerva.info/pkdocs/).
 
-    ```nushell
+    ```nu
     > doc s use javascript
     ```
 
@@ -83,7 +83,7 @@ license: MIT
 
     Downloads all `md` files from a GitHub repository and indexes them by filename.
 
-    ```nushell
+    ```nu
     > doc src:github use ArseAssassin/pikadoc
     ```
 
@@ -91,7 +91,7 @@ license: MIT
 
     Parses available command line flags from manpages installed locally.
 
-    ```nushell
+    ```nu
     > doc src:man use curl
     ```
 
@@ -99,7 +99,7 @@ license: MIT
 
     Parses documentation from [DevDocs](https://devdocs.io).
 
-    ```nushell
+    ```nu
     > doc src:devdocs use jq
     ```
 
@@ -109,7 +109,7 @@ license: MIT
 
     Parses documentation from a Python package.
 
-    ```nushell
+    ```nu
     > doc src:python use flask
     ```
 
@@ -117,7 +117,7 @@ license: MIT
 
     Parses documentation from an npm package.
 
-    ```nushell
+    ```nu
     > doc src:npm use ramda@0.30.1
     ```
 
@@ -125,7 +125,7 @@ license: MIT
 
     Generates documentation from commands available in the current nushell session.
 
-    ```nushell
+    ```nu
     > doc src:nushell use "doc"
     ```
 
@@ -135,7 +135,7 @@ license: MIT
 
     Uses `psql` to parse definitions from a PostgreSQL database.
 
-    ```nushell
+    ```nu
     > doc src:psql use 'public' '-d' 'my_database'
     ```
 
@@ -143,7 +143,7 @@ license: MIT
 
     Given an sqlite file, generates doctable from all tables and columns.
 
-    ```nushell
+    ```nu
     > doc src:sqlite use ./path-to.db
     ```
 
@@ -151,7 +151,7 @@ license: MIT
 
     Generates documentation from a Swagger API definition file.
 
-    ```nushell
+    ```nu
     > doc src:openapi use "https://petstore.swagger.io/v2/swagger.json"
     ```
 
@@ -263,7 +263,7 @@ license: MIT
 
     To persistently change these values, you can use the `pikadocrc.nu`-file. To get started, you can type:
 
-    ```nushell
+    ```nu
     cp -n ($env.PKD_HOME|path join 'pikadocrc.example.nu') ($env.PKD_CONFIG_HOME|path join 'pikadocrc.nu')
     ```
 
@@ -285,13 +285,13 @@ license: MIT
 
     The simplest possible pikadoc command is `doc`. If you try running it now, you should see a notice telling you that no doctable has been selected for use. To change that, we can run a pikadoc generator to mount one:
 
-    ```nushell
+    ```nu
     doc src:nushell use doc
     ```
 
     The above command generates documentation for the `doc` nushell module. All pikadoc commands are exposed under this module. To get a list of all the commands, you can again run `doc`.
 
-    ```nushell
+    ```nu
     # Show a list of symbols in the current doctable
     doc
     ```
@@ -304,7 +304,7 @@ license: MIT
 
     By default, `doc` displays a summarized list of symbols, limited to 20 search results. `doc page` can be used to browse search results:
 
-    ```nushell
+    ```nu
     # Show more results from your last query
     doc page next
 
@@ -314,14 +314,14 @@ license: MIT
 
     To search for a specific query, you can use `doc <query>`
 
-    ```nushell
+    ```nu
     # Show search results matching 'src:'
     doc 'src:'
     ```
 
     The result list view includes the column `§` as the index of the symbol. To view the symbol, select it from the table:
 
-    ```nushell
+    ```nu
     # Show full description for symbol §0
     doc 0
 
@@ -337,14 +337,14 @@ license: MIT
 
     A great place to start looking for documentation is the PikaDoc central repository. It holds 150+ doctables, pre-generated for your convenince. To get a full list of featured documentation, you can use `doc s index`.
 
-    ```nushell
+    ```nu
     # Show a list of doctables available in the central repository
     doc s index
     ```
 
     To use a doctable from the central repository, you can type `doc s use <name>`:
 
-    ```nushell
+    ```nu
     # Mount `javascript` documentation for use
     doc s use 'javascript'
 
@@ -354,7 +354,7 @@ license: MIT
 
     We can also use `src:github` to download documentation for any project on GitHub:
 
-    ```nushell
+    ```nu
     # Mount `javascript` documentation for use
     doc s use 'javascript'
 
@@ -362,7 +362,7 @@ license: MIT
     doc 'Intl.dateTimeFormat'
     ```
 
-    ```nushell
+    ```nu
     # Download and use files available in the pikadoc GitHub repo
     doc src:github use 'ArseAssassin/pikadoc'
     doc
@@ -370,7 +370,7 @@ license: MIT
 
     To discover more generators, you can list all available documentation sources:
 
-    ```nushell
+    ```nu
     # Show a list of usable generators
     doc src:nushell use doc
     doc 'src:'
@@ -378,7 +378,7 @@ license: MIT
 
     You can also use the `--help` flag to get help on any generator:
 
-    ```nushell
+    ```nu
     # Show usage instructions for `doc src:nushell`
     doc src:nushell use --help
     ```
@@ -390,14 +390,14 @@ license: MIT
 
     Numeric IDs can be difficult to memorize when switching between multiple symbols. The `doc history` command can be used to see a reminder which symbols you've viewed recently.
 
-    ```nushell
+    ```nu
     # Show a summarized list of recent symbols
     doc history
     ```
 
     It can be useful to bookmark certain symbols for future reference. You can use `doc bookmarks` for that.
 
-    ```nushell
+    ```nu
     # Bookmark symbols 10 and 11
     doc bookmarks add 10
     doc bookmarks add 11
@@ -408,7 +408,7 @@ license: MIT
 
     To see a list of recently used doctables, you can use `doc history doctables`.
 
-    ```nushell
+    ```nu
     # Show a list of recently used doctables
     doc history doctables
     ```
@@ -420,14 +420,14 @@ license: MIT
 
     Sometimes we can't find what we need by headlines alone. You can use `doc search` to search through entire symbol definitions:
 
-    ```nushell
+    ```nu
     # Show all symbols with `use` in the description
     doc search 'use'
     ```
 
     Sometimes it's useful to filter symbols by their header metadata. A closure can be passed to `doc` query any field in the full doctable.
 
-    ```nushell
+    ```nu
     # Show all tables with a column named `date`
     doc src:sqlite use ./path-to.db
     doc|where {'date' in ($in.columns|get name)}
@@ -435,7 +435,7 @@ license: MIT
 
     When you query symbols with `doc`, the results are transformed to make them easier to read. Flag `--full` can be used to show the raw symbol when planning queries for advanced filters:
 
-    ```nushell
+    ```nu
     # Get raw data for symbol 0 in current doctable
     doc --full|get 0
     ```
@@ -449,7 +449,7 @@ license: MIT
 
     Here are some additional commands you might find useful:
 
-    ```nushell
+    ```nu
     # Save a doctable in the filesystem
     doc save './doctable.pkd'
 

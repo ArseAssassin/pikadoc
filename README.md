@@ -35,7 +35,7 @@ nix --experimental-features "nix-command flakes" run "github:ArseAssassin/pikado
 
 The best way to learn `pikadoc` is by going through the interactive tutorial:
 
-```nushell
+```nu
 # Inside the `pikadoc` shell
 doc tutor
 ```
@@ -56,7 +56,7 @@ To assist in bringing this about, PikaDoc CLI provides a number of modules out o
 
 The pkDocs central repository holds documentation for 150+ technologies that are immediately ready to download for use. See [here](https://github.com/ArseAssassin/pkdocs/tree/main/docs/index.yml) for a full listing. These are also available using the [web client](https://tuomas.kanerva.info/pkdocs/).
 
-```nushell
+```nu
 > doc s use javascript
 ```
 
@@ -66,7 +66,7 @@ The pkDocs central repository holds documentation for 150+ technologies that are
 
 Downloads all `md` files from a GitHub repository and indexes them by filename.
 
-```nushell
+```nu
 > doc src:github use ArseAssassin/pikadoc
 ```
 
@@ -74,7 +74,7 @@ Downloads all `md` files from a GitHub repository and indexes them by filename.
 
 Parses available command line flags from manpages installed locally.
 
-```nushell
+```nu
 > doc src:man use curl
 ```
 
@@ -82,7 +82,7 @@ Parses available command line flags from manpages installed locally.
 
 Parses documentation from [DevDocs](https://devdocs.io).
 
-```nushell
+```nu
 > doc src:devdocs use jq
 ```
 
@@ -92,7 +92,7 @@ Parses documentation from [DevDocs](https://devdocs.io).
 
 Parses documentation from a Python package.
 
-```nushell
+```nu
 > doc src:python use flask
 ```
 
@@ -100,7 +100,7 @@ Parses documentation from a Python package.
 
 Parses documentation from an npm package.
 
-```nushell
+```nu
 > doc src:npm use ramda@0.30.1
 ```
 
@@ -108,7 +108,7 @@ Parses documentation from an npm package.
 
 Generates documentation from commands available in the current nushell session.
 
-```nushell
+```nu
 > doc src:nushell use "doc"
 ```
 
@@ -118,7 +118,7 @@ Generates documentation from commands available in the current nushell session.
 
 Uses `psql` to parse definitions from a PostgreSQL database.
 
-```nushell
+```nu
 > doc src:psql use 'public' '-d' 'my_database'
 ```
 
@@ -126,7 +126,7 @@ Uses `psql` to parse definitions from a PostgreSQL database.
 
 Given an sqlite file, generates doctable from all tables and columns.
 
-```nushell
+```nu
 > doc src:sqlite use ./path-to.db
 ```
 
@@ -134,7 +134,7 @@ Given an sqlite file, generates doctable from all tables and columns.
 
 Generates documentation from a Swagger API definition file.
 
-```nushell
+```nu
 > doc src:openapi use "https://petstore.swagger.io/v2/swagger.json"
 ```
 

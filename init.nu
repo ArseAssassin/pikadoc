@@ -1,6 +1,6 @@
 let PROMPT_COMMAND_OLD = $env.PROMPT_COMMAND
 $env.PROMPT_COMMAND = {||
-  $"pikadoc \(($env.PKD_CURRENT?.about?.generator?): ($env.PKD_CURRENT?.about.name|default 'none')\) (do $PROMPT_COMMAND_OLD)"
+  $"pikadoc (if ((doc lib index) != []) { '*' })\(($env.PKD_CURRENT?.about?.generator?): ($env.PKD_CURRENT?.about.name|default 'none')\) (do $PROMPT_COMMAND_OLD)"
 }
 
 let PROMPT_COMMAND_RIGHT_OLD = $env.PROMPT_COMMAND_RIGHT
@@ -13,7 +13,7 @@ $env.PROMPT_COMMAND_RIGHT = {
 }
 
 $env.DOC_USE = {|docs, command?:string|
-  doc use $docs $command
+  doc pkd use $docs $command
 }
 
 $env.DOC = {|query|
@@ -55,7 +55,9 @@ $env.PKD_CONFIG = {
   summarize_command: {
     let table = $in
 
-    if ('signatures' in ($table|columns)) {
+    if ('matches' in ($table|columns)) {
+      $table|select '§'? ns? name? kind? matches
+    } else if ('signatures' in ($table|columns)) {
       $table
       |upsert signatures {|row| $row.signatures?|default []|doc present-signatures }
       |select '§'? ns? name? kind? summary? signatures?
@@ -140,7 +142,9 @@ $env.pkd = {
   results: null
 }
 
-alias 'doc save' = doc doctable save
+alias 'doc use' = doc pkd use
+alias 'doc save' = doc pkd save
+alias 'doc version' = doc pkd version
 alias 'doc more' = doc page next
 
 source (if ('~/.config/pikadoc/pikadocrc.nu'|path exists) {

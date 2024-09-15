@@ -6,7 +6,7 @@ use src:jsdoc.nu
 # if available.
 #
 # ### Examples:
-# ```nushell
+# ```nu
 # # Generate docs for ramda.js npm package
 # > doc src:npm use ramda
 #

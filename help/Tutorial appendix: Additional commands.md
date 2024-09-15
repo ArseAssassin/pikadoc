@@ -2,7 +2,7 @@
 
 Here are some additional commands you might find useful:
 
-```nushell
+```nu
 # Save a doctable in the filesystem
 doc save './doctable.pkd'
 

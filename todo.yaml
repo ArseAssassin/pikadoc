@@ -1,0 +1,42 @@
+- task: glow mangles whitespace
+  tags: [bug]
+  description: |
+    Run the code below:
+
+    ```nu
+    http get 'https://raw.githubusercontent.com/nushell/nushell.github.io/main/lang-guide/chapters/filters/each-par-each.md'
+    |glow -sauto
+    |complete
+    |get stdout
+    ```
+
+    nushell formatted tables come out with mangled newlines.
+- task: possible nushell bugs
+  subtasks:
+  - task: "`default -1` parses `-1` as a flag"
+    description: |
+      Run the code below:
+
+      ```nu
+      default -1
+
+        Error: nu::parser::unknown_flag
+
+        × The `default` command doesn't have flag `-1`.
+        ...
+      ```
+
+  - task: "`error make.examples.results` errors out nushell"
+    description: |
+      Run the code below:
+
+      ```nu
+      scope commands|where name == 'error make'|get 0.examples|select result
+      ```
+
+      This causes the shell to error out without returning any results.
+---
+
+views:
+  default:
+    where: ..|select_task|select(.status != "done")

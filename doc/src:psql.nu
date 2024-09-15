@@ -54,7 +54,7 @@ def parse-psql-array [] {
 # Queries a PostgreSQL database for definitions. All tables, views and functions that can be found are mounted as a doctable.
 #
 # ### Examples:
-# ```nushell
+# ```nu
 # # Parses database 'my_database'.'schema' for definitions
 # > doc src:psql use 'public' '-d' 'my_database'
 # ```

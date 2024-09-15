@@ -1,7 +1,7 @@
 # Generates a doctable from Python `$module`. Invokes `$env.PKD_CONFIG.python_command` to run a script using `python3` found using PATH. Doesn't install packages.
 #
 # ### Examples:
-# ```nushell
+# ```nu
 # # Generates a doctable from a locally installed package
 # > doc src:python use flask
 #

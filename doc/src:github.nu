@@ -10,7 +10,7 @@ def download-file [repo:string, branch:string, path:string] {
 # not passed an argument, default branch of the project is chosen.
 #
 # ### Examples:
-# ```nushell
+# ```nu
 # # Use the docs available in the pikadoc GitHub repository
 # > doc src:github use ArseAssassin/pikadoc
 #

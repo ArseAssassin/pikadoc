@@ -319,10 +319,10 @@ license: MIT
     doc 'src:'
     ```
 
-    The result list view includes the column `#` as the index of the symbol. To view the symbol, select it from the table:
+    The result list view includes the column `§` as the index of the symbol. To view the symbol, select it from the table:
 
     ```nushell
-    # Show full description for symbol #0
+    # Show full description for symbol §0
     doc 0
 
     # Symbol can be selected from a list as well
@@ -453,7 +453,7 @@ license: MIT
     # Save a doctable in the filesystem
     doc save './doctable.pkd'
 
-    # View source code for symbol #0
+    # View source code for symbol §0
     doc 0|doc view-source
 
     # Return a list of doctables cached in the local filesystem

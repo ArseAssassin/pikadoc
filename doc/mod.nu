@@ -1,4 +1,8 @@
 export use cache.nu
+export use history.nu
+export use bookmarks.nu
+export use page.nu
+export use lib.nu
 
 export use s.nu
 export use tutor.nu
@@ -14,10 +18,6 @@ export use src:jsdoc.nu
 export use src:npm.nu
 export use src:godot.nu
 export use src:html.nu
-
-export use history.nu
-export use bookmarks.nu
-export use page.nu
 
 # Filters current doctable using $query. If $query is null, returns full list of all symbols in current doctable. If $query is `int`, gets symbol with that index.
 #
@@ -57,7 +57,7 @@ export def --env main [
   }
 
   if (($query|describe) == 'int') {
-    $docs|where {$in.'#' == ($query)}|first
+    $docs|where {$in.'§' == ($query)}|first
   } else if (($query|describe) == 'string') {
     let query = ($query|str downcase)
     let search = (
@@ -65,14 +65,13 @@ export def --env main [
     )
 
     $search
-    |insert dist {|row| (
+    |insert relevance {|row| (
       (($row.name|ansi strip|str downcase|str index-of $query|if ($in == -1) { 100 } else { $in }) * 100) +
       (($row.name|ansi strip|str distance $query)) * 100 +
       (($row.summary?|default ''|ansi strip|str downcase|find $query|length) * -10) +
       ($row.description?|default ''|ansi strip|str downcase|find $query|length) * -1
     )}
-    |sort-by dist
-    |reject dist
+    |sort-by relevance
   } else {
     $docs
   }
@@ -152,24 +151,24 @@ export def --env search [
 
   main
   |find $query -c ['description']
-  |insert ranking {|row| (
+  |insert relevance {|row| (
     $row.description
     |ansi strip
     |grep -F -i -o $query
     |lines
     |length
   ) * -1}
-  |sort-by ranking
+  |sort-by relevance
   |insert matches {|row|
     $row.description
     |grep -F -i $query -A0 -B0 --group-separator='...' -m 5
   }
-  |select '#' name matches
+  |select '§' name matches
   |output --full
 }
 
 def add-doc-ids [] {
-  zip 0..|each {|vals| {'#': $vals.1}|merge $vals.0}
+  zip 0..|each {|vals| {'§': $vals.1}|merge $vals.0}
 }
 
 def result-lines [] {
@@ -265,7 +264,7 @@ export def pkd-doctable [] {
 }
 
 export def summarize [] {
-  select '#'? ns? name? kind? summary?
+  select '§'? ns? name? kind? summary?
   |if ($in.ns? == null) {
     update ns ''
   } else {
@@ -472,7 +471,7 @@ def cache-docs [name:string, docs:record] {
 #
 # ### Examples:
 # ```nushell
-# # Show sources for symbol #0
+# # Show sources for symbol §0
 # doc|get 0|doc view-source
 # ```
 export def view-source [] {
@@ -490,4 +489,8 @@ export def view-source [] {
 # Returns configuration value for $name
 export def pkd-config [name:string] {
   $env.PKD_CONFIG|get $name
+}
+
+export def 'use help' [] {
+  do --env $env.DOC_USE ($env.PKD_HOME|path join 'user_guide.pkd')
 }

@@ -31,3 +31,6 @@ export def 'profile set' [name:string, value:any] {
   profile|merge {$name: $value}|to yaml|save -f (profile file)
 }
 
+export def 'doctable id' [] {
+  get about|$"($in.name)~($in.version)"
+}

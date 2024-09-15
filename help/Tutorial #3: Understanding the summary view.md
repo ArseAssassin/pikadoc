@@ -17,10 +17,10 @@ To search for a specific query, you can use `doc <query>`
 doc 'src:'
 ```
 
-The result list view includes the column `#` as the index of the symbol. To view the symbol, select it from the table:
+The result list view includes the column `§` as the index of the symbol. To view the symbol, select it from the table:
 
 ```nushell
-# Show full description for symbol #0
+# Show full description for symbol §0
 doc 0
 
 # Symbol can be selected from a list as well

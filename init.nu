@@ -58,10 +58,10 @@ $env.PKD_CONFIG = {
     if ('signatures' in ($table|columns)) {
       $table
       |upsert signatures {|row| $row.signatures?|default []|doc present-signatures }
-      |select '#'? ns? name? kind? summary? signatures?
+      |select '§'? ns? name? kind? summary? signatures?
     } else {
       $table
-      |select '#'? ns? name? kind? summary?
+      |select '§'? ns? name? kind? summary?
     }
   }
   table_max_rows: 20
@@ -75,9 +75,9 @@ let config = $env.config|upsert hooks {
     let is_output_list = (
       (
         ($output_type|str starts-with 'list<any') and
-        ('#' in ($output|columns))
+        ('§' in ($output|columns))
       ) or
-      ($output_type|str starts-with 'table<#: int')
+      ($output_type|str starts-with 'table<§: int')
     )
 
     let should_page = (
@@ -94,9 +94,9 @@ let config = $env.config|upsert hooks {
 
     if (
       $should_summarize and
-      ($output_type|str starts-with 'record<#: int')
+      ($output_type|str starts-with 'record<§: int')
     ) {
-      $output.'#'|doc history symbols add
+      $output.'§'|doc history symbols add
       $output|do $env.PKD_CONFIG.present_symbol_command
     } else if ($is_output_list) {
       if (not $should_skip_pager) {
@@ -133,6 +133,7 @@ $env.pkd = {
   summarize_output: true
   page_output: true
   symbol_history: []
+  lib: []
   cursor: 0
   page_summarize: true
   skip_pager: false

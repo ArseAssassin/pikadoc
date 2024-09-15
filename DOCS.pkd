@@ -449,6 +449,96 @@ generator: src:nushell
       optional: false
       default: null
       kind: return
+- name: doc lib add
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: mount
+      type: closure()
+      description: ''
+      optional: true
+      default: null
+      kind: positional
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc lib index
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc lib query
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: query
+      type: closure()
+      description: ''
+      optional: false
+      default: null
+      kind: positional
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc lib use
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: doctable
+      type: any
+      description: ''
+      optional: false
+      default: null
+      kind: positional
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
 - name: doc output
   summary: Controls displayed output. If `--all` is set, displayed results won't be paged. If `--full` is set, symbols won't be summarized or formatted for output.
   kind: command
@@ -1351,6 +1441,24 @@ generator: src:nushell
       optional: false
       default: null
       kind: return
+- name: doc use help
+  summary: ''
+  kind: command
+  description: ''
+  examples: []
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
 - name: doc version
   summary: Returns current pikadoc version
   kind: command
@@ -1377,7 +1485,7 @@ generator: src:nushell
 
     ### Examples:
     ```nushell
-    # Show sources for symbol #0
+    # Show sources for symbol §0
     doc|get 0|doc view-source
     ```
   examples: []

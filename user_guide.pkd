@@ -17,8 +17,6 @@ license: MIT
   description: |
     # PikaDoc
 
-    *It's like man pages, but for reference docs*
-
     PikaDoc is a human-readable, structured documentation format. `pkd`-files don't ship as HTML files, but as already indexed data tables, ready to be explored on the command line or your browser.
 
     Currently there are two PikaDoc clients: the `pikadoc` CLI maintained in this repository and the [web interface](https://tuomas.kanerva.info/pkdocs/) for reading docs stored in the [pkDocs central repository](https://github.com/ArseAssassin/pkdocs/tree/main/docs).
@@ -425,12 +423,15 @@ license: MIT
     doc search 'use'
     ```
 
-    Sometimes it's useful to filter symbols by their header metadata. A closure can be passed to `doc` query any field in the full doctable.
+    Sometimes it's useful to filter symbols by their header metadata. pikadoc treats doctables as regular nushell values, and as such, regular nushell filters can be used to query them:
 
     ```nu
     # Show all tables with a column named `date`
     doc src:sqlite use ./path-to.db
     doc|where {'date' in ($in.columns|get name)}
+
+    # To find out more about the help command
+    where --help
     ```
 
     When you query symbols with `doc`, the results are transformed to make them easier to read. `doc output --full` can be used to show the raw symbol when planning queries for advanced filters:
@@ -440,7 +441,7 @@ license: MIT
     doc|get 0|doc output --full
     ```
 
-    This covers the basics of reading and generating doctables using pikadoc. If you're curious about more advanced usage, feel free to keep working through this tutorial.
+    This covers the basics of reading and generating doctables using pikadoc. The full user guide for pikadoc can be accessed by typing `doc help`. If you're curious about more advanced usage, feel free to keep working through this tutorial.
 
 - name: 'Tutorial appendix: Documentation libraries'
   kind: 'tutorial'
@@ -460,7 +461,7 @@ license: MIT
     doc s use html
     doc lib add
 
-    # We can also pass a block to `doc lib add`
+    # We can also pass a closure to `doc lib add`
     doc lib add { doc s use css }
 
     doc lib index
@@ -516,6 +517,6 @@ license: MIT
     doc cache clear
 
     # Show metadata about the currently mounted doctable
-    doc pkd-about
+    doc pkd about
     ```
 

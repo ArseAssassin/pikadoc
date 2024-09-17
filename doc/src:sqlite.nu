@@ -3,7 +3,7 @@
 # `in` is a valid sqlite database.
 #
 # Example: open my-database.db|doc src:sqlite parse-from-db
-export def parse-from-db [] {
+def parse-from-db [] {
   let $db = $in
   let tables = $db|query db 'SELECT type, name, sql FROM sqlite_master WHERE name not like "sqlite_%"'
 

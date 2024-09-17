@@ -64,7 +64,7 @@ def parse-from-jsdoc [] {
 
 # Attempts to detect whether given path contains any jsdoc annotations
 # in .js files.
-export def is-jsdoc-module [path:string] {
+def is-jsdoc-module [path:string] {
   cd $path
   (grep -qs '\\* @' **/*.js -m1 --exclude-dir=*.js|complete|get exit_code) == 0
 }

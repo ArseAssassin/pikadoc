@@ -13,7 +13,7 @@ doc lib index
 doc s use html
 doc lib add
 
-# We can also pass a block to `doc lib add`
+# We can also pass a closure to `doc lib add`
 doc lib add { doc s use css }
 
 doc lib index

@@ -16,5 +16,5 @@ doc cache
 doc cache clear
 
 # Show metadata about the currently mounted doctable
-doc pkd-about
+doc pkd about
 ```

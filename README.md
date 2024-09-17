@@ -1,7 +1,5 @@
 # PikaDoc
 
-*It's like man pages, but for reference docs*
-
 PikaDoc is a human-readable, structured documentation format. `pkd`-files don't ship as HTML files, but as already indexed data tables, ready to be explored on the command line or your browser.
 
 Currently there are two PikaDoc clients: the `pikadoc` CLI maintained in this repository and the [web interface](https://tuomas.kanerva.info/pkdocs/) for reading docs stored in the [pkDocs central repository](https://github.com/ArseAssassin/pkdocs/tree/main/docs).

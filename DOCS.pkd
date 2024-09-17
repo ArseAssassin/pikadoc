@@ -1356,34 +1356,6 @@ generator: src:nushell
       optional: false
       default: null
       kind: return
-- name: doc src:jsdoc is-jsdoc-module
-  summary: |-
-    Attempts to detect whether given path contains any jsdoc annotations
-    in .js files.
-  kind: command
-  description: |-
-    Attempts to detect whether given path contains any jsdoc annotations
-    in .js files.
-  examples: null
-  signatures:
-  - - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: input
-    - name: path
-      type: string
-      description: ''
-      optional: false
-      default: null
-      kind: positional
-    - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: return
 - name: doc src:jsdoc use
   summary: |-
     Parses doctable using `jsdoc -X`. For more details on how jsdoc is invoked, you can run:
@@ -1634,29 +1606,6 @@ generator: src:nushell
       optional: false
       default: null
       kind: positional
-    - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: return
-- name: doc src:sqlite parse-from-db
-  summary: Returns documentation for all tables, columns and indexes in a sqlite database.
-  kind: command
-  description: |-
-    Returns documentation for all tables, columns and indexes in a sqlite database.
-
-    `in` is a valid sqlite database.
-
-    Example: open my-database.db|doc src:sqlite parse-from-db
-  examples: null
-  signatures:
-  - - name: null
-      type: any
-      description: null
-      optional: false
-      default: null
-      kind: input
     - name: null
       type: any
       description: null

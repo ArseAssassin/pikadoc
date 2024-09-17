@@ -154,7 +154,7 @@ export def save [library_file:string, doc_path?:string=''] {
 
   $docs
   |each {|file| {
-    path: ($file)
+    name: ($file)
   }}
   |to yaml
   |do {$"# This is a pikadoc library index file. Check paths listed below for the actual documentation files:\n($in)"}
@@ -167,15 +167,26 @@ export def save [library_file:string, doc_path?:string=''] {
 }
 
 # Loads a saved `$library_file` and replaces the current library with it. Assumes that all doctables are stored in relative path to `$library_file`.
-export def --env load [library_file:string] {
+export def --env load [
+  library_file:string # path to the pikadoc library file
+  ] {
   cd ($library_file|path dirname)
 
-  set (
+  load files (
     open ($library_file|path basename)
     |from yaml
+  )
+}
+
+# Loads files from a list returned by `ls`
+export def --env 'load files' [
+  files:list<any> # list of files returned by `ls`
+  ] {
+  set (
+    $files
     |each {|doctable|
       do {
-        pkd use $doctable.path
+        pkd use $doctable.name
         pkd full
       }
     }

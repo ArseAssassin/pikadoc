@@ -15,11 +15,11 @@ doc src:sqlite use ./path-to.db
 doc|where {'date' in ($in.columns|get name)}
 ```
 
-When you query symbols with `doc`, the results are transformed to make them easier to read. Flag `--full` can be used to show the raw symbol when planning queries for advanced filters:
+When you query symbols with `doc`, the results are transformed to make them easier to read. `doc output --full` can be used to show the raw symbol when planning queries for advanced filters:
 
 ```nu
 # Get raw data for symbol 0 in current doctable
-doc --full|get 0
+doc|get 0|doc output --full
 ```
 
 This covers the basics of reading and generating doctables using pikadoc. If you're curious about more advanced usage, feel free to keep working through this tutorial.

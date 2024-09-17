@@ -535,7 +535,31 @@ generator: src:nushell
       kind: input
     - name: library_file
       type: string
-      description: ''
+      description: path to the pikadoc library file
+      optional: false
+      default: null
+      kind: positional
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc lib load files
+  summary: Loads files from a list returned by `ls`
+  kind: command
+  description: Loads files from a list returned by `ls`
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: files
+      type: list<any>
+      description: list of files returned by `ls`
       optional: false
       default: null
       kind: positional

@@ -135,3 +135,5 @@ docs
 # Added by cargo
 
 /target
+
+.pikadocs

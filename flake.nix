@@ -17,7 +17,7 @@
           pkgs = import nixpkgs {
             inherit system;
           };
-          version-number = "1.0.0-${if (self ? rev) then self.rev else "dirty"}";
+          version-number = "1.0.0RC1-${if (self ? rev) then self.rev else "dirty"}";
         in
         rec {
           packages.pikadoc =

@@ -1,6 +1,6 @@
 # PikaDoc
 
-PikaDoc is a human-readable, structured documentation format. `pkd`-files don't ship as HTML files, but as already indexed data tables, ready to be explored on the command line or your browser.
+PikaDoc is an offline-first documentation reader and generator that aims to end developer reliance on web search engines for official documentation. To do this, it caches all data locally using `.pkd`-files, a human-readable, structured documentation format. At the moment PikaDoc maintains documentation for 150+ modern programming languages/frameworks/libraries in the central repository, and supports automatically generating docs from more than a dozen other sources.
 
 Currently there are two PikaDoc clients: the `pikadoc` CLI maintained in this repository and the [web interface](https://tuomas.kanerva.info/pkdocs/) for reading docs stored in the [pkDocs central repository](https://github.com/ArseAssassin/pkdocs/tree/main/docs).
 
@@ -36,9 +36,12 @@ The best way to learn `pikadoc` is by going through the interactive tutorial:
 ```nu
 # Inside the `pikadoc` shell
 doc tutor
+
+# The user guide can be found by typing
+doc help
 ```
 
-The tutorial can also be viewed under the [`help/` directory](help/).
+The user guide can be found under the [`help/` directory](help/).
 
 ### PikaDoc web
 

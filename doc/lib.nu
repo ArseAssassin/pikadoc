@@ -173,11 +173,15 @@ export def save [library_file:string, doc_path?:string=''] {
 export def --env load [
   library_file:string # path to the pikadoc library file
   ] {
-  cd ($library_file|path dirname)
-
   load files (
-    open ($library_file|path basename)
+    open ($library_file)
     |from yaml
+    |each {|row|
+      $row
+      |merge {
+        name: (($library_file|path dirname)|path join $row.name)
+      }
+    }
   )
 }
 

@@ -503,6 +503,30 @@ generator: src:nushell
       optional: false
       default: null
       kind: return
+- name: doc lib concat
+  summary: Concatenates $doctables to current libraryu
+  kind: command
+  description: Concatenates $doctables to current libraryu
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: doctables
+      type: list<any>
+      description: ''
+      optional: false
+      default: null
+      kind: positional
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
 - name: doc lib index
   summary: Lists all doctables in the current library
   kind: command
@@ -657,6 +681,30 @@ generator: src:nushell
       description: ''
       optional: true
       default: ''
+      kind: positional
+    - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: return
+- name: doc lib set
+  summary: Sets current library to $doctables
+  kind: command
+  description: Sets current library to $doctables
+  examples: null
+  signatures:
+  - - name: null
+      type: any
+      description: null
+      optional: false
+      default: null
+      kind: input
+    - name: doctables
+      type: list<any>
+      description: replaces current library
+      optional: false
+      default: null
       kind: positional
     - name: null
       type: any
@@ -1468,6 +1516,12 @@ generator: src:nushell
       optional: false
       default: null
       kind: positional
+    - name: no-sections
+      type: bool
+      description: ''
+      optional: true
+      default: null
+      kind: flag
     - name: null
       type: any
       description: null

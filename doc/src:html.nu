@@ -43,9 +43,6 @@ export def --env use [
           html: (
             open $file.name
             |do $env.PKD_CONFIG.tidy_command
-            |complete
-            |get stdout
-            |str replace ' xmlns="http://www.w3.org/1999/xhtml"' ""
             |hxunent -b
             |if ($options.language? != null) {
               xmlstarlet ed --update '//pre/@class' --value $options.language

@@ -35,7 +35,7 @@ export def --env add [mount?:closure] {
       $env.PKD_CURRENT
     }
   )
-  $env.pkd.lib = (
+  set (
     lib
     |append $doctable
     |uniq
@@ -44,7 +44,10 @@ export def --env add [mount?:closure] {
   index
 }
 
-def --env set [doctables:list<any>] {
+# Sets current library to $doctables
+export def --env set [
+  doctables:list<any> # replaces current library
+] {
   $env.pkd.lib = $doctables
 }
 
@@ -170,11 +173,15 @@ export def save [library_file:string, doc_path?:string=''] {
 export def --env load [
   library_file:string # path to the pikadoc library file
   ] {
-  cd ($library_file|path dirname)
-
   load files (
-    open ($library_file|path basename)
+    open ($library_file)
     |from yaml
+    |each {|row|
+      $row
+      |merge {
+        name: (($library_file|path dirname)|path join $row.name)
+      }
+    }
   )
 }
 
@@ -193,4 +200,12 @@ export def --env 'load files' [
   )
 
   pkd use (lib|first)
+}
+
+# Concatenates $doctables to current libraryu
+export def --env concat [
+  doctables:list<any>
+] {
+  set ((lib) ++ $doctables)
+  index
 }

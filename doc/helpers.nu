@@ -1,12 +1,12 @@
 export def markdown-to-summary [] {
   pandoc -f gfm -t html --wrap=none
-  |hxnormalize -x
+  |do $env.PKD_CONFIG.tidy_command
   |hxunent -b
   |xmlstarlet select -t --value-of '//p[contains(., '.')][1]'
   |lines
   |each {|| str trim}
   |str join ' '
-  |split row '.'
+  |split row -r '\.($|\s)'
   |get 0
   |str trim
 }

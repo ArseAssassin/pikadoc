@@ -35,7 +35,7 @@ export def --env add [mount?:closure] {
       $env.PKD_CURRENT
     }
   )
-  $env.pkd.lib = (
+  set (
     lib
     |append $doctable
     |uniq
@@ -44,7 +44,10 @@ export def --env add [mount?:closure] {
   index
 }
 
-def --env set [doctables:list<any>] {
+# Sets current library to $doctables
+export def --env set [
+  doctables:list<any> # replaces current library
+] {
   $env.pkd.lib = $doctables
 }
 
@@ -193,4 +196,12 @@ export def --env 'load files' [
   )
 
   pkd use (lib|first)
+}
+
+# Concatenates $doctables to current libraryu
+export def --env concat [
+  doctables:list<any>
+] {
+  set ((lib) ++ $doctables)
+  index
 }

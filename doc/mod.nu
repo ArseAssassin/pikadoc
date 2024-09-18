@@ -21,6 +21,7 @@ export use src:npm.nu
 export use src:godot.nu
 export use src:html.nu
 export use src:md.nu
+export use src:git.nu
 
 # Filters current doctable using $query. If $query is null, returns full list of all symbols in current doctable. If $query is `int`, returns symbol with that index.
 #

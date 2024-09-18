@@ -32,12 +32,15 @@ $env.PKD_CONFIG = {
     run-external 'npx' ...$args
   }
   tidy_command: {||
-   tidy -c --output-xhtml yes --doctype omit
+    tidy -c --output-xhtml yes --doctype omit
+    |complete
+    |get stdout
+    |str replace ' xmlns="http://www.w3.org/1999/xhtml"' ""
   }
   pager_command: {|file?:string, line?:int|
     let s = $in
     if ($file == null and $s != null) {
-      if (($s|lines|length) >= (term size).rows) {
+      if (($s|lines|length) >= ((term size).rows - 1)) {
         $s|less -r
       } else {
         $s

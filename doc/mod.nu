@@ -22,7 +22,9 @@ export use src:godot.nu
 export use src:html.nu
 export use src:md.nu
 
-# Filters current doctable using $query. If $query is null, returns full list of all symbols in current doctable. If $query is `int`, returns symbol with that index.
+# Filters current doctable using $query.
+#
+# If $query is null, returns full list of all symbols in current doctable. If $query is `int`, returns symbol with that index.
 #
 # By default search results are paged according to `$env.PKD_CONFIG.table_max_rows` (use `doc page next` to show more results). In addition, all results are summarized using `$env.PKD_CONFIG.summarize_command`.
 #
@@ -62,7 +64,7 @@ export def --env main [
     )
 
     $search
-    |insert relevance {|row| (
+    |upsert relevance {|row| (
       (($row.name|ansi strip|str downcase|str index-of $query|if ($in == -1) { 100 } else { $in }) * 100) +
       (($row.name|ansi strip|str distance $query)) * 100 +
       (($row.summary?|default ''|ansi strip|str downcase|find $query|length) * -10) +
@@ -97,21 +99,32 @@ export def --env output [
 }
 
 # Returns a table of recently used symbols
-export def --env history [] {
+export def --env history [index?:int] {
   let docs = main
 
   history symbols
   |reverse
   |each {|index| $docs|get $index}
+  |if ($index != null) {
+    get $index
+  } else {
+    $in
+  }
 }
 
 # Returns a table of bookmarked symbols
-export def --env bookmarks [] {
+export def --env bookmarks [index?:int] {
   let docs = main
 
   bookmarks current
   |reverse
   |each {|index| $docs|get $index}
+  |if ($index != null) {
+    get $index
+  } else {
+    $in
+  }
+
 }
 
 # Returns the children of symbol `$in` as indicated by `belongs_to`
@@ -150,7 +163,7 @@ export def --env search [
 
   main
   |find $query -c ['description']
-  |insert relevance {|row| (
+  |upsert relevance {|row| (
     $row.description
     |ansi strip
     |grep -F -i -o $query
@@ -193,7 +206,7 @@ def present-type [] {
   $"($type.name?)(if (($type.name?|default '') != '' and ($type.type?|default '') != '') { ':' })($type.type?)(if ($type.optional? == true) { '?' })(if ($type.rest? == true) {
     '...'
   })(if ($type.default? != null) {
-    '=' + ($type.default|to nuon)
+    '=' + ($type.default)
   })"
 }
 

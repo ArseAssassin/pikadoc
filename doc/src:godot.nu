@@ -18,6 +18,7 @@ def parse-signature [] {
       kind: 'positional'
       name: $param.attributes.name
       type: $param.attributes.type
+      default: $param.attributes.default?
     }}
   ) ++ (
     $params
@@ -145,6 +146,16 @@ export def --env use [path:string] {
                 value: $constant.attributes.value?
                 belongs_to: $xml.attributes.name
               }|add-text-fields $constant)
+          }) ++ (
+            get-content 'signals'
+            |each {|signal|
+              ({
+                kind: 'signal'
+                name: $"($xml.attributes.name).($signal.attributes.name)"
+                value: $signal.attributes.value?
+                signatures: [($signal.content|parse-signature)]
+                belongs_to: $xml.attributes.name
+              }|add-text-fields ($signal.content|where tag == 'description'|get 0?))
           })
         }
         |flatten

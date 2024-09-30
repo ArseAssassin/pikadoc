@@ -5,10 +5,12 @@ generator: src:nushell
 
 ---
 - name: doc
-  summary: Filters current doctable using $query. If $query is null, returns full list of all symbols in current doctable. If $query is `int`, returns symbol with that index.
+  summary: Filters current doctable using $query.
   kind: command
   description: |-
-    Filters current doctable using $query. If $query is null, returns full list of all symbols in current doctable. If $query is `int`, returns symbol with that index.
+    Filters current doctable using $query.
+
+    If $query is null, returns full list of all symbols in current doctable. If $query is `int`, returns symbol with that index.
 
     By default search results are paged according to `$env.PKD_CONFIG.table_max_rows` (use `doc page next` to show more results). In addition, all results are summarized using `$env.PKD_CONFIG.summarize_command`.
 
@@ -58,6 +60,12 @@ generator: src:nushell
       optional: false
       default: null
       kind: input
+    - name: index
+      type: int
+      description: ''
+      optional: true
+      default: null
+      kind: positional
     - name: null
       type: any
       description: null
@@ -311,6 +319,12 @@ generator: src:nushell
       optional: false
       default: null
       kind: input
+    - name: index
+      type: int
+      description: ''
+      optional: true
+      default: null
+      kind: positional
     - name: null
       type: any
       description: null

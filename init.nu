@@ -35,7 +35,7 @@ $env.PKD_CONFIG = {
     tidy -c --output-xhtml yes --doctype omit
     |complete
     |get stdout
-    |str replace ' xmlns="http://www.w3.org/1999/xhtml"' ""
+    |str replace -a ' xmlns="http://www.w3.org/1999/xhtml"' ""
   }
   pager_command: {|file?:string, line?:int|
     let s = $in
@@ -60,13 +60,21 @@ $env.PKD_CONFIG = {
 
     if ('matches' in ($table|columns)) {
       $table|select '§'? ns? name? kind? matches
-    } else if ('signatures' in ($table|columns)) {
-      $table
-      |upsert signatures {|row| $row.signatures?|default []|doc present-signatures }
-      |select '§'? ns? name? kind? summary? signatures?
     } else {
-      $table
-      |select '§'? ns? name? kind? summary?
+      if ('signatures' in ($table|columns)) {
+        $table
+        |upsert type {|row|
+          $row.type?
+          |default ($row.signatures?|default []|doc present-signatures)
+        }
+      } else {
+        $table
+      }
+      |if ('type' in ($in|columns)) {
+        select '§'? ns? name? kind? summary? type?
+      } else {
+        select '§'? ns? name? kind? summary?
+      }
     }
   }
   table_max_rows: 20

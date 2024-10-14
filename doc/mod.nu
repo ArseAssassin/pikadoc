@@ -206,7 +206,7 @@ def present-type [] {
   $"($type.name?)(if (($type.name?|default '') != '' and ($type.type?|default '') != '') { ':' })($type.type?)(if ($type.optional? == true) { '?' })(if ($type.rest? == true) {
     '...'
   })(if ($type.default? != null) {
-    '=' + ($type.default)
+    '=' + ($type.default?|to nuon)
   })"
 }
 
